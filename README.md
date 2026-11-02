@@ -9,7 +9,7 @@ Relis (**RE**ading + **LIS**tening) là web luyện đề IELTS Reading và List
 | Tài liệu | Link |
 |---|---|
 | User stories, Site diagram, Thiết kế dữ liệu, REST API (các tab trong cùng tài liệu) | https://claude.ai/artifact/3mLLoyc5j3wyFofXYzcG9Q |
-| Hướng dẫn Sprint 0 | [docs/sprint-0-guide.md](docs/sprint-0-guide.md) |
+| Hướng dẫn Sprint 0 · Sprint 1 | [docs/sprint-0-guide.md](docs/sprint-0-guide.md) · [docs/sprint-1-guide.md](docs/sprint-1-guide.md) |
 | Wireframe (bấm thử được) | https://claude.ai/artifact/94SMziHvK7AhzPuf9QAPbG |
 | Drive của nhóm (bản chụp theo mốc, báo cáo) | https://drive.google.com/drive/folders/1qqBiZ8i43wJcxnqG-dlJYyr3iRymBXF0 |
 
