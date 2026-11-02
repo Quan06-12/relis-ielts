@@ -1,0 +1,16 @@
+name: Task
+description: Việc kỹ thuật không phải story (setup, refactor, deploy)
+labels: ["task"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: Việc cần làm
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: Xong khi
+      value: |
+        - [ ] 

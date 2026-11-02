@@ -1,0 +1,33 @@
+name: User story
+description: Một user story trong Product Backlog
+title: "USxx · "
+labels: ["story"]
+body:
+  - type: textarea
+    id: story
+    attributes:
+      label: User story
+      placeholder: "Là <vai trò>, tôi muốn <việc> để <lợi ích>."
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Tiêu chí chấp nhận
+      description: Mỗi tiêu chí một dòng checkbox.
+      value: |
+        - [ ] 
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Ưu tiên
+      options: [Must, Should, Could]
+    validations:
+      required: true
+  - type: input
+    id: screen
+    attributes:
+      label: Màn hình wireframe
+      placeholder: "Ví dụ: 09 Làm bài · Reading"
