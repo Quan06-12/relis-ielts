@@ -1,0 +1,46 @@
+/* Design tokens taken from the wireframe */
+:root {
+  --purple: #6b50e3;
+  --purple-dark: #5a3fd6;
+  --yellow: #ffc531;
+  --reading: #6b50e3;
+  --listening: #c2410c;
+  --overall: #2f7a3b;
+  --text: #1e1640;
+  --text-muted: #6b6785;
+  --border: #e6e3f0;
+  --background: #f7f6fb;
+  --white: #ffffff;
+  --radius: 12px;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text);
+  background: var(--background);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--purple);
+  outline-offset: 2px;
+}
+
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
