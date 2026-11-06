@@ -1,0 +1,9 @@
+// Line-drawn cube logo from the wireframe; `size` in pixels.
+export default function CubeLogo({ size = 22 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 2.5l8.5 4.75v9.5L12 21.5l-8.5-4.75v-9.5z" />
+      <path d="M3.5 7.25L12 12l8.5-4.75M12 12v9.5" />
+    </svg>
+  )
+}

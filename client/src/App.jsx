@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import AppLayout from './layouts/AppLayout.jsx'
+import RequireAuth from './auth/RequireAuth.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import HomePage from './pages/HomePage.jsx'
 import LibraryPage from './pages/LibraryPage.jsx'
@@ -19,22 +20,25 @@ export default function App() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
 
-      {/* Pages that show the purple navigation bar */}
-      <Route element={<AppLayout />}>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/library" element={<LibraryPage />} />
-        <Route path="/tests/new" element={<TestEditorPage />} />
-        <Route path="/tests/:testId/edit" element={<TestEditorPage />} />
-        <Route path="/classes" element={<ClassesPage />} />
-        <Route path="/classes/:classId" element={<ClassDetailPage />} />
-        <Route path="/vocab" element={<VocabPage />} />
-        <Route path="/vocab/:setId" element={<VocabSetPage />} />
-        <Route path="/history" element={<HistoryPage />} />
-      </Route>
+      {/* Everything below needs a signed-in user (US02) */}
+      <Route element={<RequireAuth />}>
+        {/* Pages that show the purple navigation bar */}
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/library" element={<LibraryPage />} />
+          <Route path="/tests/new" element={<TestEditorPage />} />
+          <Route path="/tests/:testId/edit" element={<TestEditorPage />} />
+          <Route path="/classes" element={<ClassesPage />} />
+          <Route path="/classes/:classId" element={<ClassDetailPage />} />
+          <Route path="/vocab" element={<VocabPage />} />
+          <Route path="/vocab/:setId" element={<VocabSetPage />} />
+          <Route path="/history" element={<HistoryPage />} />
+        </Route>
 
-      {/* Full-screen pages: no navigation bar while taking or reviewing a test */}
-      <Route path="/attempts/:attemptId" element={<AttemptPage />} />
-      <Route path="/attempts/:attemptId/review" element={<ReviewPage />} />
+        {/* Full-screen pages: no navigation bar while taking or reviewing a test */}
+        <Route path="/attempts/:attemptId" element={<AttemptPage />} />
+        <Route path="/attempts/:attemptId/review" element={<ReviewPage />} />
+      </Route>
 
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

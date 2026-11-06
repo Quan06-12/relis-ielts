@@ -1,4 +1,6 @@
 import { Link, NavLink, Outlet } from 'react-router-dom'
+import CubeLogo from '../components/CubeLogo.jsx'
+import AccountMenu from '../components/AccountMenu.jsx'
 import './AppLayout.css'
 
 const tabs = [
@@ -16,7 +18,7 @@ export default function AppLayout() {
       <header className="app-header">
         <nav className="app-nav">
           <Link to="/" className="app-logo">
-            <CubeIcon />
+            <CubeLogo />
             <span>Relis</span>
           </Link>
 
@@ -31,8 +33,7 @@ export default function AppLayout() {
 
           <div className="app-actions">
             <Link to="/tests/new" className="create-test-button">+ Tạo đề</Link>
-            {/* The avatar and the sign-out menu are added in US01–US03 */}
-            <div className="avatar" aria-hidden="true" />
+            <AccountMenu />
           </div>
         </nav>
         <div className="app-nav-strip" />
@@ -40,15 +41,5 @@ export default function AppLayout() {
 
       <Outlet />
     </>
-  )
-}
-
-// Line-drawn cube logo from the wireframe
-function CubeIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" aria-hidden="true">
-      <path d="M12 2.5l8.5 4.75v9.5L12 21.5l-8.5-4.75v-9.5z" />
-      <path d="M3.5 7.25L12 12l8.5-4.75M12 12v9.5" />
-    </svg>
   )
 }
