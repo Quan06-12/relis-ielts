@@ -1,6 +1,6 @@
-# Hướng dẫn Sprint 0 (02/11 – 03/11)
+# Hướng dẫn Sprint 0 (07/11 – 08/11)
 
-Mục tiêu sprint: cuối ngày 03/11 mở link Vercel thấy thanh menu, bấm "Tiếp tục với Google" là đăng nhập được, server trên Render trả về đúng user.
+Mục tiêu sprint: cuối ngày 08/11 mở link Vercel thấy thanh menu, bấm "Tiếp tục với Google" là đăng nhập được, server trên Render trả về đúng user.
 
 Thứ tự gợi ý: **T04 → T02 + T01 song song → US01 → T03 → T05**.
 
@@ -201,8 +201,8 @@ Lưu ý: Render gói Free ngủ sau 15 phút không có request, lần gọi đ�
 
 ---
 
-## Cuối Sprint 0 (tối 03/11)
+## Cuối Sprint 0 (tối 08/11)
 
 - **Review**: mở link Vercel, đăng nhập bằng Gmail của cả hai người.
-- **Retro**: ghi 3 dòng vào Discussions (tốt / chưa tốt / thử gì ở Sprint 1).
+- **Retro**: điền `docs/sprints/sprint-0.md` (giữ lại / bỏ đi / thử mới).
 - Mở PR `develop` → `main` để bản deploy cập nhật.

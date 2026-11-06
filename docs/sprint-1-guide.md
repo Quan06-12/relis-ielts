@@ -1,13 +1,15 @@
-# Hướng dẫn Sprint 1 (04/11 – 08/11): luồng lõi
+# Hướng dẫn Sprint 1 (09/11 – 11/11): soạn đề & làm bài
 
-Mục tiêu: tạo một đề Reading và một đề Listening, làm thử full test, nộp, vào Xem lại thấy câu đúng/sai, giải thích và bằng chứng tô vàng. 20 issue trong milestone "Sprint 1 · Luồng lõi".
+Mục tiêu: tạo một đề Reading và một đề Listening, làm thử full test có đồng hồ và nộp được. 16 issue trong milestone "Sprint 1 · Soạn đề & làm bài".
+
+Phần **thuật toán chấm** và **trang Xem lại** bên dưới thuộc Sprint 2 (US35–US37) nhưng để chung ở đây vì B nên đọc trước khi thiết kế model `Attempt`. Ở Sprint 1, nộp bài chỉ cần lưu `answers`, `submittedAt` và chuyển `status` sang `submitted`.
 
 | Người | Phần | Issue chính |
 |---|---|---|
 | A | Soạn đề (model `Test`, API nhóm 2, trang Soạn đề, upload) | US11, US13–US17, US20 |
-| B | Làm bài, chấm, xem lại (model `Attempt`, API nhóm 6, 3 trang) | US18, US22, US24–US25, US27–US28, US30–US32, US35–US37 |
+| B | Làm bài (model `Attempt`, API nhóm 6, hộp thoại Chọn chế độ, trang Làm bài) | US18, US22, US24–US25, US27–US28, US30–US32 |
 
-**Ngày 04/11, làm trước tiên:** hai người ngồi cùng viết `server/src/models/Test.js` theo tab Thiết kế dữ liệu. B cần model này để chấm, A cần để lưu, nên đây là chỗ duy nhất phải chốt chung.
+**Ngày 09/11, làm trước tiên:** hai người ngồi cùng viết `server/src/models/Test.js` theo tab Thiết kế dữ liệu. B cần model này để chấm, A cần để lưu, nên đây là chỗ duy nhất phải chốt chung.
 
 ---
 
@@ -47,13 +49,13 @@ Viết các hàm cập nhật bất biến (immutable) theo đường dẫn `(i,
 2. `GET /tests/:id/play`: viết hàm `toPlayView(test)` bỏ `answers`, `explanation`, `evidence` khỏi mọi câu. Dùng lại hàm này cho `POST /attempts` và `GET /attempts/:id`.
 3. Hộp thoại Chọn chế độ: full hay từng phần, thời gian, cảnh báo audio dài hơn thời gian (US26 là Should, để sau).
 4. Trang Làm bài Reading: hai cột, thanh câu hỏi dưới đáy, đồng hồ.
-5. `POST /attempts/:id/submit` + hàm chấm.
-6. Trang Xem lại.
-7. Listening: audio player, transcript chỉ hiện ở Xem lại.
+5. `POST /attempts/:id/submit` (Sprint 1: lưu bài; Sprint 2: gắn thêm hàm chấm).
+6. Listening: audio player; transcript chỉ hiện ở Xem lại.
+7. Sprint 2: hàm chấm và trang Xem lại theo hai mục dưới.
 
 **Đồng hồ không được tin client.** Server lưu `startedAt` và `mode.timeLimitMin`, nên thời gian còn lại là `timeLimitMin * 60 − (now − startedAt)`. Client chỉ đếm để hiển thị, cứ mỗi lần tải trang thì lấy lại `remainingSec` từ server. Khi về 0, client gọi submit; server vẫn chấp nhận submit trễ vài giây (độ trễ mạng) nhưng không nhận đáp án đổi sau hạn.
 
-**Thuật toán chấm** (viết thành hàm thuần `grade(test, answers)` để dễ test):
+**Thuật toán chấm** · Sprint 2, US35 (viết thành hàm thuần `grade(test, answers)` để dễ test):
 
 1. Lấy các câu thuộc `mode.sectionIndexes`.
 2. Với từng câu, chuẩn hoá cả đáp án người làm lẫn đáp án đúng: `trim`, gộp nhiều khoảng trắng thành một, chuyển chữ thường.
@@ -86,7 +88,7 @@ Viết các hàm cập nhật bất biến (immutable) theo đường dẫn `(i,
 
 Overall ở Trang chủ (Sprint 3) là trung bình Reading và Listening, làm tròn kiểu IELTS: phần lẻ .25 lên .5, phần lẻ .75 lên số nguyên kế tiếp.
 
-**Trang Xem lại** đọc `GET /attempts/:id/review`. Bằng chứng tô vàng dùng `evidence: { start, end }` (vị trí ký tự trong passage hoặc transcript): cắt chuỗi passage thành 3 phần trước, giữa, sau rồi bọc phần giữa trong `<mark>`. Một câu có thể trùng vùng với câu khác, nên chỉ tô vùng của câu đang chọn.
+**Trang Xem lại** · Sprint 2, US36–US37, đọc `GET /attempts/:id/review`. Bằng chứng tô vàng dùng `evidence: { start, end }` (vị trí ký tự trong passage hoặc transcript): cắt chuỗi passage thành 3 phần trước, giữa, sau rồi bọc phần giữa trong `<mark>`. Một câu có thể trùng vùng với câu khác, nên chỉ tô vùng của câu đang chọn.
 
 **Câu hỏi tự kiểm tra**
 - Mở DevTools → Network ở trang Làm bài, có thấy đáp án đúng không?
@@ -94,8 +96,9 @@ Overall ở Trang chủ (Sprint 3) là trung bình Reading và Listening, làm t
 
 ---
 
-## Cuối Sprint 1 (tối 08/11)
+## Cuối Sprint 1 (tối 11/11)
 
-- **Review**: A soạn một đề Reading full 40 câu (dán từ một đề Cambridge đã có giấy) và một đề Listening; B làm cả hai và vào Xem lại.
+- **Review**: A soạn một đề Reading full 40 câu (dán từ một đề Cambridge đã có giấy) và một đề Listening; B làm cả hai, để hết giờ tự nộp một lần và nộp sớm một lần.
+- **Retro**: điền `docs/sprints/sprint-1.md`.
 - Ghi lại các lỗi thành issue loại Bug, gắn vào Sprint 2.
 - PR `develop` → `main`.

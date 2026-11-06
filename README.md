@@ -9,7 +9,7 @@ Relis (**RE**ading + **LIS**tening) là web luyện đề IELTS Reading và List
 | Tài liệu | Link |
 |---|---|
 | User stories, Site diagram, Thiết kế dữ liệu, REST API (các tab trong cùng tài liệu) | https://claude.ai/artifact/3mLLoyc5j3wyFofXYzcG9Q |
-| Hướng dẫn Sprint 0 · Sprint 1 | [docs/sprint-0-guide.md](docs/sprint-0-guide.md) · [docs/sprint-1-guide.md](docs/sprint-1-guide.md) |
+| Hướng dẫn từng sprint | [Sprint 0](docs/sprint-0-guide.md) · [Sprint 1](docs/sprint-1-guide.md) · [Sprint 2](docs/sprint-2-guide.md) |
 | Wireframe (bấm thử được) | https://claude.ai/artifact/94SMziHvK7AhzPuf9QAPbG |
 | Drive của nhóm (bản chụp theo mốc, báo cáo) | https://drive.google.com/drive/folders/1qqBiZ8i43wJcxnqG-dlJYyr3iRymBXF0 |
 
@@ -24,16 +24,19 @@ Relis (**RE**ading + **LIS**tening) là web luyện đề IELTS Reading và List
 | Lưu ảnh, audio | Cloudinary | |
 | AI feedback | Gemini API (US49) | |
 
-## Timeline (2 tuần: 02/11 – 16/11/2026)
+## Timeline (02/11 – 16/11/2026)
 
-| Sprint | Ngày | Mục tiêu |
-|---|---|---|
-| Sprint 0 | 02/11 – 03/11 | Dựng repo, khung client/server, MongoDB Atlas, đăng nhập Google chạy được, deploy bản rỗng |
-| Sprint 1 | 04/11 – 08/11 | Luồng lõi: soạn đề → chọn chế độ → làm bài → chấm → xem lại |
-| Sprint 2 | 09/11 – 13/11 | Lớp học, kho đề lớp, giao bài có hạn, bảng điểm, lịch sử, trang chủ |
-| Sprint 3 | 14/11 – 16/11 | Story Should còn lại, AI feedback, dữ liệu demo, sửa lỗi, báo cáo, video demo |
+| Sprint | Ngày | Mục tiêu | Issue |
+|---|---|---|---|
+| Sprint 0 · Setup | 07 – 08/11 | Mở link deploy, đăng nhập Google được | 9 |
+| Sprint 1 · Soạn đề & làm bài | 09 – 11/11 | Soạn một đề, làm bài có giờ và nộp | 16 |
+| Sprint 2 · Xem lại, lịch sử & lớp học | 12 – 13/11 | Chấm, xem lại có giải thích, lịch sử, lớp học, bảng điểm | 10 |
+| Sprint 3 · Should ưu tiên | 14/11 | Giữ đáp án khi tải lại, giao bài có hạn, trang chủ | 4 |
+| Sprint 4 · Dự phòng | 15 – 16/11 | Sửa lỗi trước; sau đó issue phát sinh, story kéo từ backlog, dữ liệu demo, báo cáo, video | — |
 
-Phạm vi cam kết: **29 story Must**. Story Should làm khi Must đã Done; story Could (AI feedback, kho từ vựng, biểu đồ band, xoá học viên, rời lớp) để cuối.
+Ước lượng dựa trên tốc độ thực tế của phiên bản làm trước đó (khoảng 2,3 issue/người/ngày): 35 issue bắt buộc (6 task + 29 Must) cần khoảng 1,9–2,7 issue/người/ngày. 16 story còn lại (Should ít ưu tiên và Could, gồm AI feedback) nằm ở backlog, chỉ kéo vào Sprint 4 khi không còn bug mở.
+
+Thứ tự cắt khi bị trễ: US26, US29, US41, US43, US47, US48 trước; sau đó US05, US10. US21 (kho đề lớp) giữ lại.
 
 ## Epic
 
