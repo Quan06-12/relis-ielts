@@ -1,0 +1,764 @@
+openapi: 3.1.0
+info:
+  title: Relis API
+  version: 0.1.0
+  description: |
+    API contract between `client/` and `server/`.
+    This file is the source of truth: change it in the same pull request as the code,
+    and change it first when the two sides need to agree on something new.
+    Covers Sprint 0 (auth) and Sprint 1 (tests, uploads, attempts).
+    Sprint 2 endpoints are added when that sprint starts.
+
+servers:
+  - url: http://localhost:5000/api
+    description: Local
+  - url: https://relis-api.onrender.com/api
+    description: Production (Render) – update once deployed
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: System
+    description: Health check
+  - name: Auth
+    description: Google sign-in and the current user (owner A)
+  - name: Tests
+    description: Personal test library and editor (owner A)
+  - name: Uploads
+    description: Cover images and audio files on Cloudinary (owner A)
+  - name: Attempts
+    description: Taking a test (owner B)
+
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      tags: [System]
+      summary: Check that the server is running
+      security: []
+      responses:
+        '200':
+          description: Server is up
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean, const: true }
+
+  /auth/google:
+    post:
+      operationId: signInWithGoogle
+      tags: [Auth]
+      summary: Sign in or sign up with a Google ID token (US01)
+      description: |
+        The server verifies `credential` with Google, creates the user on the first sign-in,
+        updates name and picture on later sign-ins, and returns the app's own JWT (valid 7 days).
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [credential]
+              properties:
+                credential:
+                  type: string
+                  description: ID token returned by the Google sign-in button
+      responses:
+        '200':
+          description: Signed in
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthResult' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401':
+          description: Google rejected the token (`INVALID_GOOGLE_TOKEN`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /auth/me:
+    get:
+      operationId: getCurrentUser
+      tags: [Auth]
+      summary: Current user (US02)
+      description: Called when the app opens, to check whether the saved token is still valid.
+      responses:
+        '200':
+          description: The signed-in user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user: { $ref: '#/components/schemas/User' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /tests:
+    get:
+      operationId: listMyTests
+      tags: [Tests]
+      summary: My test library (US20, US22, US23)
+      parameters:
+        - { name: skill, in: query, schema: { $ref: '#/components/schemas/Skill' } }
+        - { name: kind, in: query, schema: { $ref: '#/components/schemas/TestKind' } }
+        - { name: status, in: query, schema: { $ref: '#/components/schemas/TestStatus' } }
+        - { name: q, in: query, description: Search in the title, schema: { type: string } }
+        - { $ref: '#/components/parameters/Page' }
+        - { $ref: '#/components/parameters/Limit' }
+      responses:
+        '200':
+          description: One page of tests, newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PageInfo'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/TestSummary' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      operationId: createTest
+      tags: [Tests]
+      summary: Create an empty draft test (US11)
+      description: |
+        Creates the right number of empty sections for the kind:
+        Reading full = 3 passages, Listening full = 4 parts, single = 1.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, skill, kind]
+              properties:
+                title: { type: string, minLength: 1, maxLength: 120 }
+                skill: { $ref: '#/components/schemas/Skill' }
+                kind: { $ref: '#/components/schemas/TestKind' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  test: { $ref: '#/components/schemas/Test' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /tests/{testId}:
+    parameters:
+      - $ref: '#/components/parameters/TestId'
+    get:
+      operationId: getTest
+      tags: [Tests]
+      summary: Full test with answers, for the editor (US20)
+      description: Owner only. Other users get 404, so they cannot tell whether the test exists.
+      responses:
+        '200':
+          description: The test
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  test: { $ref: '#/components/schemas/Test' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    put:
+      operationId: saveTest
+      tags: [Tests]
+      summary: Save the whole test (US12–US18)
+      description: |
+        The editor always sends the complete test. The server renumbers questions 1..n,
+        recalculates `questionCount`, and keeps question `id`s that already exist.
+        If someone has already submitted this test and an answer changed, the response
+        carries `warning: ANSWERS_CHANGED_AFTER_ATTEMPTS` (old scores stay as they were).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TestInput' }
+      responses:
+        '200':
+          description: Saved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  test: { $ref: '#/components/schemas/Test' }
+                  warning:
+                    type: [string, 'null']
+                    enum: [ANSWERS_CHANGED_AFTER_ATTEMPTS, null]
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      operationId: deleteTest
+      tags: [Tests]
+      summary: Delete a test (US20)
+      description: Deleted for real if nobody has taken it; otherwise hidden so history and gradebooks keep working.
+      responses:
+        '204': { description: Deleted or hidden }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /tests/{testId}/status:
+    parameters:
+      - $ref: '#/components/parameters/TestId'
+    patch:
+      operationId: changeTestStatus
+      tags: [Tests]
+      summary: Publish a test or move it back to draft (US19)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { $ref: '#/components/schemas/TestStatus' }
+      responses:
+        '200':
+          description: Status changed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  test: { $ref: '#/components/schemas/TestSummary' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422':
+          description: Cannot publish (`TEST_INCOMPLETE`); `details` lists the questions without an answer
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /tests/{testId}/play:
+    parameters:
+      - $ref: '#/components/parameters/TestId'
+    get:
+      operationId: getTestForPlay
+      tags: [Tests]
+      summary: Test without answers, for the choose-mode dialog (US24, US26)
+      description: |
+        Allowed for the owner, or a member of a class that has this test (from Sprint 2).
+        Never contains answers, explanations, evidence or transcripts.
+      responses:
+        '200':
+          description: The test, safe to show while taking it
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  test: { $ref: '#/components/schemas/PlayTest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /uploads:
+    post:
+      operationId: uploadFile
+      tags: [Uploads]
+      summary: Upload a cover image or an audio file (US12, US14)
+      description: Stored on Cloudinary; the database only keeps the returned URL.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, kind]
+              properties:
+                file: { type: string, format: binary }
+                kind:
+                  type: string
+                  enum: [image, audio]
+                  description: image ≤ 2 MB (jpg, png, webp); audio ≤ 30 MB (mp3, m4a)
+      responses:
+        '201':
+          description: Uploaded
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [url]
+                properties:
+                  url: { type: string, format: uri }
+                  durationSec:
+                    type: number
+                    description: Audio only
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '413':
+          description: File too large (`FILE_TOO_LARGE`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /attempts:
+    post:
+      operationId: startAttempt
+      tags: [Attempts]
+      summary: Start taking a test (US24, US25)
+      description: |
+        Creates an attempt with status `in_progress` and returns it with the test (no answers).
+        If the user already has an unfinished attempt on the same test, returns 409 with
+        `details.attemptId` so the client can offer to continue it.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [testId, mode]
+              properties:
+                testId: { $ref: '#/components/schemas/Id' }
+                assignmentId:
+                  description: Set when the test is taken as a class assignment (Sprint 3)
+                  oneOf:
+                    - $ref: '#/components/schemas/Id'
+                    - type: 'null'
+                mode: { $ref: '#/components/schemas/AttemptMode' }
+      responses:
+        '201':
+          description: Started
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AttemptWithTest' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: An unfinished attempt exists (`ATTEMPT_IN_PROGRESS`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /attempts/{attemptId}:
+    parameters:
+      - $ref: '#/components/parameters/AttemptId'
+    get:
+      operationId: getAttempt
+      tags: [Attempts]
+      summary: Continue an attempt (US30, US31, US33)
+      description: |
+        `remainingSec` is calculated by the server from `startedAt` and the time limit.
+        If time is already up, the server submits the attempt first and returns it as `submitted`.
+      responses:
+        '200':
+          description: The attempt and its test (no answers)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AttemptWithTest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /attempts/{attemptId}/answers:
+    parameters:
+      - $ref: '#/components/parameters/AttemptId'
+    patch:
+      operationId: saveAnswers
+      tags: [Attempts]
+      summary: Autosave answers (US33)
+      description: The client sends only the questions that changed (debounced ~1 s). Rejected after time is up.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [answers]
+              properties:
+                answers:
+                  type: array
+                  items: { $ref: '#/components/schemas/Answer' }
+      responses:
+        '200':
+          description: Saved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  savedAt: { type: string, format: date-time }
+                  remainingSec: { type: integer }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Already submitted or time is up (`ATTEMPT_CLOSED`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /attempts/{attemptId}/submit:
+    parameters:
+      - $ref: '#/components/parameters/AttemptId'
+    post:
+      operationId: submitAttempt
+      tags: [Attempts]
+      summary: Submit (US31, US32; scoring added in Sprint 2 for US35)
+      description: |
+        Sprint 1 saves the attempt and sets `status: submitted`; `result` is `null`.
+        From Sprint 2 the server also scores it. Submitting twice returns the same result.
+      responses:
+        '200':
+          description: Submitted
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [attemptId, status]
+                properties:
+                  attemptId: { $ref: '#/components/schemas/Id' }
+                  status: { type: string, const: submitted }
+                  result:
+                    oneOf:
+                      - $ref: '#/components/schemas/Result'
+                      - type: 'null'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: The token returned by `POST /auth/google`
+
+  parameters:
+    TestId:
+      name: testId
+      in: path
+      required: true
+      schema: { $ref: '#/components/schemas/Id' }
+    AttemptId:
+      name: attemptId
+      in: path
+      required: true
+      schema: { $ref: '#/components/schemas/Id' }
+    Page:
+      name: page
+      in: query
+      schema: { type: integer, minimum: 1, default: 1 }
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+
+  responses:
+    ValidationError:
+      description: The request body or query is invalid (`VALIDATION_ERROR`); `details` lists each field
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example:
+            error:
+              code: VALIDATION_ERROR
+              message: Dữ liệu không hợp lệ
+              details:
+                - { field: title, message: Tiêu đề không được để trống }
+    Unauthorized:
+      description: Missing, invalid or expired token (`UNAUTHENTICATED`)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: Does not exist, or the user is not allowed to see it (`NOT_FOUND`)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+
+  schemas:
+    Id:
+      type: string
+      description: MongoDB ObjectId as a 24-character hex string
+      pattern: '^[a-f0-9]{24}$'
+      example: 6730a1f2c4e5d6b7a8091234
+
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              description: Stable, machine-readable code; the client chooses the Vietnamese text from it
+              example: NOT_FOUND
+            message:
+              type: string
+              description: Human-readable explanation, for logs and debugging
+            details:
+              description: Extra data, e.g. invalid fields or an existing attempt id
+
+    PageInfo:
+      type: object
+      properties:
+        total: { type: integer }
+        page: { type: integer }
+        limit: { type: integer }
+
+    Skill:
+      type: string
+      enum: [reading, listening]
+    TestKind:
+      type: string
+      enum: [full, single]
+      description: full = 3 passages (Reading) or 4 parts (Listening); single = 1
+    TestStatus:
+      type: string
+      enum: [draft, published]
+    QuestionType:
+      type: string
+      enum: [mcq, multi_select, tfng, ynng, matching, completion, short_answer]
+
+    User:
+      type: object
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        name: { type: string }
+        email: { type: string, format: email }
+        avatarUrl: { type: string, format: uri }
+        goals:
+          type: object
+          properties:
+            reading: { type: [number, 'null'] }
+            listening: { type: [number, 'null'] }
+            overall: { type: [number, 'null'] }
+        examDate: { type: [string, 'null'], format: date }
+
+    AuthResult:
+      type: object
+      required: [token, user]
+      properties:
+        token: { type: string }
+        user: { $ref: '#/components/schemas/User' }
+
+    TestSummary:
+      type: object
+      description: One card in the test library
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        title: { type: string }
+        skill: { $ref: '#/components/schemas/Skill' }
+        kind: { $ref: '#/components/schemas/TestKind' }
+        status: { $ref: '#/components/schemas/TestStatus' }
+        coverUrl: { type: [string, 'null'], format: uri }
+        durationMin: { type: integer }
+        questionCount: { type: integer }
+        updatedAt: { type: string, format: date-time }
+        lastBand:
+          type: [number, 'null']
+          description: Band of the caller's latest full attempt, for the band stamp
+
+    Test:
+      type: object
+      description: Full test as the owner sees it in the editor
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        title: { type: string }
+        skill: { $ref: '#/components/schemas/Skill' }
+        kind: { $ref: '#/components/schemas/TestKind' }
+        status: { $ref: '#/components/schemas/TestStatus' }
+        coverUrl: { type: [string, 'null'], format: uri }
+        durationMin: { type: integer }
+        questionCount: { type: integer }
+        sections:
+          type: array
+          items: { $ref: '#/components/schemas/Section' }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    TestInput:
+      type: object
+      description: What the editor sends on save
+      required: [title, sections]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 120 }
+        coverUrl: { type: [string, 'null'], format: uri }
+        durationMin: { type: integer, minimum: 1, maximum: 180 }
+        sections:
+          type: array
+          items: { $ref: '#/components/schemas/Section' }
+
+    Section:
+      type: object
+      description: A Reading passage or a Listening part
+      properties:
+        title: { type: string }
+        passage:
+          type: string
+          description: Reading only
+        audioUrl:
+          type: [string, 'null']
+          format: uri
+          description: Listening only
+        audioDurationSec: { type: [number, 'null'] }
+        transcript:
+          type: string
+          description: Listening only; shown on the review page
+        groups:
+          type: array
+          items: { $ref: '#/components/schemas/QuestionGroup' }
+
+    QuestionGroup:
+      type: object
+      properties:
+        type: { $ref: '#/components/schemas/QuestionType' }
+        instruction: { type: string }
+        questions:
+          type: array
+          items: { $ref: '#/components/schemas/Question' }
+
+    Question:
+      type: object
+      properties:
+        id:
+          description: Set by the server; omit for a new question
+          $ref: '#/components/schemas/Id'
+        number:
+          type: integer
+          description: Set by the server (1..n across the whole test)
+        prompt: { type: string }
+        options:
+          type: array
+          items: { type: string }
+          description: Choices for mcq, multi_select, tfng, ynng, matching
+        answers:
+          type: array
+          items: { type: string }
+          minItems: 1
+          description: All accepted answers, e.g. ["10", "ten"]; the full correct set for multi_select
+        explanation:
+          type: array
+          items: { type: string }
+          description: Explanation steps shown on the review page
+        evidence:
+          description: Character range in the passage or transcript (US18)
+          oneOf:
+            - $ref: '#/components/schemas/TextRange'
+            - type: 'null'
+
+    TextRange:
+      type: object
+      required: [start, end]
+      properties:
+        start: { type: integer, minimum: 0 }
+        end: { type: integer, minimum: 0 }
+
+    PlayTest:
+      type: object
+      description: Test without answers, explanations, evidence or transcripts
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        title: { type: string }
+        skill: { $ref: '#/components/schemas/Skill' }
+        kind: { $ref: '#/components/schemas/TestKind' }
+        durationMin: { type: integer }
+        questionCount: { type: integer }
+        sections:
+          type: array
+          items:
+            type: object
+            properties:
+              title: { type: string }
+              passage: { type: string }
+              audioUrl: { type: [string, 'null'], format: uri }
+              audioDurationSec: { type: [number, 'null'] }
+              groups:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type: { $ref: '#/components/schemas/QuestionType' }
+                    instruction: { type: string }
+                    questions:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id: { $ref: '#/components/schemas/Id' }
+                          number: { type: integer }
+                          prompt: { type: string }
+                          options:
+                            type: array
+                            items: { type: string }
+
+    AttemptMode:
+      type: object
+      required: [type, sectionIndexes, timeLimitMin]
+      properties:
+        type:
+          type: string
+          enum: [full, parts]
+          description: Only `full` gets a band score
+        sectionIndexes:
+          type: array
+          items: { type: integer, minimum: 0 }
+          minItems: 1
+          example: [0, 1, 2]
+        timeLimitMin: { type: integer, minimum: 1, maximum: 180 }
+
+    Answer:
+      type: object
+      required: [questionId, value]
+      properties:
+        questionId: { $ref: '#/components/schemas/Id' }
+        value:
+          type: array
+          items: { type: string }
+          description: One item for most questions; several for multi_select; empty = cleared
+
+    Result:
+      type: object
+      properties:
+        correct: { type: integer }
+        total: { type: integer }
+        band:
+          type: [number, 'null']
+          description: Only for full tests with 40 questions
+
+    Attempt:
+      type: object
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        testId: { $ref: '#/components/schemas/Id' }
+        assignmentId:
+          oneOf:
+            - $ref: '#/components/schemas/Id'
+            - type: 'null'
+        mode: { $ref: '#/components/schemas/AttemptMode' }
+        status:
+          type: string
+          enum: [in_progress, submitted]
+        answers:
+          type: array
+          items: { $ref: '#/components/schemas/Answer' }
+        remainingSec: { type: integer }
+        startedAt: { type: string, format: date-time }
+        submittedAt: { type: [string, 'null'], format: date-time }
+        result:
+          oneOf:
+            - $ref: '#/components/schemas/Result'
+            - type: 'null'
+
+    AttemptWithTest:
+      type: object
+      required: [attempt, test]
+      properties:
+        attempt: { $ref: '#/components/schemas/Attempt' }
+        test: { $ref: '#/components/schemas/PlayTest' }
