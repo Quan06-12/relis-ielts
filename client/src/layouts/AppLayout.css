@@ -1,0 +1,74 @@
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.app-nav {
+  display: flex;
+  align-items: flex-end;
+  gap: 32px;
+  height: 56px;
+  padding: 0 24px;
+  background: var(--purple);
+  color: var(--white);
+}
+
+/* Thin white strip under the bar so the active tab looks connected to the page */
+.app-nav-strip {
+  height: 8px;
+  background: var(--white);
+}
+
+.app-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  font-size: 18px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.app-tabs {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.app-tab {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 12px 12px 0 0;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.app-tab:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* NavLink adds the "active" class to the tab of the current page */
+.app-tab.active {
+  background: var(--white);
+  color: var(--purple);
+}
+
+.app-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  align-self: center;
+}
+
+.create-test-button {
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--yellow);
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
