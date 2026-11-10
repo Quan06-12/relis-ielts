@@ -1,11 +1,17 @@
 import express from 'express'
 import cors from 'cors'
 import healthRoutes from './routes/health.routes.js'
+import { createAuthRoutes } from './routes/auth.routes.js'
+import { createGoogleVerifier } from './services/googleAuth.js'
 import { notFoundRoute } from './middleware/notFoundRoute.js'
 import { errorHandler } from './middleware/errorHandler.js'
 
 // Builds the Express app without starting it, so tests can call it directly.
-export function createApp({ clientUrl = 'http://localhost:5173' } = {}) {
+// Tests pass a fake `verifyGoogleCredential`; the real one asks Google.
+export function createApp({
+  clientUrl = 'http://localhost:5173',
+  verifyGoogleCredential = createGoogleVerifier(process.env.GOOGLE_CLIENT_ID),
+} = {}) {
   const app = express()
 
   // Only our own frontend may call the API from a browser
@@ -13,7 +19,7 @@ export function createApp({ clientUrl = 'http://localhost:5173' } = {}) {
   app.use(express.json({ limit: '1mb' }))
 
   app.use('/api/health', healthRoutes)
-  // Each feature mounts its routes here, e.g. app.use('/api/auth', authRoutes)
+  app.use('/api/auth', createAuthRoutes({ verifyGoogleCredential }))
 
   app.use(notFoundRoute)
   app.use(errorHandler)
