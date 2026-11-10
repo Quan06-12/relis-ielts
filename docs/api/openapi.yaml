@@ -6,8 +6,8 @@ info:
     API contract between `client/` and `server/`.
     This file is the source of truth: change it in the same pull request as the code,
     and change it first when the two sides need to agree on something new.
-    Covers Sprint 0 (auth) and Sprint 1 (tests, uploads, attempts).
-    Sprint 2 endpoints are added when that sprint starts.
+    Covers Sprint 0, Sprint 1 and owner B's review, history, dashboard and vocabulary APIs.
+    Owner A's auth, test management and class APIs remain integration dependencies.
 
 servers:
   - url: http://localhost:5000/api
@@ -307,6 +307,30 @@ paths:
               schema: { $ref: '#/components/schemas/Error' }
 
   /attempts:
+    get:
+      operationId: listAttempts
+      tags: [Attempts]
+      summary: Own attempt history (US39)
+      description: Newest startedAt first. Filters skill and status; page starts at 1, limit 1..50.
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - { name: skill, in: query, schema: { $ref: '#/components/schemas/Skill' } }
+        - { name: status, in: query, schema: { type: string, enum: [in_progress, submitted] } }
+      responses:
+        '200':
+          description: Own attempts only, expired attempts finalized before returning
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/HistoryItem' } }
+                  total: { type: integer }
+                  page: { type: integer }
+                  limit: { type: integer }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
     post:
       operationId: startAttempt
       tags: [Attempts]
@@ -409,8 +433,10 @@ paths:
       tags: [Attempts]
       summary: Submit (US31, US32; scoring added in Sprint 2 for US35)
       description: |
-        Sprint 1 saves the attempt and sets `status: submitted`; `result` is `null`.
-        From Sprint 2 the server also scores it. Submitting twice returns the same result.
+        Scores the immutable test snapshot taken at start using already saved answers.
+        No answers in the submit body. Save outstanding edits before submitting.
+        Submitting twice (including concurrently) returns the same persisted result.
+        After deadline only previously saved answers are graded; no grace period for edits.
       responses:
         '200':
           description: Submitted
@@ -426,6 +452,131 @@ paths:
                     oneOf:
                       - $ref: '#/components/schemas/Result'
                       - type: 'null'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /attempts/{attemptId}/review:
+    parameters:
+      - $ref: '#/components/parameters/AttemptId'
+    get:
+      operationId: reviewAttempt
+      tags: [Attempts]
+      summary: Review a submitted attempt (US36, US37)
+      description: Owner or class teacher via the class authorization adapter. In-progress attempts return 409 ATTEMPT_NOT_SUBMITTED.
+      responses:
+        '200':
+          description: Snapshot including explanations, evidence and transcript
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  attempt: { $ref: '#/components/schemas/Attempt' }
+                  test: { $ref: '#/components/schemas/Test' }
+                  questions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        questionId: { $ref: '#/components/schemas/Id' }
+                        correct: { type: boolean }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: ATTEMPT_NOT_SUBMITTED
+
+  /dashboard:
+    get:
+      operationId: getDashboard
+      tags: [Attempts]
+      summary: Personal dashboard (US46)
+      description: Latest graded full-test band per skill; overall only when both exist, rounded to nearest half. No inferred goals or exam date.
+      responses:
+        '200':
+          description: Personal summary
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reading: { type: [number, 'null'] }
+                  listening: { type: [number, 'null'] }
+                  overall: { type: [number, 'null'] }
+                  submittedCount: { type: integer }
+                  recent: { type: array, items: { $ref: '#/components/schemas/HistoryItem' } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /vocab-sets:
+    get:
+      operationId: listVocabSets
+      tags: [Vocabulary]
+      summary: Own vocabulary sets (US47, backlog extension requested locally)
+      responses:
+        '200':
+          description: Own sets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/VocabSet' } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      operationId: createVocabSet
+      tags: [Vocabulary]
+      summary: Create personal vocabulary set
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VocabInput' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VocabEnvelope' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /vocab-sets/{setId}:
+    parameters:
+      - { name: setId, in: path, required: true, schema: { $ref: '#/components/schemas/Id' } }
+    get:
+      operationId: getVocabSet
+      tags: [Vocabulary]
+      summary: Read own vocabulary set (US48)
+      responses:
+        '200':
+          description: Own set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VocabEnvelope' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    put:
+      operationId: updateVocabSet
+      tags: [Vocabulary]
+      summary: Replace title and words of own set
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VocabInput' }
+      responses:
+        '200':
+          description: Saved
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VocabEnvelope' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      operationId: deleteVocabSet
+      tags: [Vocabulary]
+      summary: Delete own vocabulary set
+      responses:
+        '204': { description: Deleted }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
 
@@ -481,6 +632,41 @@ components:
           schema: { $ref: '#/components/schemas/Error' }
 
   schemas:
+    HistoryItem:
+      allOf:
+        - $ref: '#/components/schemas/Attempt'
+        - type: object
+          properties:
+            title: { type: string }
+            skill: { $ref: '#/components/schemas/Skill' }
+    VocabInput:
+      type: object
+      required: [title, words]
+      additionalProperties: false
+      properties:
+        title: { type: string, minLength: 1, maxLength: 120 }
+        words:
+          type: array
+          maxItems: 500
+          items:
+            type: object
+            required: [term, meaning, example]
+            additionalProperties: false
+            properties:
+              term: { type: string, minLength: 1, maxLength: 200 }
+              meaning: { type: string, minLength: 1, maxLength: 1000 }
+              example: { type: string, maxLength: 2000 }
+    VocabSet:
+      allOf:
+        - $ref: '#/components/schemas/VocabInput'
+        - type: object
+          properties:
+            id: { $ref: '#/components/schemas/Id' }
+            updatedAt: { type: string, format: date-time }
+    VocabEnvelope:
+      type: object
+      properties:
+        set: { $ref: '#/components/schemas/VocabSet' }
     Id:
       type: string
       description: MongoDB ObjectId as a 24-character hex string
@@ -730,7 +916,7 @@ components:
         total: { type: integer }
         band:
           type: [number, 'null']
-          description: Only for full tests with 40 questions
+          description: Only for full tests with 40 questions. Null for 0..3 correct because the project band table does not define this range.
 
     Attempt:
       type: object

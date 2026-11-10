@@ -1,0 +1,36 @@
+{
+  "name": "relis-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "dev:fixture": "node src/dev/server.js",
+    "start": "node src/server.js",
+    "test": "node --test test/*.test.js",
+    "lint": "oxlint src test",
+    "lint:js": "node scripts/lint.mjs",
+    "test:mongo": "node --test test/mongo.integration.js",
+    "test:e2e": "node e2e/practice.mjs"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^9.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "mongodb-memory-server": "^11.3.0",
+    "oxlint": "^1.89.0",
+    "playwright": "^1.65.0",
+    "prettier": "^3.9.10",
+    "supertest": "^7.1.4",
+    "yaml": "^2.8.0"
+  }
+}

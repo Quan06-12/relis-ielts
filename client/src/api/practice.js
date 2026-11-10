@@ -1,0 +1,16 @@
+import http from './http.js'
+export const listTests = (params) => http.get('/tests', { params }).then((r) => r.data)
+export const playTest = (id) => http.get(`/tests/${id}/play`).then((r) => r.data)
+export const startAttempt = (input) => http.post('/attempts', input).then((r) => r.data)
+export const getAttempt = (id) => http.get(`/attempts/${id}`).then((r) => r.data)
+export const saveAnswers = (id, answers) =>
+  http.patch(`/attempts/${id}/answers`, { answers }).then((r) => r.data)
+export const submitAttempt = (id) => http.post(`/attempts/${id}/submit`).then((r) => r.data)
+export const reviewAttempt = (id) => http.get(`/attempts/${id}/review`).then((r) => r.data)
+export const listAttempts = (params) => http.get('/attempts', { params }).then((r) => r.data)
+export const getDashboard = () => http.get('/dashboard').then((r) => r.data)
+export const listVocab = () => http.get('/vocab-sets').then((r) => r.data)
+export const getVocab = (id) => http.get(`/vocab-sets/${id}`).then((r) => r.data)
+export const createVocab = (data) => http.post('/vocab-sets', data).then((r) => r.data)
+export const updateVocab = (id, data) => http.put(`/vocab-sets/${id}`, data).then((r) => r.data)
+export const deleteVocab = (id) => http.delete(`/vocab-sets/${id}`)

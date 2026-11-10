@@ -50,6 +50,8 @@ Client hiển thị thông báo tiếng Việt dựa trên `code`, không hiển
 | 404 | `NOT_FOUND` | Không tồn tại hoặc không có quyền xem |
 | 409 | `ATTEMPT_IN_PROGRESS` | Đã có bài làm dở của đề này; `details.attemptId` |
 | 409 | `ATTEMPT_CLOSED` | Lưu đáp án khi bài đã nộp hoặc đã hết giờ |
+| 409 | `ATTEMPT_NOT_SUBMITTED` | Chưa nộp nên chưa được xem đáp án |
+| 409 | `ATTEMPT_BUSY` | Xung đột cập nhật liên tục; client có thể thử lại |
 | 409 | `ALREADY_MEMBER` | Nhập mã lớp đã tham gia (Sprint 2) |
 | 413 | `FILE_TOO_LARGE` | File upload vượt giới hạn |
 | 422 | `TEST_INCOMPLETE` | Xuất bản đề còn câu chưa có đáp án; `details` liệt kê số câu |
@@ -59,3 +61,15 @@ Client hiển thị thông báo tiếng Việt dựa trên `code`, không hiển
 | 503 | `DATABASE_UNAVAILABLE` | Mất kết nối MongoDB |
 
 Thêm mã lỗi mới thì thêm vào bảng này trong cùng pull request.
+
+## Phần B đã bổ sung
+
+- `/attempts`, `/attempts/:id/answers`, `/attempts/:id/submit`, `/attempts/:id/review`, `/tests/:id/play`.
+- `GET /attempts`: lịch sử riêng, lọc kỹ năng/trạng thái và phân trang.
+- `GET /dashboard`: band gần nhất có giá trị của từng kỹ năng; overall chỉ có khi đủ hai kỹ năng.
+- `/vocab-sets`: CRUD bộ từ cá nhân, giới hạn 500 từ/bộ. Đây là phạm vi cơ bản theo yêu cầu local; US47–US48 vẫn cần đối chiếu acceptance criteria của backlog.
+- Nộp bài không nhận đáp án từ body: phải PATCH thành công trước khi POST submit. Submit lặp trả cùng kết quả đã lưu. Sau hạn chỉ chấm đáp án đã lưu, không nhận thay đổi trễ.
+- Bài làm lưu bản chụp đề lúc bắt đầu. API play dùng danh sách trường cho phép, không trả đáp án, giải thích, bằng chứng hoặc transcript.
+- Xung đột: các câu khác nhau được gộp; cùng một câu lấy lần lưu thành công sau cùng. Revision trong database ngăn ghi đè cả bài hoặc thay đáp án sau submit.
+- Range 0–3 câu đúng chưa có trong bảng band của dự án: trả `band: null`, không tự suy ra.
+- API của A về auth, quản lý đề và lớp học chưa được thay thế bằng fixture trong production. Xem [bàn giao B](../member-b-handoff.md).

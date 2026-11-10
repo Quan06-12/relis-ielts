@@ -5,6 +5,7 @@ import { useAuth } from '../auth/AuthContext.jsx'
 import { getErrorMessage } from '../api/errorMessages.js'
 import CubeLogo from '../components/CubeLogo.jsx'
 import './LoginPage.css'
+import DevSession from '../components/DevSession.jsx'
 
 // US01: the only way in is "Continue with Google"; a new account is created on the first sign-in.
 export default function LoginPage() {
@@ -40,8 +41,8 @@ export default function LoginPage() {
         <h1>IELTS Practice Platform</h1>
         <p className="login-subtitle">Personal Test Library · Classroom</p>
         <p>
-          Luyện Reading và Listening như thi thật: đồng hồ đếm ngược, chấm điểm và quy đổi band,
-          xem lại từng câu có giải thích. Giáo viên tạo lớp, giao đề và theo dõi điểm của cả lớp.
+          Luyện Reading và Listening như thi thật: đồng hồ đếm ngược, chấm điểm và quy đổi band, xem
+          lại từng câu có giải thích. Giáo viên tạo lớp, giao đề và theo dõi điểm của cả lớp.
         </p>
       </section>
 
@@ -64,9 +65,14 @@ export default function LoginPage() {
               locale="vi"
             />
           </div>
+          {import.meta.env.DEV && import.meta.env.VITE_DEV_FIXTURES === 'true' && <DevSession />}
 
           {isSigningIn && <p className="login-status">Đang đăng nhập…</p>}
-          {error && <p className="login-error" role="alert">{error}</p>}
+          {error && (
+            <p className="login-error" role="alert">
+              {error}
+            </p>
+          )}
         </div>
       </section>
     </div>

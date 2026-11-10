@@ -1,5 +1,7 @@
 # Dependencies
 node_modules/
+.cache/
+test-results/
 
 # Build output
 dist/

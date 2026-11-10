@@ -8,6 +8,12 @@ const messages = {
   FILE_TOO_LARGE: 'File quá lớn.',
   INTERNAL_ERROR: 'Máy chủ gặp lỗi, vui lòng thử lại sau.',
   DATABASE_UNAVAILABLE: 'Máy chủ đang bận, vui lòng thử lại sau.',
+  INVALID_JSON: 'Dữ liệu gửi lên chưa đúng định dạng.',
+  ATTEMPT_IN_PROGRESS: 'Bạn có bài đang làm của đề này. Hãy chọn tiếp tục.',
+  ATTEMPT_CLOSED: 'Bài đã nộp hoặc hết giờ. Đáp án mới chưa được lưu.',
+  ATTEMPT_NOT_SUBMITTED: 'Bài chưa được nộp nên chưa thể xem đáp án.',
+  ATTEMPT_BUSY: 'Bài đang được cập nhật ở nơi khác. Vui lòng thử lại.',
+  TEST_INCOMPLETE: 'Đề chưa đủ đáp án để chấm. Hãy liên hệ người soạn đề.',
 }
 
 const NETWORK_ERROR = 'Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.'

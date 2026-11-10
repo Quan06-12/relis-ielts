@@ -5,6 +5,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google'
 import { AuthProvider } from './auth/AuthContext.jsx'
 import App from './App.jsx'
 import './styles.css'
+import './practice.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -15,5 +16,5 @@ createRoot(document.getElementById('root')).render(
         </BrowserRouter>
       </AuthProvider>
     </GoogleOAuthProvider>
-  </StrictMode>
+  </StrictMode>,
 )
