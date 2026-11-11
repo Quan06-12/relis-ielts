@@ -3,6 +3,7 @@ import cors from 'cors'
 import healthRoutes from './routes/health.routes.js'
 import { createAuthRoutes } from './routes/auth.routes.js'
 import testsRoutes from './routes/tests.routes.js'
+import attemptsRoutes from './routes/attempts.routes.js'
 import { createGoogleVerifier } from './services/googleAuth.js'
 import { createUploadRoutes } from './routes/uploads.routes.js'
 import { createCloudinaryStorage } from './services/fileStorage.js'
@@ -26,6 +27,7 @@ export function createApp({
   app.use('/api/auth', createAuthRoutes({ verifyGoogleCredential }))
   app.use('/api/tests', testsRoutes)
   app.use('/api/uploads', createUploadRoutes({ saveFile }))
+  app.use('/api/attempts', attemptsRoutes)
 
   app.use(notFoundRoute)
   app.use(errorHandler)
