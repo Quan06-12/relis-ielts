@@ -24,3 +24,16 @@ export async function submitAttempt(attemptId) {
   const response = await http.post(`/attempts/${attemptId}/submit`)
   return response.data
 }
+
+// GET /attempts/:id/review — the submitted attempt with answers and explanations
+// returns { attempt, test, viewerRole }
+export async function getReview(attemptId) {
+  const response = await http.get(`/attempts/${attemptId}/review`)
+  return response.data
+}
+
+// GET /attempts — my history (filters: status, skill, source, range, q, page, limit)
+export async function listMyAttempts(filters = {}) {
+  const response = await http.get('/attempts', { params: filters })
+  return response.data // { items, total, page, limit }
+}
