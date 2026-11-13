@@ -8,6 +8,8 @@ import QuestionGroup from '../features/attempt/QuestionGroup.jsx'
 import './AttemptPage.css'
 
 const AUTOSAVE_DELAY_MS = 1000
+// In the last seconds, answers are saved immediately: the server rejects answers after the deadline
+const FINAL_SECONDS = 5
 
 // Taking a test (US27–US32): passage or audio, questions, countdown, autosave and submit.
 export default function AttemptPage() {
@@ -26,6 +28,7 @@ export default function AttemptPage() {
   const pendingChanges = useRef({})
   const autosaveTimer = useRef(null)
   const isSubmitting = useRef(false)
+  const secondsLeftNow = useRef(null)
 
   const goToReview = useCallback(() => navigate(`/attempts/${attemptId}/review`, { replace: true }), [navigate, attemptId])
 
@@ -57,10 +60,11 @@ export default function AttemptPage() {
   function handleAnswer(questionId, value) {
     setAnswers((current) => ({ ...current, [questionId]: value }))
     pendingChanges.current[questionId] = value
+    const isAlmostTimeUp = secondsLeftNow.current !== null && secondsLeftNow.current <= FINAL_SECONDS
     clearTimeout(autosaveTimer.current)
     autosaveTimer.current = setTimeout(() => {
       flushAnswers().catch((saveError) => setError(getErrorMessage(saveError)))
-    }, AUTOSAVE_DELAY_MS)
+    }, isAlmostTimeUp ? 0 : AUTOSAVE_DELAY_MS)
   }
 
   const handleSubmit = useCallback(async () => {
@@ -79,6 +83,7 @@ export default function AttemptPage() {
 
   // US31: when the clock reaches zero the test is handed in automatically
   const secondsLeft = useCountdown(initialSeconds, handleSubmit)
+  secondsLeftNow.current = secondsLeft
 
   if (error && !test) return <p className="page">{error}</p>
   if (!test) return <p className="page">Đang tải bài làm…</p>
