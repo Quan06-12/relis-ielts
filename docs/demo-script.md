@@ -4,7 +4,8 @@ Chạy trên bản deploy ở mỗi Sprint Review và trước buổi bảo vệ
 
 ## 0. Chuẩn bị
 
-- Mở `/api/health` trên Render trước vài phút (gói Free ngủ sau 15 phút).
+- Web: https://relis-ielts.vercel.app · API: https://relis-ielts-api.onrender.com
+- Mở https://relis-ielts-api.onrender.com/api/health trước vài phút (gói Free ngủ sau 15 phút).
 - Hai cửa sổ trình duyệt: **Giáo viên** và **Học viên**, hai tài khoản Google khác nhau.
 - Dữ liệu mẫu: chạy script seed (làm ở Sprint 3) để có đề full, đề lẻ, đề nháp, lịch sử và một lớp có bài giao.
 
