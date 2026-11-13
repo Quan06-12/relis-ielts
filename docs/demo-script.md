@@ -47,5 +47,8 @@ Chạy trên bản deploy ở mỗi Sprint Review và trước buổi bảo vệ
 | 35 | Học viên mở tab Kho đề lớp → Làm bài → nộp | Bài làm được chấm như bình thường |
 | 36 | Giáo viên mở tab Bảng điểm | Ô của học viên đó có điểm, bấm vào mở trang Xem lại ở chế độ chỉ xem (US40) |
 | 37 | Học viên thử mở `/classes/<id>` của lớp khác | Báo không tìm thấy |
+| 38 | Giáo viên mở tab Bài tập → "+ Giao bài", chọn đề, hạn nộp ngày mai | Bài tập hiện "0/1 đã nộp" và thời gian còn lại (US44) |
+| 39 | Học viên mở tab Bài tập | Bài nằm ở nhóm "Cần làm"; bấm Làm bài → nộp → bài chuyển sang "Đã nộp" kèm điểm (US45) |
+| 40 | Giáo viên mở lại tab Bài tập | "1/1 đã nộp"; Bảng điểm có điểm của học viên |
 
 ## 6. Trang chủ và từ vựng (E6)
