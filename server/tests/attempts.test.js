@@ -130,7 +130,9 @@ test('answers sent five seconds late are rejected without changing saved answers
 
   const reopened = await request(app).get(`/api/attempts/${attemptId}`).set('Authorization', authHeader)
   assert.equal(reopened.body.attempt.status, 'submitted')
-  assert.deepEqual(reopened.body.attempt.answers, [{ questionId, value: ['TRUE'] }])
+  // Scoring adds every question to answers; the one saved before the deadline keeps its value
+  const kept = reopened.body.attempt.answers.find((answer) => answer.questionId === questionId)
+  assert.deepEqual(kept, { questionId, value: ['TRUE'], correct: true })
 })
 
 test('a submit request delayed five seconds closes saved answers and remains repeatable', async () => {
@@ -150,12 +152,14 @@ test('a submit request delayed five seconds closes saved answers and remains rep
   const second = await request(app).post(`/api/attempts/${attemptId}/submit`).set('Authorization', authHeader)
   assert.equal(first.status, 200)
   assert.equal(first.body.status, 'submitted')
-  assert.equal(first.body.result, null)
+  assert.deepEqual(first.body.result, { correct: 1, total: 3, band: null })
   assert.equal(second.status, 200)
   assert.deepEqual(second.body, first.body)
 
   const reopened = await request(app).get(`/api/attempts/${attemptId}`).set('Authorization', authHeader)
-  assert.deepEqual(reopened.body.attempt.answers, [{ questionId, value: ['TRUE'] }])
+  // Scoring adds every question to answers; the one saved before the deadline keeps its value
+  const kept = reopened.body.attempt.answers.find((answer) => answer.questionId === questionId)
+  assert.deepEqual(kept, { questionId, value: ['TRUE'], correct: true })
 })
 
 test("another user's attempt is not found", async () => {

@@ -3,10 +3,12 @@ import { Attempt } from '../models/Attempt.js'
 import { Test } from '../models/Test.js'
 import { AppError, notFound, validationError } from '../errors/AppError.js'
 import { findTestUserCanTake } from '../services/testAccess.js'
-import { canTakeFromClass } from '../services/classAccess.js'
+import { canTakeFromClass, isTeacherOf } from '../services/classAccess.js'
+import { Class } from '../models/Class.js'
 import { checkMode } from '../utils/attemptMode.js'
 import { secondsLeft, isPastDeadline } from '../utils/attemptTimer.js'
-import { listQuestions, toPlayView } from '../utils/testContent.js'
+import { listQuestions, toPlayView, toReviewView } from '../utils/testContent.js'
+import { gradeAttempt } from '../utils/grading.js'
 
 // POST /api/attempts — start taking a test (US24, US25), alone or from a class library (US22)
 export async function startAttempt(request, response) {
@@ -91,8 +93,7 @@ export async function saveAnswers(request, response) {
   response.json({ savedAt: new Date().toISOString(), remainingSec: secondsLeft(attempt) })
 }
 
-// POST /api/attempts/:attemptId/submit — hand in early or when time is up (US31, US32)
-// Sprint 1 only closes the attempt; scoring (US35) is added in Sprint 2.
+// POST /api/attempts/:attemptId/submit — hand in early or when time is up, and score it (US31, US32, US35)
 // A request delayed by the network can still submit saved answers; this endpoint never accepts edits.
 export async function submitAttempt(request, response) {
   const attempt = await findOwnAttempt(request.params.attemptId, request.userId)
@@ -105,7 +106,91 @@ export async function submitAttempt(request, response) {
   response.json({ attemptId: attempt.id, status: attempt.status, result: attempt.result })
 }
 
+// GET /api/attempts/:attemptId/review — the submitted attempt with answers, explanations and evidence (US36, US37)
+// The person who took it can always see it; a teacher can see it when it was made from their class.
+export async function reviewAttempt(request, response) {
+  const { attemptId } = request.params
+  const attempt = mongoose.isValidObjectId(attemptId) ? await Attempt.findById(attemptId) : null
+  if (!attempt) throw notFound('Attempt')
+
+  const isOwner = String(attempt.userId) === String(request.userId)
+  const isClassTeacher = !isOwner && attempt.classId !== null && (await isTeacherOf(attempt.classId, request.userId))
+  if (!isOwner && !isClassTeacher) throw notFound('Attempt')
+
+  // The answers must not leak while the test is still being taken
+  if (attempt.status !== 'submitted') {
+    throw new AppError(409, 'ATTEMPT_NOT_SUBMITTED', 'This attempt has not been submitted yet')
+  }
+
+  const test = await Test.findById(attempt.testId)
+  response.json({
+    attempt: attempt.toJSON(),
+    test: toReviewView(test, attempt.mode.sectionIndexes),
+    viewerRole: isOwner ? 'owner' : 'teacher',
+  })
+}
+
+const HISTORY_RANGES = { '7d': 7, '30d': 30 }
+
+// GET /api/attempts — my history, newest first (US39)
+// Filters: status, skill, source (self | class), range (7d | 30d | all), q (test title), page, limit.
+export async function listMyAttempts(request, response) {
+  const { status, skill, source, range, q } = request.query
+  const page = Math.max(Number(request.query.page) || 1, 1)
+  const limit = Math.min(Math.max(Number(request.query.limit) || 20, 1), 50)
+
+  const filter = { userId: request.userId }
+  if (['in_progress', 'submitted'].includes(status)) filter.status = status
+  if (source === 'self') filter.classId = null
+  if (source === 'class') filter.classId = { $ne: null }
+  if (HISTORY_RANGES[range]) {
+    filter.startedAt = { $gte: new Date(Date.now() - HISTORY_RANGES[range] * 24 * 60 * 60 * 1000) }
+  }
+
+  // Skill and title live on the test, so first find the matching tests among the ones I attempted
+  if (['reading', 'listening'].includes(skill) || q) {
+    const testFilter = { _id: { $in: await Attempt.distinct('testId', { userId: request.userId }) } }
+    if (['reading', 'listening'].includes(skill)) testFilter.skill = skill
+    if (q) testFilter.title = { $regex: escapeRegex(q), $options: 'i' }
+    filter.testId = { $in: await Test.distinct('_id', testFilter) }
+  }
+
+  const [attempts, total] = await Promise.all([
+    Attempt.find(filter).sort({ startedAt: -1 }).skip((page - 1) * limit).limit(limit),
+    Attempt.countDocuments(filter),
+  ])
+
+  // Titles, covers and class names for the cards, fetched in two queries instead of one per card
+  const [tests, classes] = await Promise.all([
+    Test.find({ _id: { $in: attempts.map((attempt) => attempt.testId) } }).select('title skill kind coverUrl'),
+    Class.find({ _id: { $in: attempts.map((attempt) => attempt.classId).filter(Boolean) } }).select('name'),
+  ])
+  const testById = new Map(tests.map((test) => [String(test._id), test]))
+  const classById = new Map(classes.map((item) => [String(item._id), item]))
+
+  const items = attempts.map((attempt) => {
+    const test = testById.get(String(attempt.testId))
+    const fromClass = attempt.classId ? classById.get(String(attempt.classId)) : null
+    return {
+      id: attempt.id,
+      status: attempt.status,
+      mode: attempt.mode,
+      result: attempt.result,
+      startedAt: attempt.startedAt,
+      submittedAt: attempt.submittedAt,
+      test: test ? { id: test.id, title: test.title, skill: test.skill, kind: test.kind, coverUrl: test.coverUrl } : null,
+      class: fromClass ? { id: fromClass.id, name: fromClass.name } : null,
+    }
+  })
+
+  response.json({ items, total, page, limit })
+}
+
 // ---- helpers ----
+
+function escapeRegex(text) {
+  return String(text).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
 
 async function findOwnAttempt(attemptId, userId) {
   const attempt = await Attempt.findOne({ _id: attemptId, userId })
@@ -115,7 +200,14 @@ async function findOwnAttempt(attemptId, userId) {
   return attempt
 }
 
+// Closes the attempt and scores it against the test as it is right now.
+// The score is stored, so editing the test later does not change it.
 async function submit(attempt) {
+  const test = await Test.findById(attempt.testId)
+  const { answers, result } = gradeAttempt(test, attempt.answers, attempt.mode)
+
+  attempt.answers = answers
+  attempt.result = result
   attempt.status = 'submitted'
   attempt.submittedAt = new Date()
   await attempt.save()

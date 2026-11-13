@@ -67,6 +67,41 @@ export function toPlayView(test) {
   }
 }
 
+// The test as shown on the review page, after the attempt is submitted (US36, US37):
+// only the sections that were taken, with answers, explanations, evidence and transcripts.
+// `index` keeps each section's position in the whole test (Passage 2 stays "Passage 2").
+export function toReviewView(test, sectionIndexes) {
+  return {
+    id: String(test.id ?? test._id),
+    title: test.title,
+    skill: test.skill,
+    kind: test.kind,
+    sections: test.sections
+      .map((section, index) => ({ section, index }))
+      .filter(({ index }) => sectionIndexes.includes(index))
+      .map(({ section, index }) => ({
+        index,
+        title: section.title,
+        passage: section.passage,
+        audioUrl: section.audioUrl,
+        transcript: section.transcript,
+        groups: section.groups.map((group) => ({
+          type: group.type,
+          instruction: group.instruction,
+          questions: group.questions.map((question) => ({
+            id: String(question.id ?? question._id),
+            number: question.number,
+            prompt: question.prompt,
+            options: question.options,
+            answers: question.answers,
+            explanation: question.explanation,
+            evidence: question.evidence ?? null,
+          })),
+        })),
+      })),
+  }
+}
+
 // One card in the test library
 export function toSummary(test, lastBand = null) {
   return {

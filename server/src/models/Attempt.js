@@ -5,6 +5,17 @@ const answerSchema = new mongoose.Schema(
   {
     questionId: { type: mongoose.Schema.Types.ObjectId, required: true },
     value: { type: [String], default: [] }, // several items only for multi_select
+    correct: { type: Boolean }, // filled when the attempt is submitted (US35), absent before
+  },
+  { _id: false }
+)
+
+// Score saved when the attempt is submitted (US35). No _id: it is a value, not a document.
+const resultSchema = new mongoose.Schema(
+  {
+    correct: Number,
+    total: Number,
+    band: Number, // null when only some sections were practised
   },
   { _id: false }
 )
@@ -25,11 +36,8 @@ const attemptSchema = new mongoose.Schema(
     answers: { type: [answerSchema], default: [] },
     startedAt: { type: Date, default: Date.now },
     submittedAt: { type: Date, default: null },
-    // Filled by scoring in Sprint 2 (US35)
-    result: {
-      type: { correct: Number, total: Number, band: Number },
-      default: null,
-    },
+    // Filled by scoring when the attempt is submitted (US35)
+    result: { type: resultSchema, default: null },
   },
   { timestamps: true }
 )
