@@ -5,6 +5,7 @@ import { deleteTest } from '../api/testEditor.js'
 import { getErrorMessage } from '../api/errorMessages.js'
 import TestCard from '../features/library/TestCard.jsx'
 import ModeDialog from '../features/attempt/ModeDialog.jsx'
+import ShareToClassesDialog from '../features/classes/ShareToClassesDialog.jsx'
 import './LibraryPage.css'
 
 const SKILL_TABS = [
@@ -13,7 +14,7 @@ const SKILL_TABS = [
   { label: 'Listening', value: 'listening' },
 ]
 
-// My test library: start, edit or delete a test (US20, US22).
+// My test library: start, edit, delete or share a test with my classes (US20, US21, US22).
 export default function LibraryPage() {
   const [skill, setSkill] = useState('')
   const [search, setSearch] = useState('')
@@ -22,6 +23,7 @@ export default function LibraryPage() {
   const [error, setError] = useState('')
   const [testToStart, setTestToStart] = useState(null)
   const [testToDelete, setTestToDelete] = useState(null)
+  const [testToShare, setTestToShare] = useState(null)
 
   useEffect(() => {
     setIsLoading(true)
@@ -83,11 +85,12 @@ export default function LibraryPage() {
 
       <div className="library-grid">
         {tests.map((test) => (
-          <TestCard key={test.id} test={test} onStart={setTestToStart} onDelete={setTestToDelete} />
+          <TestCard key={test.id} test={test} onStart={setTestToStart} onDelete={setTestToDelete} onShare={setTestToShare} />
         ))}
       </div>
 
       {testToStart && <ModeDialog testId={testToStart.id} onClose={() => setTestToStart(null)} />}
+      {testToShare && <ShareToClassesDialog test={testToShare} onClose={() => setTestToShare(null)} />}
 
       {testToDelete && (
         <div className="dialog-backdrop" onClick={() => setTestToDelete(null)}>

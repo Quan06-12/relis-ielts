@@ -27,4 +27,15 @@ Chạy trên bản deploy ở mỗi Sprint Review và trước buổi bảo vệ
 
 ## 5. Lớp học (E5)
 
+| # | Làm gì | Người xem thấy |
+|---|---|---|
+| 30 | Giáo viên vào Lớp học → "+ Tạo lớp", nhập tên, chọn màu | Vào trang lớp mới, thấy mã lớp 6 ký tự (US04) |
+| 31 | Bấm Sao chép cạnh mã lớp, dán vào chat | Mã được dán đúng (US05) |
+| 32 | Học viên → "Nhập mã lớp", gõ mã bằng chữ thường | Vào được lớp; nhập lại lần nữa thì báo "đã ở trong lớp" (US06) |
+| 33 | Cả hai mở trang Lớp học | Giáo viên thấy lớp ở tab "Lớp tôi dạy" kèm số học viên; học viên thấy ở "Lớp tôi học" kèm tên giáo viên (US07) |
+| 34 | Giáo viên ở Kho đề bấm "Đưa lên lớp" trên một đề đã xuất bản, chọn lớp | Đề xuất hiện ở tab Kho đề lớp; đề nháp không có nút này (US21) |
+| 35 | Học viên mở tab Kho đề lớp → Làm bài → nộp | Bài làm được chấm như bình thường |
+| 36 | Giáo viên mở tab Bảng điểm | Ô của học viên đó có điểm, bấm vào mở trang Xem lại ở chế độ chỉ xem (US40) |
+| 37 | Học viên thử mở `/classes/<id>` của lớp khác | Báo không tìm thấy |
+
 ## 6. Trang chủ và từ vựng (E6)

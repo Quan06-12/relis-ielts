@@ -1,0 +1,117 @@
+.classes-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.classes-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.classes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.class-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--white);
+  text-decoration: none;
+}
+
+.class-card:hover {
+  border-color: var(--purple);
+}
+
+.class-card-band {
+  height: 56px;
+}
+
+.class-card-body {
+  padding: 14px 16px 16px;
+}
+
+.class-card-body h3 {
+  margin: 0 0 6px;
+  font-size: 17px;
+}
+
+.class-card-description {
+  margin: 0 0 8px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.class-card-meta {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* Create / join dialogs */
+.class-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.class-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.class-form input,
+.class-form textarea {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 400;
+}
+
+.class-code-input {
+  letter-spacing: 0.3em;
+  font-size: 20px !important;
+  text-align: center;
+}
+
+.class-colors {
+  display: flex;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.class-colors legend {
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.color-swatch {
+  width: 32px;
+  height: 32px;
+  border: 3px solid transparent;
+  border-radius: 50%;
+}
+
+.color-swatch.selected {
+  border-color: var(--text);
+}
+
+.form-error {
+  margin: 0;
+  color: #9b1c1c;
+}
