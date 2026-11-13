@@ -27,12 +27,10 @@ export async function startAttempt(request, response) {
     throw validationError([{ field: 'assignmentId', message: 'assignmentId must be an assignment id or null' }])
   }
 
-  const test = await findTestUserCanTake(testId, request.userId)
-  const cleanMode = checkMode(mode, test)
-
+  let assignment = null
   if (assignmentId !== null) {
     // Homework: the assignment must be for this test and for a class the user is in
-    const assignment = await Assignment.findOne({ _id: assignmentId, testId: test._id })
+    assignment = await Assignment.findOne({ _id: assignmentId, testId })
     if (!assignment || !(await findRole(assignment.classId, request.userId))) {
       throw notFound('Assignment')
     }
@@ -40,7 +38,15 @@ export async function startAttempt(request, response) {
       throw new AppError(422, 'DEADLINE_PASSED', 'The deadline of this assignment has passed')
     }
     classId = assignment.classId
-  } else if (classId !== null && !(await canTakeFromClass(classId, test._id, request.userId))) {
+  }
+
+  const test = assignment
+    ? await Test.findOne({ _id: testId, status: 'published', hidden: false })
+    : await findTestUserCanTake(testId, request.userId)
+  if (!test) throw notFound('Test')
+  const cleanMode = checkMode(mode, test)
+
+  if (assignmentId === null && classId !== null && !(await canTakeFromClass(classId, test._id, request.userId))) {
     // Started from a class library: remember the class so the teacher's gradebook can find it (US40)
     throw notFound('Test')
   }
