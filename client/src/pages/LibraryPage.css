@@ -1,0 +1,52 @@
+.library-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.library-search {
+  min-width: 260px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font: inherit;
+}
+
+.library-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0 24px;
+}
+
+.library-tab {
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--white);
+}
+
+.library-tab.active {
+  border-color: var(--purple);
+  background: var(--purple);
+  color: var(--white);
+}
+
+.library-message {
+  color: var(--text-muted);
+}
+
+.library-message.error {
+  color: #9b1c1c;
+}
+
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.primary-button.danger {
+  background: #b42318;
+}

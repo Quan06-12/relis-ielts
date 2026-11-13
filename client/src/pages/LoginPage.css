@@ -1,0 +1,83 @@
+.login-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+  background: var(--purple);
+  color: var(--white);
+}
+
+.login-intro {
+  align-self: center;
+  max-width: 520px;
+  padding: 48px 48px 48px 72px;
+}
+
+.login-intro h1 {
+  margin: 0 0 8px;
+  font-size: 40px;
+}
+
+.login-subtitle {
+  margin: 0 0 24px;
+  font-size: 20px;
+  color: #e4dcff;
+}
+
+.login-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+  padding: 48px;
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 56px;
+  font-weight: 700;
+}
+
+/* Glass card from the wireframe; the dark tint keeps white text readable */
+.login-card {
+  max-width: 440px;
+  padding: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04)), rgba(30, 15, 90, 0.15);
+  backdrop-filter: blur(18px);
+}
+
+.login-card h2 {
+  margin: 0 0 8px;
+}
+
+.login-google-button {
+  margin-top: 24px;
+}
+
+.login-status {
+  color: #e4dcff;
+}
+
+.login-error {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #fde8e8;
+  color: #9b1c1c;
+}
+
+@media (max-width: 800px) {
+  .login-page {
+    grid-template-columns: 1fr;
+  }
+
+  .login-intro {
+    padding: 32px 24px 0;
+  }
+
+  .login-panel {
+    padding: 24px;
+  }
+}

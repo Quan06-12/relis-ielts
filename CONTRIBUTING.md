@@ -85,6 +85,6 @@ Một story chỉ được kéo sang Done khi:
 2. Pull request đã được approve và merge vào `develop`.
 3. Logic dễ sai có unit test: chấm điểm, quy đổi band, đồng hồ, quyền truy cập.
 4. Chạy đúng trên bản deploy, không có lỗi trong console.
-5. Endpoint mới hoặc thay đổi đã cập nhật trong bảng REST API.
+5. Endpoint mới hoặc thay đổi đã cập nhật trong hợp đồng `docs/api/openapi.yaml` trước khi code.
 6. Tính năng người dùng nhìn thấy đã có bước tương ứng trong `docs/demo-script.md`.
 7. Không commit `.env`, API key hay mật khẩu.

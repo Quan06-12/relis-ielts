@@ -1,0 +1,80 @@
+.test-card {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--white);
+}
+
+.test-card-cover {
+  display: grid;
+  place-items: center;
+  height: 120px;
+  border-radius: 12px 12px 0 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.test-card-cover.reading {
+  background-color: #ece8fc;
+  color: var(--reading);
+}
+
+.test-card-cover.listening {
+  background-color: #fdebd9;
+  color: var(--listening);
+}
+
+.test-card-skill-mark {
+  font-weight: 700;
+  font-size: 20px;
+}
+
+/* Brownish-red ribbon from the wireframe */
+.band-stamp {
+  position: absolute;
+  top: -6px;
+  right: 14px;
+  width: 34px;
+  padding: 12px 0 14px;
+  background: linear-gradient(90deg, #c73b2c, #8e271c);
+  color: var(--white);
+  font-weight: 700;
+  font-size: 13px;
+  text-align: center;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 7px), 0 100%);
+}
+
+.test-card-body {
+  padding: 14px 16px 16px;
+}
+
+.test-card-body h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+}
+
+.test-card-meta {
+  margin: 0 0 14px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.draft-chip {
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--background);
+  font-size: 12px;
+}
+
+.test-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+
+.secondary-button.danger {
+  margin-left: auto;
+  color: #b42318;
+}

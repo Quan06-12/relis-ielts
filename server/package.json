@@ -1,0 +1,29 @@
+{
+  "name": "relis-server",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "node --watch --env-file=.env src/server.js",
+    "start": "node src/server.js",
+    "test": "node --test",
+    "lint": "oxlint src tests"
+  },
+  "dependencies": {
+    "cloudinary": "^2.11.0",
+    "cors": "^2.8.6",
+    "express": "^5.3.0",
+    "google-auth-library": "^11.3.4",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.12.1",
+    "multer": "^2.5.0"
+  },
+  "devDependencies": {
+    "mongodb-memory-server": "^11.3.0",
+    "oxlint": "^1.89.0",
+    "supertest": "^7.3.2"
+  }
+}
