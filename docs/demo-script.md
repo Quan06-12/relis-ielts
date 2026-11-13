@@ -25,6 +25,15 @@ Chạy trên bản deploy ở mỗi Sprint Review và trước buổi bảo vệ
 
 ## 4. Kết quả, xem lại và AI feedback (E4, E7)
 
+| # | Làm gì | Người xem thấy |
+|---|---|---|
+| 20 | Học viên nộp một đề, cố ý làm sai vài câu | Chuyển sang trang Xem lại, dòng đầu ghi số câu đúng; đề full 40 câu có thêm band (US35) |
+| 21 | Nhìn danh sách câu và thanh số câu ở đáy | Câu đúng viền xanh lá, câu sai viền đỏ, câu bỏ trống màu xám; câu sai hiện đáp án đúng (US36) |
+| 22 | Bấm vào một câu sai | Hiện các bước giải thích; đoạn bằng chứng trong passage (hoặc transcript) được tô vàng (US37) |
+| 23 | Mở Lịch sử | Lần làm vừa rồi nằm ở nhóm "Tuần này", có điểm và nút Xem lại (US39) |
+| 24 | Lọc "Đang làm dở", rồi lọc Listening, rồi gõ tên đề | Danh sách đổi theo từng bộ lọc; bài làm dở có nút Làm tiếp (US39) |
+| 25 | Giáo viên sửa đáp án đề vừa làm, học viên mở lại Lịch sử | Điểm cũ không đổi |
+
 ## 5. Lớp học (E5)
 
 | # | Làm gì | Người xem thấy |

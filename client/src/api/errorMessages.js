@@ -7,6 +7,7 @@ const messages = {
   NOT_FOUND: 'Không tìm thấy nội dung này.',
   ALREADY_MEMBER: 'Bạn đã ở trong lớp này rồi.',
   FILE_TOO_LARGE: 'File quá lớn.',
+  ATTEMPT_NOT_SUBMITTED: 'Bài này chưa nộp nên chưa xem lại được.',
   INTERNAL_ERROR: 'Máy chủ gặp lỗi, vui lòng thử lại sau.',
   DATABASE_UNAVAILABLE: 'Máy chủ đang bận, vui lòng thử lại sau.',
 }
