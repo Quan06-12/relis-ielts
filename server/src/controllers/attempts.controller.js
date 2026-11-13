@@ -3,19 +3,28 @@ import { Attempt } from '../models/Attempt.js'
 import { Test } from '../models/Test.js'
 import { AppError, notFound, validationError } from '../errors/AppError.js'
 import { findTestUserCanTake } from '../services/testAccess.js'
+import { canTakeFromClass } from '../services/classAccess.js'
 import { checkMode } from '../utils/attemptMode.js'
 import { secondsLeft, isPastDeadline } from '../utils/attemptTimer.js'
 import { listQuestions, toPlayView } from '../utils/testContent.js'
 
-// POST /api/attempts — start taking a test (US24, US25)
+// POST /api/attempts — start taking a test (US24, US25), alone or from a class library (US22)
 export async function startAttempt(request, response) {
-  const { testId, mode } = request.body ?? {}
+  const { testId, mode, classId = null } = request.body ?? {}
   if (!mongoose.isValidObjectId(testId)) {
     throw validationError([{ field: 'testId', message: 'testId is required' }])
+  }
+  if (classId !== null && !mongoose.isValidObjectId(classId)) {
+    throw validationError([{ field: 'classId', message: 'classId must be a class id or null' }])
   }
 
   const test = await findTestUserCanTake(testId, request.userId)
   const cleanMode = checkMode(mode, test)
+
+  // Started from a class library: remember the class so the teacher's gradebook can find it (US40)
+  if (classId !== null && !(await canTakeFromClass(classId, test._id, request.userId))) {
+    throw notFound('Test')
+  }
 
   // Only one unfinished attempt per test: offer to continue it instead (US33)
   const unfinished = await Attempt.findOne({ userId: request.userId, testId: test._id, status: 'in_progress' })
@@ -28,7 +37,7 @@ export async function startAttempt(request, response) {
     await submit(unfinished)
   }
 
-  const attempt = await Attempt.create({ userId: request.userId, testId: test._id, mode: cleanMode })
+  const attempt = await Attempt.create({ userId: request.userId, testId: test._id, classId, mode: cleanMode })
 
   response.status(201).json(withTest(attempt, test))
 }

@@ -37,5 +37,7 @@ const attemptSchema = new mongoose.Schema(
 // History page and "unfinished attempt" lookups
 attemptSchema.index({ userId: 1, startedAt: -1 })
 attemptSchema.index({ userId: 1, testId: 1, status: 1 })
+// Class gradebook (US40)
+attemptSchema.index({ classId: 1, status: 1 })
 
 export const Attempt = mongoose.model('Attempt', attemptSchema)

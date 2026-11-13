@@ -1,5 +1,6 @@
 import { Test } from '../models/Test.js'
 import { notFound } from '../errors/AppError.js'
+import { isInOneOfMyClasses } from './classAccess.js'
 
 // Loads a test that belongs to the user (for the editor). Anyone else gets 404.
 export async function findOwnedTest(testId, userId) {
@@ -10,8 +11,21 @@ export async function findOwnedTest(testId, userId) {
   return test
 }
 
-// Loads a test the user is allowed to take.
-// Sprint 1: only the owner. Sprint 2 adds members of a class that has this test.
+// Loads a test the user is allowed to take: their own test, or a published test
+// in the library of a class they belong to (US22).
 export async function findTestUserCanTake(testId, userId) {
-  return findOwnedTest(testId, userId)
+  const test = await Test.findOne({ _id: testId, hidden: false })
+  if (!test) {
+    throw notFound('Test')
+  }
+
+  if (String(test.ownerId) === String(userId)) {
+    return test
+  }
+
+  if (test.status === 'published' && (await isInOneOfMyClasses(test._id, userId))) {
+    return test
+  }
+
+  throw notFound('Test')
 }
