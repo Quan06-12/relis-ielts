@@ -21,3 +21,7 @@ pnpm-debug.log*
 .idea/
 .DS_Store
 Thumbs.db
+
+# Local test artifacts
+server/.cache/
+server/test-results/

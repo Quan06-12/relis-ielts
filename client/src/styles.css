@@ -44,3 +44,58 @@ button {
   margin: 0 auto;
   padding: 32px 24px;
 }
+
+/* Shared buttons and dialog, used on several pages */
+.primary-button,
+.secondary-button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.primary-button {
+  border: none;
+  background: var(--purple);
+  color: var(--white);
+}
+
+.primary-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.secondary-button {
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--text);
+}
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(30, 22, 64, 0.45);
+}
+
+.dialog {
+  width: min(460px, 100%);
+  padding: 24px;
+  border-radius: 16px;
+  background: var(--white);
+}
+
+.dialog h2 {
+  margin: 0 0 16px;
+  font-size: 20px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
