@@ -72,3 +72,8 @@
   gap: 8px;
 }
 
+
+.secondary-button.danger {
+  margin-left: auto;
+  color: #b42318;
+}

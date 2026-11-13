@@ -46,3 +46,7 @@
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 20px;
 }
+
+.primary-button.danger {
+  background: #b42318;
+}
