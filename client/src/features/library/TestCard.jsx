@@ -4,8 +4,8 @@ import './TestCard.css'
 const SKILL_LABEL = { reading: 'Reading', listening: 'Listening' }
 const KIND_LABEL = { full: 'Full test', single: 'Đề lẻ' }
 
-// One test in the library grid: cover, band stamp, title and actions (US22).
-export default function TestCard({ test, onStart }) {
+// One test in the library grid: cover, band stamp, title and actions (US20, US22).
+export default function TestCard({ test, onStart, onDelete }) {
   const canStart = test.questionCount > 0
 
   return (
@@ -31,6 +31,7 @@ export default function TestCard({ test, onStart }) {
             Làm bài
           </button>
           <Link to={`/tests/${test.id}/edit`} className="secondary-button">Sửa</Link>
+          <button type="button" className="secondary-button danger" onClick={() => onDelete(test)}>Xoá</button>
         </div>
       </div>
     </article>
