@@ -6,8 +6,7 @@ info:
     API contract between `client/` and `server/`.
     This file is the source of truth: change it in the same pull request as the code,
     and change it first when the two sides need to agree on something new.
-    Covers Sprint 0 (auth) and Sprint 1 (tests, uploads, attempts).
-    Sprint 2 endpoints are added when that sprint starts.
+    Covers Sprint 0 (auth), Sprint 1 (tests, uploads, attempts) and Sprint 2 (classes; grading, review, history).
 
 servers:
   - url: http://localhost:5000/api
@@ -29,6 +28,8 @@ tags:
     description: Cover images and audio files on Cloudinary (owner A)
   - name: Attempts
     description: Taking a test (owner B)
+  - name: Classes
+    description: Classes, class library and gradebook (owner A)
 
 paths:
   /health:
@@ -324,6 +325,11 @@ paths:
               required: [testId, mode]
               properties:
                 testId: { $ref: '#/components/schemas/Id' }
+                classId:
+                  description: Set when the test is started from a class library; the attempt then appears in that class gradebook
+                  oneOf:
+                    - $ref: '#/components/schemas/Id'
+                    - type: 'null'
                 assignmentId:
                   description: Set when the test is taken as a class assignment (Sprint 3)
                   oneOf:
@@ -429,6 +435,268 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
 
+  /classes:
+    get:
+      operationId: listMyClasses
+      tags: [Classes]
+      summary: Classes I teach and classes I study in (US07)
+      parameters:
+        - name: role
+          in: query
+          schema: { type: string, enum: [teacher, student] }
+          description: Leave out to get both
+      responses:
+        '200':
+          description: My classes, newest membership first
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/ClassInfo' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      operationId: createClass
+      tags: [Classes]
+      summary: Create a class; the creator becomes its teacher (US04)
+      description: The server generates a unique 6-character code (A–Z and 2–9, without O/0/I/1).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string, maxLength: 80 }
+                description: { type: string, maxLength: 300 }
+                color: { $ref: '#/components/schemas/ClassColor' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [class]
+                properties:
+                  class: { $ref: '#/components/schemas/ClassInfo' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /classes/join:
+    post:
+      operationId: joinClass
+      tags: [Classes]
+      summary: Join a class with its code (US06)
+      description: Spaces and lower case in the code are ignored.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code: { type: string, example: AB3K9Z }
+      responses:
+        '201':
+          description: Joined as a student
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [class]
+                properties:
+                  class: { $ref: '#/components/schemas/ClassInfo' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Already a member (`ALREADY_MEMBER`); `details.classId`
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /classes/{classId}:
+    parameters:
+      - $ref: '#/components/parameters/ClassId'
+    get:
+      operationId: getClass
+      tags: [Classes]
+      summary: Class details (US05)
+      description: Members only. `code` is filled only for teachers.
+      responses:
+        '200':
+          description: The class
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [class]
+                properties:
+                  class: { $ref: '#/components/schemas/ClassInfo' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /classes/{classId}/members:
+    parameters:
+      - $ref: '#/components/parameters/ClassId'
+    get:
+      operationId: listClassMembers
+      tags: [Classes]
+      summary: Members of the class, teachers first (teacher only)
+      responses:
+        '200':
+          description: Members
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        user: { $ref: '#/components/schemas/PublicUser' }
+                        role: { type: string, enum: [teacher, student] }
+                        joinedAt: { type: string, format: date-time }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /classes/{classId}/library:
+    parameters:
+      - $ref: '#/components/parameters/ClassId'
+    get:
+      operationId: listClassLibrary
+      tags: [Classes]
+      summary: Tests in the class library (US22)
+      description: Members only. `lastBand` is the caller's own latest full-test band.
+      responses:
+        '200':
+          description: Tests, most recently added first
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/TestSummary'
+                        - type: object
+                          properties:
+                            addedAt: { type: string, format: date-time }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      operationId: addToClassLibrary
+      tags: [Classes]
+      summary: Add some of my published tests to the class (US21, teacher only)
+      description: |
+        Tests already in the class are skipped, so repeating the request is harmless.
+        To add to several classes, the client calls this once per class.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [testIds]
+              properties:
+                testIds:
+                  type: array
+                  minItems: 1
+                  items: { $ref: '#/components/schemas/Id' }
+      responses:
+        '200':
+          description: How many tests were new to the class
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  added: { type: integer }
+        '400':
+          description: A test is not one of my published tests (`VALIDATION_ERROR`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /classes/{classId}/library/{testId}:
+    parameters:
+      - $ref: '#/components/parameters/ClassId'
+      - $ref: '#/components/parameters/TestId'
+    delete:
+      operationId: removeFromClassLibrary
+      tags: [Classes]
+      summary: Remove a test from the class (US21, teacher only)
+      description: Attempts already made from the class are kept.
+      responses:
+        '204': { description: Removed }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /classes/{classId}/gradebook:
+    parameters:
+      - $ref: '#/components/parameters/ClassId'
+    get:
+      operationId: getGradebook
+      tags: [Classes]
+      summary: Scores of every student on every class test (US40, teacher only)
+      description: |
+        One row per student, one cell per test in the class library.
+        A cell is the student's latest submitted attempt started from this class, or `null`.
+        `averageBand` is the mean of the full-test bands, rounded the IELTS way.
+      responses:
+        '200':
+          description: The gradebook
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [tests, rows]
+                properties:
+                  tests:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { $ref: '#/components/schemas/Id' }
+                        title: { type: string }
+                        skill: { $ref: '#/components/schemas/Skill' }
+                  rows:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        student: { $ref: '#/components/schemas/PublicUser' }
+                        averageBand: { type: [number, 'null'] }
+                        cells:
+                          type: array
+                          items:
+                            oneOf:
+                              - type: 'null'
+                              - type: object
+                                properties:
+                                  testId: { $ref: '#/components/schemas/Id' }
+                                  attemptId: { $ref: '#/components/schemas/Id' }
+                                  correct: { type: [integer, 'null'] }
+                                  total: { type: [integer, 'null'] }
+                                  band: { type: [number, 'null'] }
+                                  submittedAt: { type: string, format: date-time }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
 components:
   securitySchemes:
     bearerAuth:
@@ -440,6 +708,11 @@ components:
   parameters:
     TestId:
       name: testId
+      in: path
+      required: true
+      schema: { $ref: '#/components/schemas/Id' }
+    ClassId:
+      name: classId
       in: path
       required: true
       schema: { $ref: '#/components/schemas/Id' }
@@ -762,3 +1035,33 @@ components:
       properties:
         attempt: { $ref: '#/components/schemas/Attempt' }
         test: { $ref: '#/components/schemas/PlayTest' }
+
+    ClassColor:
+      type: string
+      enum: [purple, blue, green, orange, pink]
+      default: purple
+
+    ClassInfo:
+      type: object
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        name: { type: string }
+        description: { type: string }
+        color: { $ref: '#/components/schemas/ClassColor' }
+        code:
+          type: [string, 'null']
+          description: Only teachers of the class get the code
+        myRole: { type: string, enum: [teacher, student] }
+        studentCount: { type: integer }
+        teacherName:
+          type: [string, 'null']
+          description: Only in GET /classes
+        createdAt: { type: string, format: date-time }
+
+    PublicUser:
+      type: object
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        name: { type: string }
+        email: { type: string }
+        avatarUrl: { type: [string, 'null'] }
