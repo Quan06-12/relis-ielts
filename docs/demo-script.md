@@ -24,6 +24,10 @@ Chạy trên bản deploy ở mỗi Sprint Review và trước buổi bảo vệ
 
 ## 3. Làm bài (E3)
 
+| # | Làm gì | Người xem thấy |
+|---|---|---|
+| 15 | Đang làm bài, chọn một đáp án rồi bấm F5 ngay | Đáp án vừa chọn vẫn còn, đồng hồ chạy tiếp đúng thời gian còn lại (US33) |
+
 ## 4. Kết quả, xem lại và AI feedback (E4, E7)
 
 | # | Làm gì | Người xem thấy |
@@ -49,3 +53,9 @@ Chạy trên bản deploy ở mỗi Sprint Review và trước buổi bảo vệ
 | 37 | Học viên thử mở `/classes/<id>` của lớp khác | Báo không tìm thấy |
 
 ## 6. Trang chủ và từ vựng (E6)
+
+| # | Làm gì | Người xem thấy |
+|---|---|---|
+| 50 | Mở Trang chủ → "Đặt mục tiêu", chọn Reading 7.0, Listening 7.5, ngày thi | Thẻ mục tiêu cập nhật, hiện "Còn N ngày đến ngày thi" (US46) |
+| 51 | Làm full một đề Reading 40 câu rồi quay lại Trang chủ | Thẻ Reading hiện band vừa đạt và khoảng cách đến mục tiêu |
+| 52 | Để một bài đang làm dở rồi mở Trang chủ | Mục "Đang làm dở" có nút Làm tiếp |
