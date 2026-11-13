@@ -6,7 +6,7 @@ info:
     API contract between `client/` and `server/`.
     This file is the source of truth: change it in the same pull request as the code,
     and change it first when the two sides need to agree on something new.
-    Covers Sprint 0 (auth), Sprint 1 (tests, uploads, attempts) and Sprint 2 (classes; grading, review, history).
+    Covers Sprint 0 (auth), Sprint 1 (tests, uploads, attempts), Sprint 2 (classes; grading, review, history) and Sprint 3 (assignments, home goals).
 
 servers:
   - url: http://localhost:5000/api
@@ -370,7 +370,9 @@ paths:
                     - $ref: '#/components/schemas/Id'
                     - type: 'null'
                 assignmentId:
-                  description: Set when the test is taken as a class assignment (Sprint 3)
+                  description: |
+                    Set when the test is taken as a class assignment (US44); the class is then taken from the assignment.
+                    After the deadline this returns 422 `DEADLINE_PASSED` unless the teacher allowed late work.
                   oneOf:
                     - $ref: '#/components/schemas/Id'
                     - type: 'null'
@@ -386,6 +388,11 @@ paths:
         '404': { $ref: '#/components/responses/NotFound' }
         '409':
           description: An unfinished attempt exists (`ATTEMPT_IN_PROGRESS`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '422':
+          description: Assignment deadline passed and late work not allowed (`DEADLINE_PASSED`)
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
@@ -765,6 +772,107 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
 
+  /users/me:
+    patch:
+      operationId: updateMyProfile
+      tags: [Auth]
+      summary: Set target bands and exam date (US46)
+      description: Only the fields sent change; `null` clears a field.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                goals:
+                  type: object
+                  properties:
+                    reading: { $ref: '#/components/schemas/BandOrNull' }
+                    listening: { $ref: '#/components/schemas/BandOrNull' }
+                    overall: { $ref: '#/components/schemas/BandOrNull' }
+                examDate: { type: [string, 'null'], format: date }
+      responses:
+        '200':
+          description: The updated user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user: { $ref: '#/components/schemas/User' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /classes/{classId}/assignments:
+    parameters:
+      - $ref: '#/components/parameters/ClassId'
+    get:
+      operationId: listAssignments
+      tags: [Classes]
+      summary: Assignments of the class, nearest deadline first (US44, US45)
+      description: |
+        Teachers get `submittedCount` and `studentCount`.
+        Students get `myStatus` (todo, in_progress, submitted, late, missed), `myAttemptId` and `myResult`.
+      responses:
+        '200':
+          description: Assignments
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Assignment' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      operationId: createAssignment
+      tags: [Classes]
+      summary: Assign one of my published tests with a deadline (US44, teacher only)
+      description: The test is also added to the class library so students can open it.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [testId, deadline]
+              properties:
+                testId: { $ref: '#/components/schemas/Id' }
+                deadline: { type: string, format: date-time, description: Must be in the future }
+                allowLate: { type: boolean, default: false }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assignment: { $ref: '#/components/schemas/Assignment' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /classes/{classId}/assignments/{assignmentId}:
+    parameters:
+      - $ref: '#/components/parameters/ClassId'
+      - name: assignmentId
+        in: path
+        required: true
+        schema: { $ref: '#/components/schemas/Id' }
+    delete:
+      operationId: deleteAssignment
+      tags: [Classes]
+      summary: Delete an assignment (teacher only); attempts already made are kept
+      responses:
+        '204': { description: Deleted }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1089,6 +1197,7 @@ components:
           oneOf:
             - $ref: '#/components/schemas/Id'
             - type: 'null'
+        isLate: { type: boolean, description: Handed in after the assignment deadline }
         mode: { $ref: '#/components/schemas/AttemptMode' }
         status:
           type: string
@@ -1210,3 +1319,38 @@ components:
               properties:
                 id: { $ref: '#/components/schemas/Id' }
                 name: { type: string }
+
+    BandOrNull:
+      type: [number, 'null']
+      minimum: 0
+      maximum: 9
+      multipleOf: 0.5
+
+    Assignment:
+      type: object
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        classId: { $ref: '#/components/schemas/Id' }
+        deadline: { type: string, format: date-time }
+        allowLate: { type: boolean }
+        createdAt: { type: string, format: date-time }
+        test:
+          type: object
+          properties:
+            id: { $ref: '#/components/schemas/Id' }
+            title: { type: string }
+            skill: { $ref: '#/components/schemas/Skill' }
+            durationMin: { type: integer }
+            questionCount: { type: integer }
+        submittedCount: { type: integer, description: Teachers only }
+        studentCount: { type: integer, description: Teachers only }
+        myStatus:
+          type: string
+          enum: [todo, in_progress, submitted, late, missed]
+          description: Students only
+        myAttemptId: { type: [string, 'null'], description: Students only }
+        myResult:
+          description: Students only
+          oneOf:
+            - $ref: '#/components/schemas/Result'
+            - type: 'null'

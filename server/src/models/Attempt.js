@@ -24,7 +24,7 @@ const attemptSchema = new mongoose.Schema(
   {
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     testId: { type: mongoose.Schema.Types.ObjectId, ref: 'Test', required: true },
-    // Set when the test is a class assignment (Sprint 3); null means practising alone
+    // Set when the test is a class assignment (US44); null means practising alone or from the class library
     assignmentId: { type: mongoose.Schema.Types.ObjectId, default: null },
     classId: { type: mongoose.Schema.Types.ObjectId, default: null },
     mode: {
@@ -38,6 +38,8 @@ const attemptSchema = new mongoose.Schema(
     submittedAt: { type: Date, default: null },
     // Filled by scoring when the attempt is submitted (US35)
     result: { type: resultSchema, default: null },
+    // Handed in after the assignment deadline (only possible when the teacher allows late work, US44)
+    isLate: { type: Boolean, default: false },
   },
   { timestamps: true }
 )
@@ -47,5 +49,7 @@ attemptSchema.index({ userId: 1, startedAt: -1 })
 attemptSchema.index({ userId: 1, testId: 1, status: 1 })
 // Class gradebook (US40)
 attemptSchema.index({ classId: 1, status: 1 })
+// Assignments tab (US44, US45)
+attemptSchema.index({ assignmentId: 1, userId: 1 })
 
 export const Attempt = mongoose.model('Attempt', attemptSchema)

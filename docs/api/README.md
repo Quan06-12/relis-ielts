@@ -54,7 +54,7 @@ Client hiển thị thông báo tiếng Việt dựa trên `code`, không hiển
 | 409 | `ALREADY_MEMBER` | Nhập mã lớp đã tham gia (Sprint 2) |
 | 413 | `FILE_TOO_LARGE` | File upload vượt giới hạn |
 | 422 | `TEST_INCOMPLETE` | Xuất bản đề còn câu chưa có đáp án; `details` liệt kê số câu |
-| 422 | `DEADLINE_PASSED` | Nộp bài giao sau hạn khi không cho nộp trễ (Sprint 3) |
+| 422 | `DEADLINE_PASSED` | Bắt đầu làm bài giao sau hạn khi giáo viên không cho nộp trễ (US44) |
 | 500 | `INTERNAL_ERROR` | Lỗi không lường trước; xem log trên Render |
 | 502 | `AI_FEEDBACK_FAILED` | Gemini lỗi hoặc hết hạn mức (US49) |
 | 503 | `DATABASE_UNAVAILABLE` | Mất kết nối MongoDB |
