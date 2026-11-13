@@ -308,6 +308,45 @@ paths:
               schema: { $ref: '#/components/schemas/Error' }
 
   /attempts:
+    get:
+      operationId: listMyAttempts
+      tags: [Attempts]
+      summary: My history, newest first (US39)
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string, enum: [in_progress, submitted] }
+        - name: skill
+          in: query
+          schema: { $ref: '#/components/schemas/Skill' }
+        - name: source
+          in: query
+          description: '`self` = practised alone, `class` = started from a class library'
+          schema: { type: string, enum: [self, class] }
+        - name: range
+          in: query
+          schema: { type: string, enum: [7d, 30d, all], default: all }
+        - name: q
+          in: query
+          description: Part of the test title
+          schema: { type: string }
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: One page of attempts; the client groups them by week
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PageInfo'
+                  - type: object
+                    required: [items]
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/HistoryItem' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
     post:
       operationId: startAttempt
       tags: [Attempts]
@@ -413,10 +452,11 @@ paths:
     post:
       operationId: submitAttempt
       tags: [Attempts]
-      summary: Submit (US31, US32; scoring added in Sprint 2 for US35)
+      summary: Submit and score (US31, US32, US35)
       description: |
-        Sprint 1 saves the attempt and sets `status: submitted`; `result` is `null`.
-        From Sprint 2 the server also scores it. Submitting twice returns the same result.
+        Sets `status: submitted` and scores the attempt: each answer gets `correct`, and `result`
+        is filled. `band` is only set for a full test of 40 questions. The score is stored, so editing
+        the test later does not change it. Submitting twice returns the same result.
       responses:
         '200':
           description: Submitted
@@ -428,12 +468,40 @@ paths:
                 properties:
                   attemptId: { $ref: '#/components/schemas/Id' }
                   status: { type: string, const: submitted }
-                  result:
-                    oneOf:
-                      - $ref: '#/components/schemas/Result'
-                      - type: 'null'
+                  result: { $ref: '#/components/schemas/Result' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
+
+  /attempts/{attemptId}/review:
+    parameters:
+      - $ref: '#/components/parameters/AttemptId'
+    get:
+      operationId: reviewAttempt
+      tags: [Attempts]
+      summary: Review a submitted attempt (US36, US37, US41)
+      description: |
+        The person who took it can always open it; a teacher can open it when the attempt was
+        started from their class (`viewerRole: teacher`, read-only).
+        Contains the taken sections with answers, explanations, evidence and transcripts.
+      responses:
+        '200':
+          description: The attempt and the test with answers
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [attempt, test, viewerRole]
+                properties:
+                  attempt: { $ref: '#/components/schemas/Attempt' }
+                  test: { $ref: '#/components/schemas/ReviewTest' }
+                  viewerRole: { type: string, enum: [owner, teacher] }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Still in progress (`ATTEMPT_NOT_SUBMITTED`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
 
   /classes:
     get:
@@ -995,6 +1063,9 @@ components:
           type: array
           items: { type: string }
           description: One item for most questions; several for multi_select; empty = cleared
+        correct:
+          type: boolean
+          description: Only after submitting; never sent by the client
 
     Result:
       type: object
@@ -1010,6 +1081,10 @@ components:
       properties:
         id: { $ref: '#/components/schemas/Id' }
         testId: { $ref: '#/components/schemas/Id' }
+        classId:
+          oneOf:
+            - $ref: '#/components/schemas/Id'
+            - type: 'null'
         assignmentId:
           oneOf:
             - $ref: '#/components/schemas/Id'
@@ -1065,3 +1140,73 @@ components:
         name: { type: string }
         email: { type: string }
         avatarUrl: { type: [string, 'null'] }
+
+    ReviewTest:
+      type: object
+      description: Only the sections that were taken; `index` is the section's position in the whole test
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        title: { type: string }
+        skill: { $ref: '#/components/schemas/Skill' }
+        kind: { $ref: '#/components/schemas/TestKind' }
+        sections:
+          type: array
+          items:
+            type: object
+            properties:
+              index: { type: integer }
+              title: { type: string }
+              passage: { type: string }
+              audioUrl: { type: [string, 'null'] }
+              transcript: { type: string }
+              groups:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type: { $ref: '#/components/schemas/QuestionType' }
+                    instruction: { type: string }
+                    questions:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id: { $ref: '#/components/schemas/Id' }
+                          number: { type: integer }
+                          prompt: { type: string }
+                          options: { type: array, items: { type: string } }
+                          answers: { type: array, items: { type: string } }
+                          explanation: { type: array, items: { type: string } }
+                          evidence:
+                            oneOf:
+                              - $ref: '#/components/schemas/TextRange'
+                              - type: 'null'
+
+    HistoryItem:
+      type: object
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        status: { type: string, enum: [in_progress, submitted] }
+        mode: { $ref: '#/components/schemas/AttemptMode' }
+        result:
+          oneOf:
+            - $ref: '#/components/schemas/Result'
+            - type: 'null'
+        startedAt: { type: string, format: date-time }
+        submittedAt: { type: [string, 'null'], format: date-time }
+        test:
+          type: object
+          properties:
+            id: { $ref: '#/components/schemas/Id' }
+            title: { type: string }
+            skill: { $ref: '#/components/schemas/Skill' }
+            kind: { $ref: '#/components/schemas/TestKind' }
+            coverUrl: { type: [string, 'null'] }
+        class:
+          description: The class it was started from, or null when practised alone
+          oneOf:
+            - type: 'null'
+            - type: object
+              properties:
+                id: { $ref: '#/components/schemas/Id' }
+                name: { type: string }

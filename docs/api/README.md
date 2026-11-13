@@ -50,6 +50,7 @@ Client hiển thị thông báo tiếng Việt dựa trên `code`, không hiển
 | 404 | `NOT_FOUND` | Không tồn tại hoặc không có quyền xem |
 | 409 | `ATTEMPT_IN_PROGRESS` | Đã có bài làm dở của đề này; `details.attemptId` |
 | 409 | `ATTEMPT_CLOSED` | Lưu đáp án khi bài đã nộp hoặc đã hết giờ |
+| 409 | `ATTEMPT_NOT_SUBMITTED` | Mở trang Xem lại khi bài còn đang làm |
 | 409 | `ALREADY_MEMBER` | Nhập mã lớp đã tham gia (Sprint 2) |
 | 413 | `FILE_TOO_LARGE` | File upload vượt giới hạn |
 | 422 | `TEST_INCOMPLETE` | Xuất bản đề còn câu chưa có đáp án; `details` liệt kê số câu |
