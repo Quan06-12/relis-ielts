@@ -5,6 +5,7 @@ const messages = {
   UNAUTHENTICATED: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.',
   INVALID_GOOGLE_TOKEN: 'Google không xác nhận được tài khoản, vui lòng thử lại.',
   NOT_FOUND: 'Không tìm thấy nội dung này.',
+  ALREADY_MEMBER: 'Bạn đã ở trong lớp này rồi.',
   FILE_TOO_LARGE: 'File quá lớn.',
   INTERNAL_ERROR: 'Máy chủ gặp lỗi, vui lòng thử lại sau.',
   DATABASE_UNAVAILABLE: 'Máy chủ đang bận, vui lòng thử lại sau.',

@@ -8,7 +8,8 @@ import './ModeDialog.css'
 
 // "Choose mode" dialog before a test starts (US24, US25):
 // full test or some sections, and how many minutes.
-export default function ModeDialog({ testId, onClose }) {
+// classId is given when the test is opened from a class library (US22).
+export default function ModeDialog({ testId, classId = null, onClose }) {
   const navigate = useNavigate()
   const [test, setTest] = useState(null)
   const [isFullTest, setIsFullTest] = useState(true)
@@ -45,7 +46,7 @@ export default function ModeDialog({ testId, onClose }) {
     setError('')
     try {
       const mode = { type: isFullTest ? 'full' : 'parts', sectionIndexes, timeLimitMin: selectedMinutes }
-      const { attempt } = await startAttempt(test.id, mode)
+      const { attempt } = await startAttempt(test.id, mode, classId)
       navigate(`/attempts/${attempt.id}`)
     } catch (startError) {
       // An unfinished attempt already exists: offer to continue it (US33)

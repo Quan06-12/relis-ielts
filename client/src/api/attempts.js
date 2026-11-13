@@ -1,8 +1,9 @@
 import http from './http.js'
 
 // POST /attempts — start a test; returns { attempt, test }
-export async function startAttempt(testId, mode) {
-  const response = await http.post('/attempts', { testId, mode })
+// classId is set when the test is started from a class library, so it shows in the gradebook
+export async function startAttempt(testId, mode, classId = null) {
+  const response = await http.post('/attempts', { testId, mode, classId })
   return response.data
 }
 

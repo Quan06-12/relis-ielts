@@ -5,7 +5,8 @@ const SKILL_LABEL = { reading: 'Reading', listening: 'Listening' }
 const KIND_LABEL = { full: 'Full test', single: 'Đề lẻ' }
 
 // One test in the library grid: cover, band stamp, title and actions (US20, US22).
-export default function TestCard({ test, onStart, onDelete }) {
+// onShare puts a published test in one or more class libraries (US21).
+export default function TestCard({ test, onStart, onDelete, onShare }) {
   const canStart = test.questionCount > 0
 
   return (
@@ -31,6 +32,9 @@ export default function TestCard({ test, onStart, onDelete }) {
             Làm bài
           </button>
           <Link to={`/tests/${test.id}/edit`} className="secondary-button">Sửa</Link>
+          {test.status === 'published' && (
+            <button type="button" className="secondary-button" onClick={() => onShare(test)}>Đưa lên lớp</button>
+          )}
           <button type="button" className="secondary-button danger" onClick={() => onDelete(test)}>Xoá</button>
         </div>
       </div>
