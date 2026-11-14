@@ -5,6 +5,7 @@ import { getErrorMessage } from '../api/errorMessages.js'
 import { useCountdown } from '../features/attempt/useCountdown.js'
 import { questionsOf, isAnswered, countUnanswered, formatClock } from '../features/attempt/answers.js'
 import QuestionGroup from '../features/attempt/QuestionGroup.jsx'
+import { backupPending, loadPending, clearPending } from '../features/attempt/pendingBackup.js'
 import './AttemptPage.css'
 
 const AUTOSAVE_DELAY_MS = 1000
@@ -32,34 +33,56 @@ export default function AttemptPage() {
 
   const goToReview = useCallback(() => navigate(`/attempts/${attemptId}/review`, { replace: true }), [navigate, attemptId])
 
+  // Send the pending answers now (used by autosave and before submitting)
+  const flushAnswers = useCallback(async () => {
+    clearTimeout(autosaveTimer.current)
+    const sending = pendingChanges.current
+    const changes = Object.entries(sending).map(([questionId, value]) => ({ questionId, value }))
+    if (changes.length === 0) return
+    pendingChanges.current = {}
+    try {
+      await saveAnswers(attemptId, changes)
+    } catch (saveError) {
+      // Not saved: put the answers back (newer changes win) so the next autosave retries them
+      pendingChanges.current = { ...sending, ...pendingChanges.current }
+      throw saveError
+    }
+    // Answers changed while saving stay in the backup; otherwise it is no longer needed
+    backupPending(attemptId, pendingChanges.current)
+  }, [attemptId])
+
   // Load the attempt (also used after a reload: answers and time continue where they were)
   useEffect(() => {
     getAttempt(attemptId)
       .then(({ attempt, test: loadedTest }) => {
         if (attempt.status === 'submitted') {
+          clearPending(attemptId)
           goToReview()
           return
         }
+        // US33: answers chosen just before a reload may not have reached the server yet;
+        // they wait in the browser, are shown again, and are sent now
+        const notYetSaved = loadPending(attemptId)
+        pendingChanges.current = notYetSaved
+
         setTest(loadedTest)
         setSections(attempt.mode.sectionIndexes.map((index) => loadedTest.sections[index]))
-        setAnswers(Object.fromEntries(attempt.answers.map((answer) => [answer.questionId, answer.value])))
+        setAnswers({
+          ...Object.fromEntries(attempt.answers.map((answer) => [answer.questionId, answer.value])),
+          ...notYetSaved,
+        })
         setInitialSeconds(attempt.remainingSec)
+        if (Object.keys(notYetSaved).length > 0) {
+          flushAnswers().catch((saveError) => setError(getErrorMessage(saveError)))
+        }
       })
       .catch((loadError) => setError(getErrorMessage(loadError)))
-  }, [attemptId, goToReview])
-
-  // Send the pending answers now (used by autosave and before submitting)
-  const flushAnswers = useCallback(async () => {
-    clearTimeout(autosaveTimer.current)
-    const changes = Object.entries(pendingChanges.current).map(([questionId, value]) => ({ questionId, value }))
-    if (changes.length === 0) return
-    pendingChanges.current = {}
-    await saveAnswers(attemptId, changes)
-  }, [attemptId])
+  }, [attemptId, goToReview, flushAnswers])
 
   function handleAnswer(questionId, value) {
     setAnswers((current) => ({ ...current, [questionId]: value }))
     pendingChanges.current[questionId] = value
+    backupPending(attemptId, pendingChanges.current)
     const isAlmostTimeUp = secondsLeftNow.current !== null && secondsLeftNow.current <= FINAL_SECONDS
     clearTimeout(autosaveTimer.current)
     autosaveTimer.current = setTimeout(() => {
@@ -74,6 +97,7 @@ export default function AttemptPage() {
       // If saving fails because time is up, the server has already closed the attempt; submit anyway
       await flushAnswers().catch(() => {})
       await submitAttempt(attemptId)
+      clearPending(attemptId)
       goToReview()
     } catch (submitError) {
       isSubmitting.current = false
