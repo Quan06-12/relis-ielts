@@ -19,3 +19,15 @@ export function timeChoices(skill, isFullTest, sectionCount) {
     default: perSection.default * sectionCount,
   }
 }
+
+// US26: total audio length of the chosen Listening parts, in whole minutes (rounded up).
+// null when a part has no audio length yet (audio uploaded before lengths were saved).
+export function audioMinutes(sections, sectionIndexes) {
+  let seconds = 0
+  for (const index of sectionIndexes) {
+    const length = sections[index]?.audioDurationSec
+    if (typeof length !== 'number') return null
+    seconds += length
+  }
+  return Math.ceil(seconds / 60)
+}

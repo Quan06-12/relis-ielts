@@ -42,3 +42,12 @@
 .mode-error {
   color: #9b1c1c;
 }
+
+.mode-warning {
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #fff4e5;
+  color: #9a3412;
+  font-size: 14px;
+}

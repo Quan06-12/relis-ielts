@@ -32,6 +32,8 @@ Chạy trên bản deploy ở mỗi Sprint Review và trước buổi bảo vệ
 | # | Làm gì | Người xem thấy |
 |---|---|---|
 | 15 | Đang làm bài, chọn một đáp án rồi bấm F5 ngay | Đáp án vừa chọn vẫn còn, đồng hồ chạy tiếp đúng thời gian còn lại (US33) |
+| 16 | Mở một đề Listening, chọn "Luyện từng phần" và thời gian ngắn nhất | Hộp thoại cảnh báo thời gian ngắn hơn độ dài audio, vẫn cho bắt đầu (US26) |
+| 17 | Khi làm Listening, bấm 1.5x rồi chuyển sang Part khác | Audio phát nhanh hơn; Part mới vẫn giữ tốc độ 1.5x (US29) |
 
 ## 4. Kết quả, xem lại và AI feedback (E4, E7)
 
