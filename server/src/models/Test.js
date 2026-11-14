@@ -4,16 +4,16 @@ import mongoose from 'mongoose'
 // test → sections (passages / parts) → groups of questions → questions.
 // It is always opened whole and has at most 40 questions, so nesting is simpler than separate collections.
 
+// No _id: a range is a value, not a document
+const evidenceSchema = new mongoose.Schema({ start: Number, end: Number }, { _id: false })
+
 const questionSchema = new mongoose.Schema({
   number: { type: Number },                       // 1..n across the whole test, set by the server
   prompt: { type: String, default: '' },
   options: { type: [String], default: [] },       // choices for multiple choice, T/F/NG, matching
   answers: { type: [String], default: [] },       // every accepted answer, e.g. ["10", "ten"]
   explanation: { type: [String], default: [] },   // step-by-step explanation for the review page
-  evidence: {                                     // character range in the passage or transcript (US18)
-    type: { start: Number, end: Number },
-    default: null,
-  },
+  evidence: { type: evidenceSchema, default: null }, // character range in the passage or transcript (US18)
 })
 
 const groupSchema = new mongoose.Schema({

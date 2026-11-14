@@ -159,3 +159,15 @@ test('US41: the teacher of the class can open a review made from that class', as
   assert.equal(review.body.viewerRole, 'teacher')
   assert.equal(history.body.items[0].class.name, 'Class A')
 })
+
+test('US18, US37: evidence saved in the editor comes back in the review as a plain range', async () => {
+  const { user, testId, attemptId } = await setUp()
+  const sections = sampleSections()
+  sections[0].groups[0].questions[0].evidence = { start: 0, end: 12 }
+  await request(app).put(`/api/tests/${testId}`).set('Authorization', user.authHeader).send({ title: 'Rooftops', sections })
+  await submit(user, attemptId)
+
+  const review = await request(app).get(`/api/attempts/${attemptId}/review`).set('Authorization', user.authHeader)
+
+  assert.deepEqual(review.body.test.sections[0].groups[0].questions[0].evidence, { start: 0, end: 12 })
+})

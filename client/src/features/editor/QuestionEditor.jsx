@@ -1,8 +1,12 @@
 import { isTextType, hasFixedOptions } from './editorState.js'
+import { evidenceFromSelection, evidenceSnippet, isEvidenceOutOfRange } from './evidence.js'
 
-// One question: prompt, options, correct answer(s) and explanation steps (US16, US17).
-export default function QuestionEditor({ type, question, number, onChange, onRemove }) {
+// One question: prompt, options, correct answer(s), explanation steps (US16, US17)
+// and the evidence in the passage or transcript (US18).
+export default function QuestionEditor({ type, question, number, evidenceSource, onChange, onRemove }) {
   const isMultiple = type === 'multi_select'
+  const { text = '', selection = null, label = 'passage' } = evidenceSource ?? {}
+  const selected = selection ? evidenceFromSelection(text, selection.start, selection.end) : null
 
   function toggleAnswer(option) {
     if (isMultiple) {
@@ -83,6 +87,29 @@ export default function QuestionEditor({ type, question, number, onChange, onRem
           )}
         </fieldset>
       )}
+
+      <div className="editor-field evidence-field">
+        <span>
+          Bằng chứng <small>(bôi đen một đoạn trong {label} ở trên, rồi bấm "Gắn đoạn đang chọn"; hiện tô vàng ở trang Xem lại)</small>
+        </span>
+        {question.evidence ? (
+          <blockquote className={isEvidenceOutOfRange(text, question.evidence) ? 'evidence-quote broken' : 'evidence-quote'}>
+            {isEvidenceOutOfRange(text, question.evidence)
+              ? `${label} đã bị sửa ngắn lại, hãy gắn lại bằng chứng`
+              : `“${evidenceSnippet(text, question.evidence)}”`}
+          </blockquote>
+        ) : (
+          <p className="evidence-empty">Chưa gắn bằng chứng.</p>
+        )}
+        <div className="evidence-actions">
+          <button type="button" className="editor-button" disabled={!selected} onClick={() => onChange({ evidence: selected })}>
+            Gắn đoạn đang chọn
+          </button>
+          {question.evidence && (
+            <button type="button" className="link-button" onClick={() => onChange({ evidence: null })}>Bỏ bằng chứng</button>
+          )}
+        </div>
+      </div>
 
       <label className="editor-field">
         Giải thích <small>(mỗi dòng một bước, hiện ở trang Xem lại)</small>

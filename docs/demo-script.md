@@ -20,7 +20,12 @@ Chạy trên bản deploy ở mỗi Sprint Review và trước buổi bảo vệ
 
 | # | Làm gì | Người xem thấy |
 |---|---|---|
-| 3 | … | … |
+| 3 | Kho đề → "+ Tạo đề", chọn Reading, full đề | Mở trình soạn đề với 3 passage trống (US11) |
+| 4 | Tải ảnh bìa lên | Ảnh hiện trên thẻ đề ở Kho đề (US12) |
+| 5 | Dán passage, thêm nhóm TRUE/FALSE/NOT GIVEN và vài câu, chọn đáp án, viết giải thích | Số câu tự đánh lại 1, 2, 3… (US13, US15, US16, US17) |
+| 6 | Bấm Xuất bản khi còn câu chưa có đáp án | Báo số câu còn thiếu đáp án, chưa xuất bản (US19) |
+| 7 | Điền đủ đáp án rồi Xuất bản | Thẻ đề đổi trạng thái "Đã xuất bản" |
+| 12 | Trong trình soạn đề, bôi đen một câu trong passage rồi bấm "Gắn đoạn đang chọn" ở một câu hỏi | Đoạn đó hiện trong khung vàng dưới câu hỏi; sau khi làm bài, trang Xem lại tô vàng đúng đoạn đó (US18) |
 
 ## 3. Làm bài (E3)
 
