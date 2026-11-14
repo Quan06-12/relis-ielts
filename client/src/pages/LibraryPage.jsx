@@ -14,9 +14,17 @@ const SKILL_TABS = [
   { label: 'Listening', value: 'listening' },
 ]
 
-// My test library: start, edit, delete or share a test with my classes (US20, US21, US22).
+const DONE_TABS = [
+  { label: 'Tất cả', value: '' },
+  { label: 'Chưa làm', value: 'false' },
+  { label: 'Đã làm', value: 'true' },
+]
+
+// My test library: filter, start, edit, delete or share a test with my classes (US20–US23).
 export default function LibraryPage() {
   const [skill, setSkill] = useState('')
+  const [kind, setKind] = useState('') // '' | 'full' | 'single'
+  const [done, setDone] = useState('') // '' | 'true' (Đã làm) | 'false' (Chưa làm)
   const [search, setSearch] = useState('')
   const [tests, setTests] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -28,11 +36,12 @@ export default function LibraryPage() {
   useEffect(() => {
     setIsLoading(true)
     setError('')
-    listMyTests({ skill: skill || undefined, q: search || undefined, limit: 50 })
+    // US23: every filter is sent together, so they combine
+    listMyTests({ skill: skill || undefined, kind: kind || undefined, done: done || undefined, q: search || undefined, limit: 50 })
       .then((page) => setTests(page.items))
       .catch((loadError) => setError(getErrorMessage(loadError)))
       .finally(() => setIsLoading(false))
-  }, [skill, search])
+  }, [skill, kind, done, search])
 
   // US20: delete after confirming. A test someone already took is hidden by the server instead.
   async function handleConfirmDelete() {
@@ -74,12 +83,34 @@ export default function LibraryPage() {
         ))}
       </div>
 
+      <div className="library-filters">
+        <div className="library-tabs" role="tablist" aria-label="Đã làm hay chưa">
+          {DONE_TABS.map((tab) => (
+            <button
+              key={tab.value}
+              type="button"
+              role="tab"
+              aria-selected={done === tab.value}
+              className={done === tab.value ? 'library-tab active' : 'library-tab'}
+              onClick={() => setDone(tab.value)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        <select value={kind} onChange={(event) => setKind(event.target.value)} aria-label="Loại đề">
+          <option value="">Mọi loại đề</option>
+          <option value="full">Full đề</option>
+          <option value="single">Đề lẻ</option>
+        </select>
+      </div>
+
       {error && <p className="library-message error">{error}</p>}
       {isLoading && <p className="library-message">Đang tải…</p>}
 
       {!isLoading && !error && tests.length === 0 && (
         <p className="library-message">
-          Chưa có đề nào. <Link to="/tests/new">Tạo đề đầu tiên</Link>
+          {skill || kind || done || search ? 'Không có đề nào khớp bộ lọc.' : <>Chưa có đề nào. <Link to="/tests/new">Tạo đề đầu tiên</Link></>}
         </p>
       )}
 

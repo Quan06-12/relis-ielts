@@ -71,9 +71,13 @@
 
 .attempt-reading {
   flex: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   min-height: 0;
+}
+
+/* The draggable split (US38) fills the reading area */
+.attempt-reading > .split-pane {
+  flex: 1;
 }
 
 .attempt-passage,
@@ -166,10 +170,6 @@
 }
 
 @media (max-width: 800px) {
-  .attempt-reading {
-    grid-template-columns: 1fr;
-  }
-
   .attempt-passage {
     border-right: none;
     border-bottom: 1px solid var(--border);

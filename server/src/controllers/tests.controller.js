@@ -2,6 +2,7 @@ import mongoose from 'mongoose'
 import { Test } from '../models/Test.js'
 import { AppError, validationError } from '../errors/AppError.js'
 import { findOwnedTest, findTestUserCanTake } from '../services/testAccess.js'
+import { findLastBands, findDoneTestIds } from '../services/attemptStats.js'
 import {
   newTestLayout,
   renumberQuestions,
@@ -14,8 +15,9 @@ const SKILLS = ['reading', 'listening']
 const KINDS = ['full', 'single']
 
 // GET /api/tests — my library, newest first (US20, US22, US23)
+// Filters combine: skill, kind (full / single), status, q (title), done (true = taken before, false = not yet)
 export async function listMyTests(request, response) {
-  const { skill, kind, status, q } = request.query
+  const { skill, kind, status, q, done } = request.query
   const page = Math.max(Number(request.query.page) || 1, 1)
   const limit = Math.min(Math.max(Number(request.query.limit) || 20, 1), 50)
 
@@ -24,13 +26,18 @@ export async function listMyTests(request, response) {
   if (KINDS.includes(kind)) filter.kind = kind
   if (['draft', 'published'].includes(status)) filter.status = status
   if (q) filter.title = { $regex: escapeRegex(q), $options: 'i' }
+  if (done === 'true' || done === 'false') {
+    const doneIds = await findDoneTestIds(request.userId)
+    filter._id = done === 'true' ? { $in: doneIds } : { $nin: doneIds }
+  }
 
   const [tests, total] = await Promise.all([
     Test.find(filter).sort({ updatedAt: -1 }).skip((page - 1) * limit).limit(limit),
     Test.countDocuments(filter),
   ])
+  const lastBands = await findLastBands(request.userId, tests.map((test) => test._id))
 
-  response.json({ items: tests.map((test) => toSummary(test)), total, page, limit })
+  response.json({ items: tests.map((test) => toSummary(test, lastBands.get(String(test._id)) ?? null)), total, page, limit })
 }
 
 // POST /api/tests — a new empty draft (US11)

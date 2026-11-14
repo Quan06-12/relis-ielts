@@ -9,6 +9,7 @@ import { generateClassCode, normalizeClassCode } from '../utils/classCode.js'
 import { buildGradebook } from '../utils/gradebook.js'
 import { loadClassCardStats } from '../services/classStats.js'
 import { toSummary } from '../utils/testContent.js'
+import { findLastBands } from '../services/attemptStats.js'
 
 const DUPLICATE_KEY = 11000 // MongoDB error code when a unique index is violated
 const MAX_CODE_TRIES = 5
@@ -252,19 +253,6 @@ async function findTeacherNames(classIds) {
     if (!names.has(id) && teacher.userId) names.set(id, teacher.userId.name)
   }
   return names
-}
-
-// testId → band of the user's latest submitted full attempt (the stamp on the test card)
-async function findLastBands(userId, testIds) {
-  const attempts = await Attempt.find({ userId, testId: { $in: testIds }, status: 'submitted', 'result.band': { $ne: null } })
-    .sort({ submittedAt: -1 })
-    .select('testId result')
-  const bands = new Map()
-  for (const attempt of attempts) {
-    const id = String(attempt.testId)
-    if (!bands.has(id)) bands.set(id, attempt.result.band)
-  }
-  return bands
 }
 
 function toClassView(item, myRole, extra = {}) {
