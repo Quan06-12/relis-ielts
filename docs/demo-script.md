@@ -4,7 +4,8 @@ Chạy trên bản deploy ở mỗi Sprint Review và trước buổi bảo vệ
 
 ## 0. Chuẩn bị
 
-- Mở `/api/health` trên Render trước vài phút (gói Free ngủ sau 15 phút).
+- Web: https://relis-ielts.vercel.app · API: https://relis-ielts-api.onrender.com
+- Mở https://relis-ielts-api.onrender.com/api/health trước vài phút (gói Free ngủ sau 15 phút).
 - Hai cửa sổ trình duyệt: **Giáo viên** và **Học viên**, hai tài khoản Google khác nhau.
 - Dữ liệu mẫu: chạy script seed (làm ở Sprint 3) để có đề full, đề lẻ, đề nháp, lịch sử và một lớp có bài giao.
 
@@ -22,6 +23,10 @@ Chạy trên bản deploy ở mỗi Sprint Review và trước buổi bảo vệ
 | 3 | … | … |
 
 ## 3. Làm bài (E3)
+
+| # | Làm gì | Người xem thấy |
+|---|---|---|
+| 15 | Đang làm bài, chọn một đáp án rồi bấm F5 ngay | Đáp án vừa chọn vẫn còn, đồng hồ chạy tiếp đúng thời gian còn lại (US33) |
 
 ## 4. Kết quả, xem lại và AI feedback (E4, E7)
 
@@ -46,5 +51,14 @@ Chạy trên bản deploy ở mỗi Sprint Review và trước buổi bảo vệ
 | 35 | Học viên mở tab Kho đề lớp → Làm bài → nộp | Bài làm được chấm như bình thường |
 | 36 | Giáo viên mở tab Bảng điểm | Ô của học viên đó có điểm, bấm vào mở trang Xem lại ở chế độ chỉ xem (US40) |
 | 37 | Học viên thử mở `/classes/<id>` của lớp khác | Báo không tìm thấy |
+| 38 | Giáo viên mở tab Bài tập → "+ Giao bài", chọn đề, hạn nộp ngày mai | Bài tập hiện "0/1 đã nộp" và thời gian còn lại (US44) |
+| 39 | Học viên mở tab Bài tập | Bài nằm ở nhóm "Cần làm"; bấm Làm bài → nộp → bài chuyển sang "Đã nộp" kèm điểm (US45) |
+| 40 | Giáo viên mở lại tab Bài tập | "1/1 đã nộp"; Bảng điểm có điểm của học viên |
 
 ## 6. Trang chủ và từ vựng (E6)
+
+| # | Làm gì | Người xem thấy |
+|---|---|---|
+| 50 | Mở Trang chủ → "Đặt mục tiêu", chọn Reading 7.0, Listening 7.5, ngày thi | Thẻ mục tiêu cập nhật, hiện "Còn N ngày đến ngày thi" (US46) |
+| 51 | Làm full một đề Reading 40 câu rồi quay lại Trang chủ | Thẻ Reading hiện band vừa đạt và khoảng cách đến mục tiêu |
+| 52 | Để một bài đang làm dở rồi mở Trang chủ | Mục "Đang làm dở" có nút Làm tiếp |

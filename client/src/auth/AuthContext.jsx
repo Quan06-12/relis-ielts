@@ -48,8 +48,11 @@ export function AuthProvider({ children }) {
     setStatus('signed-in')
   }
 
+  // After the user changes their profile (goals on the home page, US46)
+  const updateUser = useCallback((changedUser) => setUser(changedUser), [])
+
   return (
-    <AuthContext.Provider value={{ user, status, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, status, signIn, signOut, updateUser }}>
       {children}
     </AuthContext.Provider>
   )

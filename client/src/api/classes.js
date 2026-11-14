@@ -49,3 +49,19 @@ export async function getGradebook(classId) {
   const response = await http.get(`/classes/${classId}/gradebook`)
   return response.data // { tests, rows }
 }
+
+// Assignments with a deadline (US44, US45)
+export async function listAssignments(classId) {
+  const response = await http.get(`/classes/${classId}/assignments`)
+  return response.data.items
+}
+
+// { testId, deadline (ISO string), allowLate }
+export async function createAssignment(classId, fields) {
+  const response = await http.post(`/classes/${classId}/assignments`, fields)
+  return response.data.assignment
+}
+
+export async function deleteAssignment(classId, assignmentId) {
+  await http.delete(`/classes/${classId}/assignments/${assignmentId}`)
+}
