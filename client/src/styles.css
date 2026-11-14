@@ -1,18 +1,19 @@
 /* Design tokens taken from the wireframe */
 :root {
-  --purple: #6b50e3;
-  --purple-dark: #5a3fd6;
+  --purple: #5b3fd6;
+  --purple-dark: #3f28a8;
+  --purple-soft: #f0ecfd;
   --yellow: #ffc531;
-  --reading: #6b50e3;
+  --reading: #5b3fd6;
   --listening: #c2410c;
   --overall: #2f7a3b;
-  --text: #1e1640;
-  --text-muted: #6b6785;
-  --border: #e6e3f0;
-  --background: #f7f6fb;
+  --text: #1a1530;
+  --text-muted: #514a66;
+  --border: #ddd6ee;
+  --background: #f7f5fc;
   --white: #ffffff;
   --radius: 12px;
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   color: var(--text);
   background: var(--background);
 }
@@ -98,4 +99,21 @@ button {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+}
+
+/* Page heading with a short description under it (wireframe) */
+.page-heading {
+  margin-bottom: 20px;
+}
+
+.page-heading h1 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.page-subtitle {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 14px;
 }

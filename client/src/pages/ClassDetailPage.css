@@ -1,9 +1,10 @@
 .class-back {
   display: inline-block;
-  margin-bottom: 12px;
-  color: var(--text-muted);
-  text-decoration: none;
+  margin-bottom: 14px;
+  color: var(--purple);
   font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
 }
 
 .class-hero {
@@ -12,14 +13,24 @@
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
-  margin-bottom: 20px;
-  padding: 24px;
+  margin-bottom: 24px;
+  padding: 24px 28px;
   border-radius: 16px;
   color: var(--white);
 }
 
+.class-hero-chip {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .class-hero h1 {
-  margin: 0 0 4px;
+  margin: 8px 0 4px;
+  font-size: 28px;
 }
 
 .class-hero p {
@@ -28,28 +39,233 @@
 }
 
 .class-hero-meta {
-  margin-top: 8px !important;
   font-size: 14px;
+}
+
+.class-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .class-code {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.95);
-  color: var(--text);
 }
 
 .class-code-label {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.class-code strong {
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  letter-spacing: 0.15em;
+  font-size: 16px;
+}
+
+/* White button on the coloured header */
+.class-hero-button {
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--white);
+  color: var(--purple);
+  font: inherit;
+  font-weight: 700;
+}
+
+.class-hero-outline {
+  padding: 9px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--white);
+  font: inherit;
+  font-weight: 600;
+}
+
+.class-hero-outline.small {
+  padding: 5px 10px;
+  font-size: 13px;
+}
+
+/* Tabs with a line under the active one (wireframe) */
+.underline-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+
+.underline-tab {
+  padding: 10px 16px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.underline-tab.active {
+  border-bottom-color: var(--purple);
+  color: var(--purple);
+}
+
+/* Assignment cards */
+.assignment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.assignment-card {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 20px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--white);
+}
+
+.assignment-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.assignment-main h3 {
+  margin: 6px 0 2px;
+  font-size: 16px;
+}
+
+.assignment-main p {
+  margin: 0;
   color: var(--text-muted);
   font-size: 13px;
 }
 
-.class-code strong {
-  letter-spacing: 0.2em;
+.assignment-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #f0eef6;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.chip.reading {
+  background: var(--purple-soft);
+  color: var(--purple);
+}
+
+.chip.listening {
+  background: #fdeee4;
+  color: #c2410c;
+}
+
+.chip.open {
+  background: #e4f3e4;
+  color: #1e6b2a;
+}
+
+.assignment-progress {
+  width: 220px;
+}
+
+.assignment-progress-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.assignment-progress-label strong {
+  color: var(--text);
+}
+
+.assignment-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: #ece8f7;
+  overflow: hidden;
+}
+
+.assignment-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--purple);
+}
+
+.assignment-average {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90px;
+}
+
+.assignment-average strong {
   font-size: 20px;
+}
+
+.assignment-average small {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.assignment-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--purple);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.link-button.muted {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+@media (max-width: 760px) {
+  .assignment-card {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .assignment-main,
+  .assignment-progress {
+    width: 100%;
+    flex-basis: 100%;
+  }
 }
 
 /* Class library list */
@@ -263,6 +479,3 @@
   font-weight: 400;
 }
 
-.class-leave {
-  background: rgba(255, 255, 255, 0.95);
-}

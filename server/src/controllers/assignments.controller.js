@@ -38,27 +38,41 @@ export async function createAssignment(request, response) {
 export async function listAssignments(request, response) {
   const { classId } = request.params
   const assignments = await Assignment.find({ classId }).sort({ deadline: 1 })
-  const tests = await Test.find({ _id: { $in: assignments.map((item) => item.testId) } }).select('title skill durationMin questionCount')
+  const tests = await Test.find({ _id: { $in: assignments.map((item) => item.testId) } }).select('title skill kind durationMin questionCount')
   const testById = new Map(tests.map((test) => [String(test._id), test]))
   const assignmentIds = assignments.map((item) => item._id)
 
   if (request.classRole === 'teacher') {
     const [studentCount, handedIn] = await Promise.all([
       ClassMember.countDocuments({ classId, role: 'student' }),
-      // number of different students who submitted each assignment
+      // For each assignment: how many different students submitted, and their average score
+      // (each student counts once, with their latest submission)
       Attempt.aggregate([
         { $match: { assignmentId: { $in: assignmentIds }, status: 'submitted' } },
-        { $group: { _id: { assignmentId: '$assignmentId', userId: '$userId' } } },
-        { $group: { _id: '$_id.assignmentId', count: { $sum: 1 } } },
+        { $sort: { submittedAt: 1 } },
+        { $group: { _id: { assignmentId: '$assignmentId', userId: '$userId' }, result: { $last: '$result' } } },
+        {
+          $group: {
+            _id: '$_id.assignmentId',
+            count: { $sum: 1 },
+            averageBand: { $avg: '$result.band' }, // $avg skips null bands (tests that are not full)
+            averageCorrect: { $avg: '$result.correct' },
+          },
+        },
       ]),
     ])
-    const countById = new Map(handedIn.map((row) => [String(row._id), row.count]))
+    const statsById = new Map(handedIn.map((row) => [String(row._id), row]))
 
-    const items = assignments.map((assignment) => ({
-      ...toAssignmentView(assignment, testById.get(String(assignment.testId))),
-      submittedCount: countById.get(String(assignment._id)) ?? 0,
-      studentCount,
-    }))
+    const items = assignments.map((assignment) => {
+      const stats = statsById.get(String(assignment._id))
+      return {
+        ...toAssignmentView(assignment, testById.get(String(assignment.testId))),
+        submittedCount: stats?.count ?? 0,
+        studentCount,
+        averageBand: stats?.averageBand != null ? roundToHalf(stats.averageBand) : null,
+        averageCorrect: stats?.averageCorrect != null ? Math.round(stats.averageCorrect * 10) / 10 : null,
+      }
+    })
     return response.json({ items })
   }
 
@@ -101,7 +115,12 @@ function toAssignmentView(assignment, test) {
     allowLate: assignment.allowLate,
     createdAt: assignment.createdAt,
     test: test
-      ? { id: String(test._id), title: test.title, skill: test.skill, durationMin: test.durationMin, questionCount: test.questionCount }
+      ? { id: String(test._id), title: test.title, skill: test.skill, kind: test.kind, durationMin: test.durationMin, questionCount: test.questionCount }
       : null,
   }
+}
+
+// Average bands are shown like IELTS bands: 6.25 → 6.5
+function roundToHalf(value) {
+  return Math.round(value * 2) / 2
 }

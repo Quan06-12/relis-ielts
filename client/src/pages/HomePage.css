@@ -18,26 +18,66 @@
   margin: 0;
 }
 
-.home-cards {
+/* Band chart and recent results side by side */
+.home-row {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 20px;
 }
 
-.home-card {
-  padding: 16px;
+/* Goals (left, wider) and exam date (right), like the wireframe */
+.home-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.home-page .home-top section {
+  margin-bottom: 0;
+}
+
+.home-panel {
   border: 1px solid var(--border);
-  border-top: 4px solid var(--purple);
-  border-radius: var(--radius);
+  border-radius: 14px;
   background: var(--white);
 }
 
-.home-card.reading {
-  border-top-color: var(--reading);
+.home-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 34px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.home-page .home-panel-header h2 {
+  margin: 0;
+}
+
+.home-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  padding: 16px 20px 0;
+}
+
+.home-card {
+  --tone: var(--reading);
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #e9e4fb, #f7f5fe);
 }
 
 .home-card.listening {
-  border-top-color: var(--listening);
+  --tone: #c2410c;
+  background: linear-gradient(135deg, #fbe3d6, #fdf5f0);
+}
+
+.home-card.overall {
+  --tone: #2e7d32;
+  background: linear-gradient(135deg, #dcefdc, #f3f9f3);
 }
 
 .home-card p {
@@ -45,25 +85,131 @@
 }
 
 .home-card-label {
-  color: var(--text-muted);
-  font-size: 14px;
-}
-
-.home-card-value {
-  margin: 6px 0 !important;
-  font-size: 32px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-weight: 700;
 }
 
+.home-card-letter {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: var(--tone);
+  color: var(--white);
+  font-size: 12px;
+}
+
+.home-card-numbers {
+  display: flex;
+  gap: 24px;
+  margin: 10px 0 14px;
+}
+
+.home-card-numbers small {
+  display: block;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.home-card-numbers strong {
+  font-size: 30px;
+  line-height: 1.1;
+}
+
+.home-card-numbers .home-card-goal {
+  color: var(--tone);
+}
+
 .home-card-note {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.home-card-bar {
+  height: 6px;
+  margin-top: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  overflow: hidden;
+}
+
+.home-card-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--tone);
+}
+
+.home-hint {
+  margin: 10px 20px 16px;
   color: var(--text-muted);
   font-size: 13px;
 }
 
-.home-hint {
-  margin-top: 8px;
+.home-exam {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding: 16px 20px 0;
+}
+
+.home-exam-box {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--white);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+}
+
+button.home-exam-box {
+  cursor: pointer;
+}
+
+button.home-exam-box:hover {
+  border-color: var(--purple);
+}
+
+.home-exam-box.soft {
+  border-color: transparent;
+  background: var(--purple-soft);
+}
+
+.home-exam-box small {
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: 12px;
+}
+
+.home-exam-box strong {
+  font-size: 22px;
+}
+
+.home-exam-edit {
+  position: absolute;
+  right: 12px;
+  bottom: 14px;
+  color: var(--text-muted);
+}
+
+@media (max-width: 900px) {
+  .home-row,
+  .home-top {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .home-cards {
+    grid-template-columns: 1fr;
+  }
 }
 
 .home-list {

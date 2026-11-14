@@ -4,17 +4,17 @@ import { listAssignments, createAssignment, deleteAssignment } from '../../api/c
 import { listMyTests } from '../../api/tests.js'
 import { getErrorMessage } from '../../api/errorMessages.js'
 import ModeDialog from '../attempt/ModeDialog.jsx'
-import { STATUS_LABEL, groupByStatus, timeLeftLabel, defaultDeadlineInput } from './assignmentDisplay.js'
+import { STATUS_LABEL, groupByStatus, timeLeftLabel, defaultDeadlineInput, assignmentChips, shortDeadline, averageLabel } from './assignmentDisplay.js'
 import { formatScore } from './classDisplay.js'
 import { useConfirm, useToast } from '../../components/FeedbackProvider.jsx'
 import { SkeletonRows } from '../../components/Skeleton.jsx'
 
 // "Assignments" tab: the teacher gives tests with a deadline (US44);
 // a student sees their homework grouped by status, with their score (US45).
-export default function AssignmentsTab({ classId, isTeacher }) {
+// The "+ Giao bài" button lives in the class header, so the page owns isCreating.
+export default function AssignmentsTab({ classId, isTeacher, isCreating, onCreatingChange, onShowResults }) {
   const [assignments, setAssignments] = useState(null)
   const [error, setError] = useState('')
-  const [isCreating, setIsCreating] = useState(false)
   const [assignmentToStart, setAssignmentToStart] = useState(null)
   const confirm = useConfirm()
   const toast = useToast()
@@ -49,47 +49,62 @@ export default function AssignmentsTab({ classId, isTeacher }) {
 
   return (
     <section>
-      {isTeacher && (
-        <div className="class-library-toolbar">
-          <button type="button" className="primary-button" onClick={() => setIsCreating(true)}>+ Giao bài</button>
-        </div>
-      )}
-
       {assignments.length === 0 && (
-        <p className="library-message">{isTeacher ? 'Chưa giao bài nào. Bấm "+ Giao bài" để giao đề có hạn nộp.' : 'Lớp chưa có bài tập nào.'}</p>
+        <p className="library-message">{isTeacher ? 'Chưa giao bài nào. Bấm "+ Giao bài" ở trên để giao đề có hạn nộp.' : 'Lớp chưa có bài tập nào.'}</p>
       )}
 
       {isTeacher ? (
-        <ul className="class-test-list">
-          {assignments.map((assignment) => (
-            <li key={assignment.id} className="class-test-row">
-              <span className={`skill-dot ${assignment.test?.skill}`} aria-hidden="true" />
-              <div className="class-test-info">
-                <h3>{assignment.test?.title ?? 'Đề đã bị xoá'}</h3>
-                <p>
-                  Hạn {new Date(assignment.deadline).toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' })} · {timeLeftLabel(assignment.deadline)}
-                  {assignment.allowLate && ' · cho nộp trễ'}
-                </p>
-              </div>
-              <span className="assignment-count">{assignment.submittedCount}/{assignment.studentCount} đã nộp</span>
-              <button type="button" className="secondary-button" onClick={() => handleDelete(assignment)}>Xoá</button>
-            </li>
-          ))}
+        <ul className="assignment-list">
+          {assignments.map((assignment) => {
+            const total = assignment.studentCount ?? 0
+            const average = averageLabel(assignment)
+            return (
+              <li key={assignment.id} className="assignment-card">
+                <div className="assignment-main">
+                  <Chips assignment={assignment} />
+                  <h3>{assignment.test?.title ?? 'Đề đã bị xoá'}</h3>
+                  <p>
+                    Hạn: {shortDeadline(assignment.deadline)} · {timeLeftLabel(assignment.deadline)}
+                    {assignment.allowLate && ' · cho nộp trễ'}
+                  </p>
+                </div>
+                <div className="assignment-progress">
+                  <div className="assignment-progress-label">
+                    <span>Đã nộp</span>
+                    <span><strong>{assignment.submittedCount}</strong> / {total}</span>
+                  </div>
+                  <div className="assignment-bar">
+                    <span style={{ width: total === 0 ? 0 : `${Math.round((assignment.submittedCount / total) * 100)}%` }} />
+                  </div>
+                </div>
+                <div className="assignment-average">
+                  <strong>{average.value}</strong>
+                  <small>{average.unit}</small>
+                </div>
+                <div className="assignment-actions">
+                  <button type="button" className="link-button" onClick={onShowResults}>Xem kết quả →</button>
+                  <button type="button" className="link-button muted" onClick={() => handleDelete(assignment)}>Xoá</button>
+                </div>
+              </li>
+            )
+          })}
         </ul>
       ) : (
         groupByStatus(assignments).map((group) => (
           <div key={group.status} className="assignment-group">
             <h3 className="assignment-group-title">{group.label} ({group.items.length})</h3>
-            <ul className="class-test-list">
+            <ul className="assignment-list">
               {group.items.map((assignment) => (
-                <li key={assignment.id} className="class-test-row">
-                  <span className={`skill-dot ${assignment.test?.skill}`} aria-hidden="true" />
-                  <div className="class-test-info">
+                <li key={assignment.id} className="assignment-card">
+                  <div className="assignment-main">
+                    <Chips assignment={assignment} />
                     <h3>{assignment.test?.title ?? 'Đề đã bị xoá'}</h3>
-                    <p>Hạn {new Date(assignment.deadline).toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' })} · {timeLeftLabel(assignment.deadline)}</p>
+                    <p>Hạn: {shortDeadline(assignment.deadline)} · {timeLeftLabel(assignment.deadline)}</p>
                   </div>
                   <span className={`assignment-status ${assignment.myStatus}`}>{STATUS_LABEL[assignment.myStatus]}</span>
-                  <StudentAction assignment={assignment} onStart={() => setAssignmentToStart(assignment)} />
+                  <div className="assignment-actions">
+                    <StudentAction assignment={assignment} onStart={() => setAssignmentToStart(assignment)} />
+                  </div>
                 </li>
               ))}
             </ul>
@@ -108,15 +123,25 @@ export default function AssignmentsTab({ classId, isTeacher }) {
       {isCreating && (
         <CreateAssignmentDialog
           classId={classId}
-          onClose={() => setIsCreating(false)}
+          onClose={() => onCreatingChange(false)}
           onCreated={() => {
-            setIsCreating(false)
+            onCreatingChange(false)
             toast('Đã giao bài cho lớp')
             load()
           }}
         />
       )}
     </section>
+  )
+}
+
+function Chips({ assignment }) {
+  return (
+    <div className="assignment-chips">
+      {assignmentChips(assignment).map((chip) => (
+        <span key={chip.label} className={`chip ${chip.tone}`}>{chip.label}</span>
+      ))}
+    </div>
   )
 }
 
