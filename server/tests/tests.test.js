@@ -120,3 +120,19 @@ test('a malformed test id is treated as not found', async () => {
 
   assert.equal(response.status, 404)
 })
+
+test('US23: filters combine, and "done" splits tests I have submitted from the others', async () => {
+  const { authHeader } = await createSignedInUser()
+  const taken = await createDraft(authHeader, { title: 'Taken', skill: 'reading', kind: 'full' })
+  await createDraft(authHeader, { title: 'Not taken', skill: 'reading', kind: 'full' })
+  await createDraft(authHeader, { title: 'Single', skill: 'reading', kind: 'single' })
+  await request(app).put(`/api/tests/${taken.id}`).set('Authorization', authHeader).send({ title: 'Taken', sections: sampleSections() })
+  const started = await request(app).post('/api/attempts').set('Authorization', authHeader).send({ testId: taken.id, mode: { type: 'full', sectionIndexes: [0, 1], timeLimitMin: 60 } })
+  await request(app).post(`/api/attempts/${started.body.attempt.id}/submit`).set('Authorization', authHeader)
+
+  const done = await request(app).get('/api/tests?done=true').set('Authorization', authHeader)
+  const notDoneFull = await request(app).get('/api/tests?done=false&kind=full&skill=reading').set('Authorization', authHeader)
+
+  assert.deepEqual(done.body.items.map((item) => item.title), ['Taken'])
+  assert.deepEqual(notDoneFull.body.items.map((item) => item.title), ['Not taken'])
+})

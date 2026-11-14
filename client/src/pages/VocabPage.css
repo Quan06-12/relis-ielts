@@ -1,0 +1,285 @@
+/* Vocabulary pages (US47, US48), laid out like the wireframe */
+
+.vocab-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.vocab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.vocab-card {
+  --set-color: var(--purple);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--white);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.vocab-card:hover {
+  border-color: var(--set-color);
+}
+
+/* A plain colour block, or the cover image */
+.vocab-cover {
+  height: 96px;
+  background: var(--set-color) center / cover no-repeat;
+}
+
+.vocab-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 14px 18px 16px;
+}
+
+.vocab-card-body h3 {
+  margin: 0 0 6px;
+  font-size: 17px;
+}
+
+.vocab-card-body p {
+  flex: 1;
+  margin: 0 0 12px;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.vocab-count {
+  align-self: flex-end;
+  color: var(--set-color);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.vocab-add-card {
+  min-height: 200px;
+  border: 1px dashed #c9c0e4;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--purple);
+  font: inherit;
+  font-weight: 700;
+}
+
+.vocab-add-card:hover {
+  background: var(--purple-soft);
+}
+
+.vocab-cover-field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.vocab-cover-field img {
+  width: 64px;
+  height: 40px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+/* One set */
+.vocab-set-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.vocab-search {
+  width: 240px;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--white);
+  font: inherit;
+  font-size: 14px;
+}
+
+.danger-text {
+  color: #b42318 !important;
+}
+
+.vocab-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--white);
+}
+
+.vocab-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.vocab-table th {
+  padding: 12px 18px;
+  background: #f7f5fc;
+  font-size: 13px;
+  text-align: left;
+}
+
+.vocab-table td {
+  padding: 12px 18px;
+  border-top: 1px solid var(--border);
+}
+
+.vocab-table tbody tr {
+  cursor: pointer;
+}
+
+.vocab-table tbody tr:hover,
+.vocab-table tbody tr.selected {
+  background: #f4f2fa;
+}
+
+.vocab-note {
+  color: var(--text-muted);
+}
+
+.type-tag {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #ece8f7;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Panel that slides in from the right */
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(26, 21, 48, 0.35);
+}
+
+.drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  width: min(460px, 100%);
+  background: var(--white);
+  box-shadow: -12px 0 40px rgba(26, 21, 48, 0.2);
+  animation: drawer-in 0.22s ease-out;
+}
+
+@keyframes drawer-in {
+  from {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+}
+
+.word-form {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+}
+
+.drawer-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.drawer-close {
+  border: 0;
+  background: none;
+  font-size: 18px;
+}
+
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 22px;
+}
+
+.drawer-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 22px;
+  border-top: 1px solid var(--border);
+}
+
+.word-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.word-title h3 {
+  margin: 0;
+  font-size: 30px;
+}
+
+.type-chip {
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--purple-soft);
+  color: var(--purple);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.word-meaning {
+  margin: 4px 0 18px;
+  color: var(--text-muted);
+  font-size: 18px;
+}
+
+.word-block {
+  margin-bottom: 14px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #f4f2fa;
+}
+
+.word-block small {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.word-block p {
+  margin: 4px 0 0;
+}
+
+.word-block.example p {
+  font-style: italic;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer {
+    animation: none;
+  }
+}
