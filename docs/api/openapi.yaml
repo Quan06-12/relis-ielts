@@ -397,6 +397,46 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
 
+  /attempts/activity:
+    get:
+      operationId: getActivity
+      tags: [Attempts]
+      summary: Submissions per day and study minutes, for the home page calendar (US42)
+      description: |
+        Counts my submitted attempts per day in the given time zone, split by skill, and adds up
+        the minutes from start to submit (each attempt capped at its time limit).
+        `currentStreak` is the number of days in a row with a submission, ending today
+        (or yesterday when nothing is submitted yet today). At most 62 days per request.
+      parameters:
+        - { name: from, in: query, required: true, schema: { type: string, format: date }, example: '2026-10-26' }
+        - { name: to, in: query, required: true, schema: { type: string, format: date }, example: '2026-12-06' }
+        - name: tz
+          in: query
+          description: IANA time zone of the viewer; unknown names fall back to Asia/Ho_Chi_Minh
+          schema: { type: string, example: Asia/Ho_Chi_Minh }
+      responses:
+        '200':
+          description: Days that have at least one submission, oldest first
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [days, currentStreak]
+                properties:
+                  days:
+                    type: array
+                    items:
+                      type: object
+                      required: [date, reading, listening, minutes]
+                      properties:
+                        date: { type: string, format: date }
+                        reading: { type: integer }
+                        listening: { type: integer }
+                        minutes: { type: integer }
+                  currentStreak: { type: integer }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
   /attempts/{attemptId}:
     parameters:
       - $ref: '#/components/parameters/AttemptId'
