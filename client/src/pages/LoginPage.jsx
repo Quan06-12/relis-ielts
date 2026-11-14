@@ -46,8 +46,8 @@ export default function LoginPage() {
       </section>
 
       <section className="login-panel">
-        <div className="login-brand">
-          <CubeLogo size={56} />
+        <div className="login-brand rl-spin">
+          <CubeLogo size={52} />
           <span>Relis</span>
         </div>
 
