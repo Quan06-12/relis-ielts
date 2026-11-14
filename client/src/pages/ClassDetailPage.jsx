@@ -6,9 +6,10 @@ import { colorOf, studentCountLabel } from '../features/classes/classDisplay.js'
 import ClassLibraryTab from '../features/classes/ClassLibraryTab.jsx'
 import GradebookTab from '../features/classes/GradebookTab.jsx'
 import MembersTab from '../features/classes/MembersTab.jsx'
+import AssignmentsTab from '../features/classes/AssignmentsTab.jsx'
 import './ClassDetailPage.css'
 
-// Class detail (US05, US21, US22, US40): class library for everyone,
+// Class detail (US05, US21, US22, US40, US44, US45): class library and assignments for everyone,
 // gradebook and members for teachers only.
 export default function ClassDetailPage() {
   const { classId } = useParams()
@@ -35,6 +36,7 @@ export default function ClassDetailPage() {
   const isTeacher = classInfo.myRole === 'teacher'
   const tabs = [
     { id: 'library', label: 'Kho đề lớp' },
+    { id: 'assignments', label: 'Bài tập' },
     ...(isTeacher ? [{ id: 'gradebook', label: 'Bảng điểm' }, { id: 'members', label: 'Thành viên' }] : []),
   ]
 
@@ -69,6 +71,7 @@ export default function ClassDetailPage() {
       </nav>
 
       {tab === 'library' && <ClassLibraryTab classId={classId} isTeacher={isTeacher} />}
+      {tab === 'assignments' && <AssignmentsTab classId={classId} isTeacher={isTeacher} />}
       {tab === 'gradebook' && <GradebookTab classId={classId} />}
       {tab === 'members' && <MembersTab classId={classId} />}
     </main>

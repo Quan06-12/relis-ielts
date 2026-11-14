@@ -213,3 +213,52 @@
   background: var(--background);
   font-size: 12px;
 }
+
+/* Assignments */
+.assignment-group-title {
+  margin: 20px 0 10px;
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.assignment-count {
+  font-weight: 600;
+  color: var(--purple);
+}
+
+.assignment-status {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--background);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.assignment-status.submitted {
+  background: #e6f4ea;
+  color: #2f7a3b;
+}
+
+.assignment-status.late {
+  background: #fff4e5;
+  color: #c2410c;
+}
+
+.assignment-status.missed {
+  background: #fdecea;
+  color: #b42318;
+}
+
+.checkbox-label {
+  flex-direction: row !important;
+  align-items: center;
+  font-weight: 400 !important;
+}
+
+.class-form select {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 400;
+}

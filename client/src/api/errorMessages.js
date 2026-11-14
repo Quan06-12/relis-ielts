@@ -6,6 +6,7 @@ const messages = {
   INVALID_GOOGLE_TOKEN: 'Google không xác nhận được tài khoản, vui lòng thử lại.',
   NOT_FOUND: 'Không tìm thấy nội dung này.',
   ALREADY_MEMBER: 'Bạn đã ở trong lớp này rồi.',
+  DEADLINE_PASSED: 'Bài tập này đã hết hạn nộp.',
   FILE_TOO_LARGE: 'File quá lớn.',
   ATTEMPT_NOT_SUBMITTED: 'Bài này chưa nộp nên chưa xem lại được.',
   INTERNAL_ERROR: 'Máy chủ gặp lỗi, vui lòng thử lại sau.',
