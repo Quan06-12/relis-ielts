@@ -50,3 +50,25 @@
 .primary-button.danger {
   background: #b42318;
 }
+
+/* US23: second row of filters */
+.library-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: -8px;
+  margin-bottom: 16px;
+}
+
+.library-filters .library-tabs {
+  margin: 0;
+}
+
+.library-filters select {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--white);
+  font: inherit;
+}

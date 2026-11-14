@@ -7,6 +7,7 @@ import { answerStatus, formatDuration } from '../features/review/reviewHelpers.j
 import ReviewQuestion from '../features/review/ReviewQuestion.jsx'
 import MarkedText from '../features/review/MarkedText.jsx'
 import AiFeedback from '../features/review/AiFeedback.jsx'
+import SplitPane from '../components/SplitPane.jsx'
 import './AttemptPage.css'
 import './ReviewPage.css'
 
@@ -118,23 +119,38 @@ export default function ReviewPage() {
       )}
 
       {test.skill === 'reading' ? (
+        // US38: drag the bar to change the widths of the passage and the questions
         <main className="attempt-reading">
-          <article className="attempt-passage">
-            <h2>{section.title}</h2>
-            <MarkedText text={section.passage} evidence={evidence} />
-          </article>
-          {questionList}
+          <SplitPane
+            label="Đổi độ rộng bài đọc và câu hỏi"
+            first={
+              <article className="attempt-passage">
+                <h2>{section.title}</h2>
+                <MarkedText text={section.passage} evidence={evidence} />
+              </article>
+            }
+            second={questionList}
+          />
         </main>
       ) : (
         <main className="attempt-listening">
           {section.audioUrl && <audio key={section.audioUrl} className="attempt-audio" src={section.audioUrl} controls preload="metadata" />}
-          {section.transcript && (
-            <details className="review-transcript" open={evidence !== null}>
-              <summary>Transcript</summary>
-              <MarkedText text={section.transcript} evidence={evidence} />
-            </details>
+          {section.transcript ? (
+            // US38: drag the bar to change the heights of the transcript and the questions
+            <SplitPane
+              direction="rows"
+              label="Đổi chiều cao transcript và câu hỏi"
+              first={
+                <section className="review-transcript">
+                  <h3>Transcript</h3>
+                  <MarkedText text={section.transcript} evidence={evidence} />
+                </section>
+              }
+              second={questionList}
+            />
+          ) : (
+            questionList
           )}
-          {questionList}
         </main>
       )}
 

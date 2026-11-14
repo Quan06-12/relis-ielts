@@ -110,6 +110,7 @@ paths:
         - { name: kind, in: query, schema: { $ref: '#/components/schemas/TestKind' } }
         - { name: status, in: query, schema: { $ref: '#/components/schemas/TestStatus' } }
         - { name: q, in: query, description: Search in the title, schema: { type: string } }
+        - { name: done, in: query, description: 'true = tests I submitted at least once (alone or in a class), false = not yet (US23)', schema: { type: string, enum: ['true', 'false'] } }
         - { $ref: '#/components/parameters/Page' }
         - { $ref: '#/components/parameters/Limit' }
       responses:

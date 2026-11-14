@@ -35,6 +35,8 @@ Chạy trên bản deploy ở mỗi Sprint Review và trước buổi bảo vệ
 | 15 | Đang làm bài, chọn một đáp án rồi bấm F5 ngay | Đáp án vừa chọn vẫn còn, đồng hồ chạy tiếp đúng thời gian còn lại (US33) |
 | 16 | Mở một đề Listening, chọn "Luyện từng phần" và thời gian ngắn nhất | Hộp thoại cảnh báo thời gian ngắn hơn độ dài audio, vẫn cho bắt đầu (US26) |
 | 17 | Khi làm Listening, bấm 1.5x rồi chuyển sang Part khác | Audio phát nhanh hơn; Part mới vẫn giữ tốc độ 1.5x (US29) |
+| 18 | Ở Kho đề chọn tab "Chưa làm", rồi "Đã làm", kết hợp với Reading và "Full đề" | Danh sách đổi theo cả ba bộ lọc; đề đã làm full có tem band (US23) |
+| 19 | Khi làm hoặc xem lại bài Reading, kéo thanh giữa passage và câu hỏi | Hai cột đổi độ rộng, không cột nào nhỏ hơn 1/4; bấm đúp thanh để về giữa (US38) |
 
 ## 4. Kết quả, xem lại và AI feedback (E4, E7)
 

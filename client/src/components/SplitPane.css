@@ -1,0 +1,72 @@
+.split-pane {
+  display: grid;
+  min-height: 0;
+}
+
+.split-pane-part {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+}
+
+/* Each pane keeps its own layout: the passage or question list fills its part */
+.split-pane-part > * {
+  height: 100%;
+}
+
+.split-pane-bar {
+  position: relative;
+  background: var(--border);
+  touch-action: none;
+}
+
+.split-pane.columns > .split-pane-bar {
+  cursor: col-resize;
+}
+
+.split-pane.rows > .split-pane-bar {
+  cursor: row-resize;
+}
+
+/* A small grip in the middle of the bar */
+.split-pane-bar::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 2px;
+  background: var(--text-muted);
+  transform: translate(-50%, -50%);
+}
+
+.split-pane.columns > .split-pane-bar::after {
+  width: 2px;
+  height: 32px;
+}
+
+.split-pane.rows > .split-pane-bar::after {
+  width: 32px;
+  height: 2px;
+}
+
+.split-pane-bar:hover,
+.split-pane-bar:focus-visible {
+  background: var(--purple);
+  outline: none;
+}
+
+/* Narrow screens: no dragging, the panes stack one above the other */
+@media (max-width: 900px) {
+  .split-pane {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .split-pane-part {
+    flex: 1;
+  }
+
+  .split-pane-bar {
+    display: none;
+  }
+}

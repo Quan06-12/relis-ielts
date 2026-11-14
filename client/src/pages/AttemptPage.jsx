@@ -6,6 +6,7 @@ import { useCountdown } from '../features/attempt/useCountdown.js'
 import { questionsOf, isAnswered, countUnanswered, formatClock } from '../features/attempt/answers.js'
 import QuestionGroup from '../features/attempt/QuestionGroup.jsx'
 import AudioPlayer from '../features/attempt/AudioPlayer.jsx'
+import SplitPane from '../components/SplitPane.jsx'
 import { backupPending, loadPending, clearPending } from '../features/attempt/pendingBackup.js'
 import './AttemptPage.css'
 
@@ -154,19 +155,27 @@ export default function AttemptPage() {
       )}
 
       {test.skill === 'reading' ? (
-        // US27: passage on the left, questions on the right, each scrolls on its own
+        // US27: passage on the left, questions on the right, each scrolls on its own;
+        // US38: the bar between them can be dragged
         <main className="attempt-reading">
-          <article className="attempt-passage">
-            <h2>{section.title}</h2>
-            {section.passage.split('\n').map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
-            ))}
-          </article>
-          <div className="attempt-questions">
-            {section.groups.map((group, index) => (
-              <QuestionGroup key={index} group={group} answers={answers} onAnswer={handleAnswer} />
-            ))}
-          </div>
+          <SplitPane
+            label="Đổi độ rộng bài đọc và câu hỏi"
+            first={
+              <article className="attempt-passage">
+                <h2>{section.title}</h2>
+                {section.passage.split('\n').map((paragraph, index) => (
+                  <p key={index}>{paragraph}</p>
+                ))}
+              </article>
+            }
+            second={
+              <div className="attempt-questions">
+                {section.groups.map((group, index) => (
+                  <QuestionGroup key={index} group={group} answers={answers} onAnswer={handleAnswer} />
+                ))}
+              </div>
+            }
+          />
         </main>
       ) : (
         // US28, US29: audio player with play, pause, seek and speed, then the questions
