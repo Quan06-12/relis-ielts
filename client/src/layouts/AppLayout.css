@@ -202,3 +202,9 @@
     font-size: 14px;
   }
 }
+
+/* The logo sits a little higher so it lines up with the tab text (wireframe) */
+.app-logo .rl-scene {
+  position: relative;
+  top: -4px;
+}

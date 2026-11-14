@@ -51,8 +51,8 @@ export default function AppLayout() {
             {isMenuOpen ? '✕' : '☰'}
           </button>
 
-          <Link to="/" className="app-logo" aria-label="Relis, về trang chủ">
-            <CubeLogo size={26} />
+          <Link to="/" className="app-logo rl-spin" aria-label="Relis, về trang chủ">
+            <CubeLogo size={20} />
             <span>Relis</span>
           </Link>
 
