@@ -13,11 +13,14 @@ import HistoryPage from './pages/HistoryPage.jsx'
 import AttemptPage from './pages/AttemptPage.jsx'
 import ReviewPage from './pages/ReviewPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
+import PageTitle from './components/PageTitle.jsx'
 
 // Route table, same structure as the "Site diagram" tab of the project docs.
 export default function App() {
   return (
-    <Routes>
+    <>
+      <PageTitle />
+      <Routes>
       <Route path="/login" element={<LoginPage />} />
 
       {/* Everything below needs a signed-in user (US02) */}
@@ -41,6 +44,7 @@ export default function App() {
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+      </Routes>
+    </>
   )
 }

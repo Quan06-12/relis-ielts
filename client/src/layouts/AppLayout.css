@@ -72,3 +72,59 @@
   font-weight: 600;
   text-decoration: none;
 }
+
+/* ☰ button, only on narrow screens */
+.menu-button {
+  display: none;
+  align-self: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--white);
+  font-size: 20px;
+}
+
+@media (max-width: 860px) {
+  .app-nav {
+    align-items: center;
+    gap: 12px;
+    padding: 0 12px;
+  }
+
+  .menu-button {
+    display: block;
+  }
+
+  .app-logo {
+    flex: 1;
+  }
+
+  /* The tabs become a panel that drops down under the bar */
+  .app-tabs {
+    display: none;
+    position: absolute;
+    top: 56px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    gap: 0;
+    padding: 8px;
+    background: var(--purple);
+    box-shadow: 0 8px 20px rgba(30, 22, 64, 0.25);
+  }
+
+  .app-tabs.open {
+    display: flex;
+  }
+
+  .app-tab {
+    border-radius: 10px;
+  }
+
+  .create-test-button {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+}
