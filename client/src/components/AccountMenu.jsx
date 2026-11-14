@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext.jsx'
+import { initialsOf } from './initials.js'
 import './AccountMenu.css'
 
 // Avatar in the navigation bar; clicking it opens a small menu with the account and US03 sign-out.
@@ -23,7 +24,7 @@ export default function AccountMenu() {
         aria-expanded={isOpen}
         aria-label="Tài khoản"
       >
-        {user.avatarUrl ? <img src={user.avatarUrl} alt="" referrerPolicy="no-referrer" /> : user.name.charAt(0)}
+        {user.avatarUrl ? <img src={user.avatarUrl} alt="" referrerPolicy="no-referrer" /> : initialsOf(user.name)}
       </button>
 
       {isOpen && (

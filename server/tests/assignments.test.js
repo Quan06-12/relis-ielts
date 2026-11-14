@@ -87,6 +87,8 @@ test('US45: the student sees todo, then submitted with their score; the teacher 
   assert.equal(afterStudent.body.items[0].myResult.total, 3)
   assert.equal(afterTeacher.body.items[0].submittedCount, 1)
   assert.equal(afterTeacher.body.items[0].studentCount, 1)
+  // Submitted with no answers: 0 correct on average
+  assert.equal(afterTeacher.body.items[0].averageCorrect, 0)
 })
 
 test('US44: after the deadline a student cannot start, unless late work is allowed (then it is marked late)', async () => {

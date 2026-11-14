@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { createTest } from '../../api/testEditor.js'
 import { getErrorMessage } from '../../api/errorMessages.js'
 
@@ -7,7 +7,9 @@ import { getErrorMessage } from '../../api/errorMessages.js'
 export default function NewTestForm() {
   const navigate = useNavigate()
   const [title, setTitle] = useState('')
-  const [skill, setSkill] = useState('reading')
+  // "+ Tạo đề" → "Đề Listening" opens this form with ?skill=listening
+  const [searchParams] = useSearchParams()
+  const [skill, setSkill] = useState(searchParams.get('skill') === 'listening' ? 'listening' : 'reading')
   const [kind, setKind] = useState('full')
   const [error, setError] = useState('')
   const [isCreating, setIsCreating] = useState(false)

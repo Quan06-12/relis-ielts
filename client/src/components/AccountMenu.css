@@ -9,11 +9,12 @@
   height: 34px;
   padding: 0;
   overflow: hidden;
-  border: 2px solid var(--white);
+  border: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
-  color: var(--white);
-  font-weight: 600;
+  background: #e9e4f5;
+  color: var(--purple);
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .account-avatar img {
