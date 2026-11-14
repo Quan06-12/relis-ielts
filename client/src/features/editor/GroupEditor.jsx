@@ -2,7 +2,7 @@ import { QUESTION_TYPES } from './editorState.js'
 import QuestionEditor from './QuestionEditor.jsx'
 
 // A group of questions sharing one type and instruction, e.g. "Questions 1–5" (US15).
-export default function GroupEditor({ group, numbers, onChangeGroup, onRemoveGroup, onAddQuestion, onChangeQuestion, onRemoveQuestion }) {
+export default function GroupEditor({ group, numbers, evidenceSource, onChangeGroup, onRemoveGroup, onAddQuestion, onChangeQuestion, onRemoveQuestion }) {
   const typeLabel = QUESTION_TYPES.find((item) => item.value === group.type)?.label
   const first = numbers[group.questions[0]?.id ?? group.questions[0]?.key]
   const last = numbers[group.questions.at(-1)?.id ?? group.questions.at(-1)?.key]
@@ -27,6 +27,7 @@ export default function GroupEditor({ group, numbers, onChangeGroup, onRemoveGro
           type={group.type}
           question={question}
           number={numbers[question.id ?? question.key]}
+          evidenceSource={evidenceSource}
           onChange={(changes) => onChangeQuestion(questionIndex, changes)}
           onRemove={() => onRemoveQuestion(questionIndex)}
         />

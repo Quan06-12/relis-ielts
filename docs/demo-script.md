@@ -5,6 +5,7 @@ Chạy trên bản deploy ở mỗi Sprint Review và trước buổi bảo vệ
 ## 0. Chuẩn bị
 
 - Web: https://relis-ielts.vercel.app · API: https://relis-ielts-api.onrender.com
+- Tạo dữ liệu mẫu (đăng nhập web bằng tài khoản giáo viên một lần trước): trong `server/` chạy `npm run seed:demo -- <email giáo viên>`. Lệnh tạo 1 đề full 40 câu, 1 đề lẻ 13 câu, lớp "[Demo] Lớp IELTS 6.5" có 3 học viên đã làm bài và 1 bài tập. Chạy lại lệnh sẽ xoá dữ liệu demo cũ rồi tạo lại.
 - Mở https://relis-ielts-api.onrender.com/api/health trước vài phút (gói Free ngủ sau 15 phút).
 - Hai cửa sổ trình duyệt: **Giáo viên** và **Học viên**, hai tài khoản Google khác nhau.
 - Dữ liệu mẫu: chạy script seed (làm ở Sprint 3) để có đề full, đề lẻ, đề nháp, lịch sử và một lớp có bài giao.
@@ -20,13 +21,20 @@ Chạy trên bản deploy ở mỗi Sprint Review và trước buổi bảo vệ
 
 | # | Làm gì | Người xem thấy |
 |---|---|---|
-| 3 | … | … |
+| 3 | Kho đề → "+ Tạo đề", chọn Reading, full đề | Mở trình soạn đề với 3 passage trống (US11) |
+| 4 | Tải ảnh bìa lên | Ảnh hiện trên thẻ đề ở Kho đề (US12) |
+| 5 | Dán passage, thêm nhóm TRUE/FALSE/NOT GIVEN và vài câu, chọn đáp án, viết giải thích | Số câu tự đánh lại 1, 2, 3… (US13, US15, US16, US17) |
+| 6 | Bấm Xuất bản khi còn câu chưa có đáp án | Báo số câu còn thiếu đáp án, chưa xuất bản (US19) |
+| 7 | Điền đủ đáp án rồi Xuất bản | Thẻ đề đổi trạng thái "Đã xuất bản" |
+| 12 | Trong trình soạn đề, bôi đen một câu trong passage rồi bấm "Gắn đoạn đang chọn" ở một câu hỏi | Đoạn đó hiện trong khung vàng dưới câu hỏi; sau khi làm bài, trang Xem lại tô vàng đúng đoạn đó (US18) |
 
 ## 3. Làm bài (E3)
 
 | # | Làm gì | Người xem thấy |
 |---|---|---|
 | 15 | Đang làm bài, chọn một đáp án rồi bấm F5 ngay | Đáp án vừa chọn vẫn còn, đồng hồ chạy tiếp đúng thời gian còn lại (US33) |
+| 16 | Mở một đề Listening, chọn "Luyện từng phần" và thời gian ngắn nhất | Hộp thoại cảnh báo thời gian ngắn hơn độ dài audio, vẫn cho bắt đầu (US26) |
+| 17 | Khi làm Listening, bấm 1.5x rồi chuyển sang Part khác | Audio phát nhanh hơn; Part mới vẫn giữ tốc độ 1.5x (US29) |
 
 ## 4. Kết quả, xem lại và AI feedback (E4, E7)
 
@@ -38,6 +46,7 @@ Chạy trên bản deploy ở mỗi Sprint Review và trước buổi bảo vệ
 | 23 | Mở Lịch sử | Lần làm vừa rồi nằm ở nhóm "Tuần này", có điểm và nút Xem lại (US39) |
 | 24 | Lọc "Đang làm dở", rồi lọc Listening, rồi gõ tên đề | Danh sách đổi theo từng bộ lọc; bài làm dở có nút Làm tiếp (US39) |
 | 25 | Giáo viên sửa đáp án đề vừa làm, học viên mở lại Lịch sử | Điểm cũ không đổi |
+| 26 | Ở trang Xem lại bấm "✨ Nhận xét bằng AI" | Sau vài giây hiện nhận xét tiếng Việt, dạng câu cần luyện và mẹo; tải lại trang thì nhận xét vẫn còn (US49) |
 
 ## 5. Lớp học (E5)
 

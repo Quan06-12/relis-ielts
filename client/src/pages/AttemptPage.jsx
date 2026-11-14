@@ -5,6 +5,7 @@ import { getErrorMessage } from '../api/errorMessages.js'
 import { useCountdown } from '../features/attempt/useCountdown.js'
 import { questionsOf, isAnswered, countUnanswered, formatClock } from '../features/attempt/answers.js'
 import QuestionGroup from '../features/attempt/QuestionGroup.jsx'
+import AudioPlayer from '../features/attempt/AudioPlayer.jsx'
 import { backupPending, loadPending, clearPending } from '../features/attempt/pendingBackup.js'
 import './AttemptPage.css'
 
@@ -168,10 +169,10 @@ export default function AttemptPage() {
           </div>
         </main>
       ) : (
-        // US28: audio player with play, pause and seek, then the questions
+        // US28, US29: audio player with play, pause, seek and speed, then the questions
         <main className="attempt-listening">
           {section.audioUrl ? (
-            <audio key={section.audioUrl} className="attempt-audio" src={section.audioUrl} controls preload="auto" />
+            <AudioPlayer src={section.audioUrl} />
           ) : (
             <p className="attempt-error">Phần này chưa có audio.</p>
           )}

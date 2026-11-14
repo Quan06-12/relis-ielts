@@ -175,3 +175,36 @@
     border-bottom: 1px solid var(--border);
   }
 }
+
+/* Audio speed (US29) */
+.audio-player {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.audio-player .attempt-audio {
+  flex: 1;
+  min-width: 260px;
+}
+
+.audio-speeds {
+  display: flex;
+  gap: 4px;
+}
+
+.speed-button {
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--white);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.speed-button.active {
+  border-color: var(--purple);
+  background: var(--purple);
+  color: var(--white);
+}

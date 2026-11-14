@@ -9,15 +9,18 @@ import usersRoutes from './routes/users.routes.js'
 import { createGoogleVerifier } from './services/googleAuth.js'
 import { createUploadRoutes } from './routes/uploads.routes.js'
 import { createCloudinaryStorage } from './services/fileStorage.js'
+import { createFeedbackRoutes } from './routes/feedback.routes.js'
+import { createGeminiFeedback } from './services/aiFeedback.js'
 import { notFoundRoute } from './middleware/notFoundRoute.js'
 import { errorHandler } from './middleware/errorHandler.js'
 
 // Builds the Express app without starting it, so tests can call it directly.
-// Tests pass fakes for the outside services (Google, Cloudinary); the defaults are the real ones.
+// Tests pass fakes for the outside services (Google, Cloudinary, Gemini); the defaults are the real ones.
 export function createApp({
   clientUrl = 'http://localhost:5173',
   verifyGoogleCredential = createGoogleVerifier(process.env.GOOGLE_CLIENT_ID),
   saveFile = createCloudinaryStorage(),
+  generateFeedback = createGeminiFeedback(),
 } = {}) {
   const app = express()
 
@@ -29,6 +32,7 @@ export function createApp({
   app.use('/api/auth', createAuthRoutes({ verifyGoogleCredential }))
   app.use('/api/tests', testsRoutes)
   app.use('/api/uploads', createUploadRoutes({ saveFile }))
+  app.use('/api/attempts', createFeedbackRoutes({ generateFeedback }))
   app.use('/api/attempts', attemptsRoutes)
   app.use('/api/classes', classesRoutes)
   app.use('/api/users', usersRoutes)

@@ -6,7 +6,7 @@ info:
     API contract between `client/` and `server/`.
     This file is the source of truth: change it in the same pull request as the code,
     and change it first when the two sides need to agree on something new.
-    Covers Sprint 0 (auth), Sprint 1 (tests, uploads, attempts), Sprint 2 (classes; grading, review, history) and Sprint 3 (assignments, home goals).
+    Covers Sprint 0 (auth), Sprint 1 (tests, uploads, attempts), Sprint 2 (classes; grading, review, history), Sprint 3 (assignments, home goals) and Sprint 4 (AI feedback).
 
 servers:
   - url: http://localhost:5000/api
@@ -478,6 +478,46 @@ paths:
                   result: { $ref: '#/components/schemas/Result' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
+
+  /attempts/{attemptId}/feedback:
+    parameters:
+      - $ref: '#/components/parameters/AttemptId'
+    post:
+      operationId: requestFeedback
+      tags: [Attempts]
+      summary: AI feedback on my submitted attempt (US49)
+      description: |
+        Only the person who took the attempt. Made once with Gemini from the score per question type
+        (the passage and the user's name are never sent), then stored on the attempt; later calls return the stored one.
+      responses:
+        '200':
+          description: Feedback made earlier
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  feedback: { $ref: '#/components/schemas/Feedback' }
+        '201':
+          description: Feedback made now
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  feedback: { $ref: '#/components/schemas/Feedback' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Still in progress (`ATTEMPT_NOT_SUBMITTED`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '502':
+          description: Gemini failed, quota used up or no API key on the server (`AI_FEEDBACK_FAILED`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
 
   /attempts/{attemptId}/review:
     parameters:
@@ -1198,6 +1238,10 @@ components:
             - $ref: '#/components/schemas/Id'
             - type: 'null'
         isLate: { type: boolean, description: Handed in after the assignment deadline }
+        feedback:
+          oneOf:
+            - $ref: '#/components/schemas/Feedback'
+            - type: 'null'
         mode: { $ref: '#/components/schemas/AttemptMode' }
         status:
           type: string
@@ -1354,3 +1398,12 @@ components:
           oneOf:
             - $ref: '#/components/schemas/Result'
             - type: 'null'
+
+    Feedback:
+      type: object
+      properties:
+        summary: { type: string }
+        weakTypes: { type: array, items: { type: string }, maxItems: 2 }
+        tips: { type: array, items: { type: string }, maxItems: 3 }
+        model: { type: string }
+        createdAt: { type: string, format: date-time }

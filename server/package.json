@@ -10,6 +10,7 @@
     "dev": "node --watch --env-file=.env src/server.js",
     "start": "node src/server.js",
     "test": "node --test",
+    "seed:demo": "node --env-file=.env scripts/seedDemo.js",
     "lint": "oxlint src tests"
   },
   "dependencies": {

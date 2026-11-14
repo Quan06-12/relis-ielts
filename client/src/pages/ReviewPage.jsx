@@ -6,6 +6,7 @@ import { questionsOf } from '../features/attempt/answers.js'
 import { answerStatus, formatDuration } from '../features/review/reviewHelpers.js'
 import ReviewQuestion from '../features/review/ReviewQuestion.jsx'
 import MarkedText from '../features/review/MarkedText.jsx'
+import AiFeedback from '../features/review/AiFeedback.jsx'
 import './AttemptPage.css'
 import './ReviewPage.css'
 
@@ -95,6 +96,9 @@ export default function ReviewPage() {
           {attempt.result.band === null && <li>Band chỉ tính khi làm full đề 40 câu.</li>}
         </ul>
       </details>
+
+      {/* Only the person who took the test can ask for AI feedback (US49) */}
+      {viewerRole === 'owner' && <AiFeedback attemptId={attempt.id} initialFeedback={attempt.feedback ?? null} />}
 
       {selected === null && <p className="review-hint">Bấm vào một câu để xem giải thích và vị trí bằng chứng.</p>}
 

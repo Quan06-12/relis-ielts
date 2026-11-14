@@ -6,6 +6,13 @@ import GroupEditor from './GroupEditor.jsx'
 // One Reading passage or Listening part with its question groups (US13, US14, US15).
 export default function SectionEditor({ skill, section, numbers, actions }) {
   const [newGroupType, setNewGroupType] = useState('tfng')
+  // Last text selected in the passage / transcript, so a question can use it as evidence (US18)
+  const [selection, setSelection] = useState(null)
+  const sourceText = skill === 'reading' ? section.passage : section.transcript
+
+  function rememberSelection(event) {
+    setSelection({ start: event.target.selectionStart, end: event.target.selectionEnd })
+  }
 
   return (
     <div className="section-editor">
@@ -17,7 +24,7 @@ export default function SectionEditor({ skill, section, numbers, actions }) {
       {skill === 'reading' ? (
         <label className="editor-field">
           Nội dung passage <small>(xuống dòng để tách đoạn)</small>
-          <textarea rows={14} value={section.passage} onChange={(event) => actions.changeSection({ passage: event.target.value })} />
+          <textarea rows={14} value={section.passage} onSelect={rememberSelection} onChange={(event) => actions.changeSection({ passage: event.target.value })} />
         </label>
       ) : (
         <>
@@ -35,7 +42,7 @@ export default function SectionEditor({ skill, section, numbers, actions }) {
           </div>
           <label className="editor-field">
             Transcript <small>(chỉ hiện ở trang Xem lại)</small>
-            <textarea rows={10} value={section.transcript} onChange={(event) => actions.changeSection({ transcript: event.target.value })} />
+            <textarea rows={10} value={section.transcript} onSelect={rememberSelection} onChange={(event) => actions.changeSection({ transcript: event.target.value })} />
           </label>
         </>
       )}
@@ -45,6 +52,7 @@ export default function SectionEditor({ skill, section, numbers, actions }) {
           key={group.id ?? group.key}
           group={group}
           numbers={numbers}
+          evidenceSource={{ text: sourceText, selection, label: skill === 'reading' ? 'passage' : 'transcript' }}
           onChangeGroup={(changes) => actions.changeGroup(groupIndex, changes)}
           onRemoveGroup={() => actions.removeGroup(groupIndex)}
           onAddQuestion={() => actions.addQuestion(groupIndex)}

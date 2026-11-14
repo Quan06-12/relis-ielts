@@ -75,7 +75,8 @@ docs: update REST API table
 - **Một issue một PR**, giữ PR nhỏ (dưới khoảng 400 dòng thay đổi) để review được trong 15 phút. Story lớn thì tách thành sub-issue.
 - Tiêu đề `USxx · <tên story>`; mô tả có `Closes #<số issue>` và cách kiểm tra.
 - Cần **1 approval** của người còn lại; người review kiểm tra cả code lẫn tiêu chí chấp nhận.
-- Dùng **Squash and merge**.
+- PR từ branch tính năng vào `develop`: dùng **Squash and merge**.
+- PR release `develop` → `main`: dùng **Create a merge commit**, không squash. Squash làm hai nhánh lệch lịch sử và lần release sau sẽ báo conflict dù code không đổi.
 
 ## Definition of Done
 

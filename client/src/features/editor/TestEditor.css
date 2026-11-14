@@ -260,3 +260,41 @@ fieldset.editor-field {
     grid-template-columns: 1fr;
   }
 }
+
+/* Evidence (US18) */
+.evidence-field {
+  gap: 6px;
+}
+
+.evidence-quote {
+  margin: 0;
+  padding: 8px 12px;
+  border-left: 4px solid #f5c400;
+  border-radius: 6px;
+  background: #fffbea;
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+
+.evidence-quote.broken {
+  border-left-color: #b42318;
+  background: #fdecea;
+  color: #b42318;
+}
+
+.evidence-empty {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.evidence-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.evidence-actions .editor-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
