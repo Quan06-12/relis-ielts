@@ -43,6 +43,7 @@ Chạy trên bản deploy ở mỗi Sprint Review và trước buổi bảo vệ
 | 23 | Mở Lịch sử | Lần làm vừa rồi nằm ở nhóm "Tuần này", có điểm và nút Xem lại (US39) |
 | 24 | Lọc "Đang làm dở", rồi lọc Listening, rồi gõ tên đề | Danh sách đổi theo từng bộ lọc; bài làm dở có nút Làm tiếp (US39) |
 | 25 | Giáo viên sửa đáp án đề vừa làm, học viên mở lại Lịch sử | Điểm cũ không đổi |
+| 26 | Ở trang Xem lại bấm "✨ Nhận xét bằng AI" | Sau vài giây hiện nhận xét tiếng Việt, dạng câu cần luyện và mẹo; tải lại trang thì nhận xét vẫn còn (US49) |
 
 ## 5. Lớp học (E5)
 

@@ -20,6 +20,18 @@ const resultSchema = new mongoose.Schema(
   { _id: false }
 )
 
+// AI feedback (US49), made once and kept so the Gemini quota is not used again
+const feedbackSchema = new mongoose.Schema(
+  {
+    summary: String,
+    weakTypes: [String],
+    tips: [String],
+    model: String,
+    createdAt: Date,
+  },
+  { _id: false }
+)
+
 const attemptSchema = new mongoose.Schema(
   {
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -40,6 +52,7 @@ const attemptSchema = new mongoose.Schema(
     result: { type: resultSchema, default: null },
     // Handed in after the assignment deadline (only possible when the teacher allows late work, US44)
     isLate: { type: Boolean, default: false },
+    feedback: { type: feedbackSchema, default: null },
   },
   { timestamps: true }
 )
