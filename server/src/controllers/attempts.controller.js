@@ -3,28 +3,51 @@ import { Attempt } from '../models/Attempt.js'
 import { Test } from '../models/Test.js'
 import { AppError, notFound, validationError } from '../errors/AppError.js'
 import { findTestUserCanTake } from '../services/testAccess.js'
-import { canTakeFromClass, isTeacherOf } from '../services/classAccess.js'
+import { canTakeFromClass, isTeacherOf, findRole } from '../services/classAccess.js'
+import { Assignment } from '../models/Assignment.js'
+import { canStartAssignment } from '../utils/assignmentStatus.js'
 import { Class } from '../models/Class.js'
 import { checkMode } from '../utils/attemptMode.js'
 import { secondsLeft, isPastDeadline } from '../utils/attemptTimer.js'
 import { listQuestions, toPlayView, toReviewView } from '../utils/testContent.js'
 import { gradeAttempt } from '../utils/grading.js'
 
-// POST /api/attempts — start taking a test (US24, US25), alone or from a class library (US22)
+// POST /api/attempts — start taking a test (US24, US25), alone, from a class library (US22)
+// or as a class assignment (US44)
 export async function startAttempt(request, response) {
-  const { testId, mode, classId = null } = request.body ?? {}
+  const { testId, mode, assignmentId = null } = request.body ?? {}
+  let { classId = null } = request.body ?? {}
   if (!mongoose.isValidObjectId(testId)) {
     throw validationError([{ field: 'testId', message: 'testId is required' }])
   }
   if (classId !== null && !mongoose.isValidObjectId(classId)) {
     throw validationError([{ field: 'classId', message: 'classId must be a class id or null' }])
   }
+  if (assignmentId !== null && !mongoose.isValidObjectId(assignmentId)) {
+    throw validationError([{ field: 'assignmentId', message: 'assignmentId must be an assignment id or null' }])
+  }
 
-  const test = await findTestUserCanTake(testId, request.userId)
+  let assignment = null
+  if (assignmentId !== null) {
+    // Homework: the assignment must be for this test and for a class the user is in
+    assignment = await Assignment.findOne({ _id: assignmentId, testId })
+    if (!assignment || !(await findRole(assignment.classId, request.userId))) {
+      throw notFound('Assignment')
+    }
+    if (!canStartAssignment(assignment)) {
+      throw new AppError(422, 'DEADLINE_PASSED', 'The deadline of this assignment has passed')
+    }
+    classId = assignment.classId
+  }
+
+  const test = assignment
+    ? await Test.findOne({ _id: testId, status: 'published', hidden: false })
+    : await findTestUserCanTake(testId, request.userId)
+  if (!test) throw notFound('Test')
   const cleanMode = checkMode(mode, test)
 
-  // Started from a class library: remember the class so the teacher's gradebook can find it (US40)
-  if (classId !== null && !(await canTakeFromClass(classId, test._id, request.userId))) {
+  if (assignmentId === null && classId !== null && !(await canTakeFromClass(classId, test._id, request.userId))) {
+    // Started from a class library: remember the class so the teacher's gradebook can find it (US40)
     throw notFound('Test')
   }
 
@@ -39,7 +62,7 @@ export async function startAttempt(request, response) {
     await submit(unfinished)
   }
 
-  const attempt = await Attempt.create({ userId: request.userId, testId: test._id, classId, mode: cleanMode })
+  const attempt = await Attempt.create({ userId: request.userId, testId: test._id, classId, assignmentId, mode: cleanMode })
 
   response.status(201).json(withTest(attempt, test))
 }
@@ -210,6 +233,13 @@ async function submit(attempt) {
   attempt.result = result
   attempt.status = 'submitted'
   attempt.submittedAt = new Date()
+
+  // Homework handed in after the deadline is marked late (US44)
+  if (attempt.assignmentId) {
+    const assignment = await Assignment.findById(attempt.assignmentId)
+    attempt.isLate = assignment !== null && attempt.submittedAt > assignment.deadline
+  }
+
   await attempt.save()
 }
 
