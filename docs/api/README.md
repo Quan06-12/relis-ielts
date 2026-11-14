@@ -53,6 +53,7 @@ Client hiển thị thông báo tiếng Việt dựa trên `code`, không hiển
 | 409 | `ATTEMPT_NOT_SUBMITTED` | Mở trang Xem lại khi bài còn đang làm |
 | 409 | `ALREADY_MEMBER` | Nhập mã lớp đã tham gia (Sprint 2) |
 | 409 | `TEACHER_CANNOT_LEAVE` | Giáo viên bấm rời lớp của chính mình (US10) |
+| 409 | `DUPLICATE_WORD` | Thêm hoặc sửa từ trùng với một từ đã có trong bộ (US48); `details` chỉ trường `term` |
 | 413 | `FILE_TOO_LARGE` | File upload vượt giới hạn |
 | 422 | `TEST_INCOMPLETE` | Xuất bản đề còn câu chưa có đáp án; `details` liệt kê số câu |
 | 422 | `DEADLINE_PASSED` | Bắt đầu làm bài giao sau hạn khi giáo viên không cho nộp trễ (US44) |

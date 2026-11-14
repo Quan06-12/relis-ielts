@@ -30,6 +30,8 @@ tags:
     description: Taking a test (owner B)
   - name: Classes
     description: Classes, class library and gradebook (owner A)
+  - name: Vocabulary
+    description: Personal vocabulary sets and their words (US47, US48)
 
 paths:
   /health:
@@ -1031,6 +1033,162 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
 
+  /vocab-sets:
+    get:
+      operationId: listMyVocabSets
+      tags: [Vocabulary]
+      summary: My vocabulary sets as cards, most recently changed first (US47)
+      responses:
+        '200':
+          description: My sets
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/VocabSetSummary' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      operationId: createVocabSet
+      tags: [Vocabulary]
+      summary: Create a set; only the name is required (US47)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VocabSetInput' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  set: { $ref: '#/components/schemas/VocabSet' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /vocab-sets/{setId}:
+    parameters:
+      - { name: setId, in: path, required: true, schema: { $ref: '#/components/schemas/Id' } }
+    get:
+      operationId: getVocabSet
+      tags: [Vocabulary]
+      summary: A set with all its words, newest first (owner only)
+      responses:
+        '200':
+          description: The set
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  set: { $ref: '#/components/schemas/VocabSet' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      operationId: updateVocabSet
+      tags: [Vocabulary]
+      summary: Rename a set or change its colour or cover
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VocabSetInput' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  set: { $ref: '#/components/schemas/VocabSet' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      operationId: deleteVocabSet
+      tags: [Vocabulary]
+      summary: Delete a set and its words
+      responses:
+        '204': { description: Deleted }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /vocab-sets/{setId}/words:
+    parameters:
+      - { name: setId, in: path, required: true, schema: { $ref: '#/components/schemas/Id' } }
+    post:
+      operationId: addVocabWord
+      tags: [Vocabulary]
+      summary: Add a word (US48); the same term twice in a set is 409 `DUPLICATE_WORD`
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VocabWordInput' }
+      responses:
+        '201':
+          description: Added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  word: { $ref: '#/components/schemas/VocabWord' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: The term is already in this set (`DUPLICATE_WORD`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /vocab-sets/{setId}/words/{wordId}:
+    parameters:
+      - { name: setId, in: path, required: true, schema: { $ref: '#/components/schemas/Id' } }
+      - { name: wordId, in: path, required: true, schema: { $ref: '#/components/schemas/Id' } }
+    put:
+      operationId: updateVocabWord
+      tags: [Vocabulary]
+      summary: Replace every field of a word (US48)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VocabWordInput' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  word: { $ref: '#/components/schemas/VocabWord' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Another word of the set has this term (`DUPLICATE_WORD`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+    delete:
+      operationId: deleteVocabWord
+      tags: [Vocabulary]
+      summary: Delete a word
+      responses:
+        '204': { description: Deleted }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1535,6 +1693,58 @@ components:
           oneOf:
             - $ref: '#/components/schemas/Result'
             - type: 'null'
+
+    VocabSetInput:
+      type: object
+      properties:
+        name: { type: string, maxLength: 80, description: Required when creating }
+        color: { type: string, enum: [purple, blue, green, orange, pink] }
+        coverUrl: { type: [string, 'null'] }
+
+    VocabSetSummary:
+      type: object
+      required: [id, name, color, coverUrl, wordCount, preview]
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        name: { type: string }
+        color: { type: string, enum: [purple, blue, green, orange, pink] }
+        coverUrl: { type: [string, 'null'] }
+        wordCount: { type: integer }
+        preview:
+          type: array
+          description: The first 4 terms
+          items: { type: string }
+        updatedAt: { type: string, format: date-time }
+
+    VocabSet:
+      allOf:
+        - $ref: '#/components/schemas/VocabSetSummary'
+        - type: object
+          required: [words]
+          properties:
+            words:
+              type: array
+              items: { $ref: '#/components/schemas/VocabWord' }
+
+    VocabWordInput:
+      type: object
+      required: [term, meaning]
+      properties:
+        type: { type: string, enum: [n, v, adj, adv, phr, other], description: Anything else becomes "other" }
+        term: { type: string, maxLength: 80 }
+        meaning: { type: string, maxLength: 200 }
+        note: { type: string }
+        verbForms: { type: string, description: Kept only when type is "v" }
+        collocations: { type: string }
+        example: { type: string }
+
+    VocabWord:
+      allOf:
+        - $ref: '#/components/schemas/VocabWordInput'
+        - type: object
+          required: [id]
+          properties:
+            id: { $ref: '#/components/schemas/Id' }
 
     Feedback:
       type: object

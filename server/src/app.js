@@ -6,6 +6,7 @@ import testsRoutes from './routes/tests.routes.js'
 import attemptsRoutes from './routes/attempts.routes.js'
 import classesRoutes from './routes/classes.routes.js'
 import usersRoutes from './routes/users.routes.js'
+import vocabRoutes from './routes/vocab.routes.js'
 import { createGoogleVerifier } from './services/googleAuth.js'
 import { createUploadRoutes } from './routes/uploads.routes.js'
 import { createCloudinaryStorage } from './services/fileStorage.js'
@@ -36,6 +37,7 @@ export function createApp({
   app.use('/api/attempts', attemptsRoutes)
   app.use('/api/classes', classesRoutes)
   app.use('/api/users', usersRoutes)
+  app.use('/api/vocab-sets', vocabRoutes)
 
   app.use(notFoundRoute)
   app.use(errorHandler)
