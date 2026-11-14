@@ -150,3 +150,28 @@ button {
   font-size: 12px;
   font-weight: 500;
 }
+
+/* Small coloured labels: skill, kind, open/closed (class detail, history) */
+.chip {
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #f0eef6;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.chip.reading {
+  background: var(--purple-soft);
+  color: var(--purple);
+}
+
+.chip.listening {
+  background: #fdeee4;
+  color: #c2410c;
+}
+
+.chip.open {
+  background: #e4f3e4;
+  color: #1e6b2a;
+}

@@ -1,83 +1,189 @@
+/* Login page (US01), laid out like the wireframe: purple page, a framed area,
+   drawing and pitch on the left, logo and a white card on the right */
 .login-page {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
   min-height: 100vh;
+  padding: 20px;
   background: var(--purple);
   color: var(--white);
 }
 
+.login-frame {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 48px;
+  min-height: calc(100vh - 40px);
+  padding: 32px 64px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 24px;
+  background: linear-gradient(160deg, #6a4fe6, #5b3fd6 60%);
+  box-shadow: inset 0 0 0 6px rgba(255, 255, 255, 0.04);
+}
+
 .login-intro {
-  align-self: center;
   max-width: 520px;
-  padding: 48px 48px 48px 72px;
+}
+
+.exam-illustration {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  margin-bottom: 24px;
+  filter: drop-shadow(0 12px 24px rgba(20, 8, 70, 0.35));
 }
 
 .login-intro h1 {
-  margin: 0 0 8px;
-  font-size: 40px;
+  margin: 0 0 10px;
+  font-size: 36px;
+  letter-spacing: -0.01em;
 }
 
 .login-subtitle {
-  margin: 0 0 24px;
-  font-size: 20px;
+  margin: 0 0 18px;
   color: #e4dcff;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.login-intro p:last-child {
+  max-width: 460px;
+  color: #efeaff;
+  line-height: 1.6;
 }
 
 .login-panel {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 24px;
-  padding: 48px;
+  gap: 28px;
+  max-width: 460px;
 }
 
 .login-brand {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 56px;
+  font-size: 52px;
   font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
-/* Glass card from the wireframe; the dark tint keeps white text readable */
 .login-card {
-  max-width: 440px;
-  padding: 32px;
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  border-radius: 20px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04)), rgba(30, 15, 90, 0.15);
-  backdrop-filter: blur(18px);
+  padding: 28px 28px 22px;
+  border-radius: 18px;
+  background: var(--white);
+  color: var(--text);
+  box-shadow: 0 20px 50px rgba(20, 8, 70, 0.3);
 }
 
 .login-card h2 {
   margin: 0 0 8px;
+  font-size: 24px;
+}
+
+.login-card > p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.55;
 }
 
 .login-google-button {
-  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+  margin-top: 22px;
 }
 
-.login-status {
-  color: #e4dcff;
+/* Shown instead of the Google button while the server checks the account */
+.login-connecting {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 44px;
+  margin-top: 22px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #f4f2fa;
+  font-size: 14px;
+  font-weight: 600;
 }
 
-.login-error {
+.login-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #d4cdea;
+  border-top-color: var(--purple);
+  border-radius: 50%;
+  animation: login-spin 0.8s linear infinite;
+}
+
+@keyframes login-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.login-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 14px 0 0;
   padding: 10px 12px;
   border-radius: 8px;
-  background: #fde8e8;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.login-note.warning {
+  background: #fff6dc;
+  color: #6b4e00;
+}
+
+.login-note.error {
+  align-items: center;
+  background: #fdecee;
   color: #9b1c1c;
 }
 
-@media (max-width: 800px) {
-  .login-page {
-    grid-template-columns: 1fr;
-  }
+.login-note.error span:nth-child(2) {
+  flex: 1;
+}
 
-  .login-intro {
-    padding: 32px 24px 0;
+.login-note button {
+  padding: 5px 10px;
+  border: 1px solid #f1b8b8;
+  border-radius: 6px;
+  background: var(--white);
+  color: #9b1c1c;
+  font: inherit;
+  font-weight: 600;
+}
+
+.login-terms {
+  margin: 16px 0 0 !important;
+  color: var(--text-muted);
+  font-size: 12px !important;
+}
+
+@media (max-width: 900px) {
+  .login-frame {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 28px 20px;
   }
 
   .login-panel {
-    padding: 24px;
+    order: -1;
+  }
+
+  .exam-illustration {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-spinner {
+    animation: none;
   }
 }

@@ -15,6 +15,7 @@ import { Class } from '../src/models/Class.js'
 import { ClassMember } from '../src/models/ClassMember.js'
 import { ClassLibraryItem } from '../src/models/ClassLibraryItem.js'
 import { Assignment } from '../src/models/Assignment.js'
+import { VocabSet } from '../src/models/VocabSet.js'
 import { renumberQuestions, listQuestions } from '../src/utils/testContent.js'
 import { gradeAttempt } from '../src/utils/grading.js'
 import { generateClassCode } from '../src/utils/classCode.js'
@@ -28,6 +29,15 @@ const STUDENTS = [
   { name: 'Nguyễn Minh Anh', correct: 26 },
   { name: 'Trần Gia Bảo', correct: 31 },
   { name: 'Lê Thu Hà', correct: 35 },
+]
+
+// Words of the demo vocabulary set (US47, US48)
+const DEMO_WORDS = [
+  { type: 'adj', term: 'sustainable', meaning: 'bền vững', note: 'Hay gặp trong Reading về đô thị, năng lượng', collocations: 'sustainable development, sustainable growth', example: 'Rooftop gardens are a sustainable way to cool city buildings.' },
+  { type: 'v', term: 'mitigate', meaning: 'giảm nhẹ, làm dịu bớt', note: 'Đồng nghĩa: reduce, alleviate', verbForms: 'mitigated – mitigated', collocations: 'mitigate the effects of' },
+  { type: 'n', term: 'biodiversity', meaning: 'đa dạng sinh học' },
+  { type: 'n', term: 'emission', meaning: 'sự thải ra, khí thải', note: 'Thường ở dạng số nhiều: emissions' },
+  { type: 'phr', term: 'run off', meaning: 'chảy tràn (nước mưa)', note: 'Danh từ: runoff' },
 ]
 
 async function main() {
@@ -91,9 +101,13 @@ async function main() {
     assignmentId: assignment._id,
   })
 
+  // A vocabulary set, so the "Từ vựng" page has something to show
+  await VocabSet.create({ ownerId: teacher._id, name: '[Demo] Environment', color: 'green', words: DEMO_WORDS })
+
   console.log('Demo data ready:')
   console.log(`  Tests: "${fullTest.title}" (40 questions), "${miniTest.title}" (13 questions)`)
   console.log(`  Class: "${demoClass.name}", code ${demoClass.code}, ${STUDENTS.length} students, 1 assignment`)
+  console.log(`  Vocabulary: "[Demo] Environment" (${DEMO_WORDS.length} words)`)
 }
 
 // Removes what an earlier run created for this teacher, and every fake student
@@ -112,6 +126,7 @@ async function removeOldDemoData(teacher) {
     Assignment.deleteMany({ $or: [{ classId: { $in: classIds } }, { testId: { $in: testIds } }] }),
   ])
   await Promise.all([
+    VocabSet.deleteMany({ ownerId: teacher._id, name: /^\[Demo\]/ }),
     Test.deleteMany({ _id: { $in: testIds } }),
     Class.deleteMany({ _id: { $in: classIds } }),
     User.deleteMany({ googleId: /^demo-student-/ }),
