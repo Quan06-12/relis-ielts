@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import { getTestForPlay } from '../../api/tests.js'
 import { startAttempt } from '../../api/attempts.js'
 import { getErrorMessage } from '../../api/errorMessages.js'
-import { timeChoices } from './timeOptions.js'
+import { timeChoices, audioMinutes } from './timeOptions.js'
 import './ModeDialog.css'
 
-// "Choose mode" dialog before a test starts (US24, US25):
+// "Choose mode" dialog before a test starts (US24, US25, US26):
 // full test or some sections, and how many minutes.
 // classId is given when the test is opened from a class library (US22),
 // assignmentId when it is homework with a deadline (US44).
@@ -37,6 +37,9 @@ export default function ModeDialog({ testId, classId = null, assignmentId = null
   const time = timeChoices(test.skill, isFullTest, sectionIndexes.length)
   const selectedMinutes = time.choices.includes(minutes) ? minutes : time.default
   const sectionWord = test.skill === 'reading' ? 'Passage' : 'Part'
+  // US26: warn (but still allow) when the time is shorter than the audio of the chosen parts
+  const audioLength = test.skill === 'listening' ? audioMinutes(test.sections, sectionIndexes) : null
+  const isShorterThanAudio = audioLength !== null && selectedMinutes < audioLength
 
   function toggleSection(index) {
     const next = chosenSections.includes(index) ? chosenSections.filter((item) => item !== index) : [...chosenSections, index]
@@ -94,6 +97,12 @@ export default function ModeDialog({ testId, classId = null, assignmentId = null
           ))}
         </select>
       </label>
+
+      {isShorterThanAudio && (
+        <p className="mode-warning" role="status">
+          Thời gian bạn chọn ({selectedMinutes} phút) ngắn hơn tổng độ dài audio ({audioLength} phút), có thể không nghe hết.
+        </p>
+      )}
 
       {unfinishedAttemptId && (
         <div className="mode-unfinished">
