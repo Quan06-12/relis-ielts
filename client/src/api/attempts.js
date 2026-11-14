@@ -38,3 +38,9 @@ export async function listMyAttempts(filters = {}) {
   const response = await http.get('/attempts', { params: filters })
   return response.data // { items, total, page, limit }
 }
+
+// POST /attempts/:id/feedback — AI feedback, made once and then stored (US49); returns the feedback
+export async function requestFeedback(attemptId) {
+  const response = await http.post(`/attempts/${attemptId}/feedback`)
+  return response.data.feedback
+}

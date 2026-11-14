@@ -10,6 +10,7 @@ const messages = {
   FILE_TOO_LARGE: 'File quá lớn.',
   ATTEMPT_NOT_SUBMITTED: 'Bài này chưa nộp nên chưa xem lại được.',
   INTERNAL_ERROR: 'Máy chủ gặp lỗi, vui lòng thử lại sau.',
+  AI_FEEDBACK_FAILED: 'Chưa lấy được nhận xét AI, thử lại sau ít phút.',
   DATABASE_UNAVAILABLE: 'Máy chủ đang bận, vui lòng thử lại sau.',
 }
 
