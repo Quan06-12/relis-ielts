@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { listMyAttempts } from '../api/attempts.js'
 import { getErrorMessage } from '../api/errorMessages.js'
 import { groupByWeek, scoreLabel } from '../features/history/historyGroups.js'
+import { SkeletonRows } from '../components/Skeleton.jsx'
+import EmptyState from '../components/EmptyState.jsx'
 import './HistoryPage.css'
 
 const PAGE_SIZE = 20
@@ -90,9 +92,9 @@ export default function HistoryPage() {
 
       {error && <p className="library-message error">{error}</p>}
       {!isLoading && !error && attempts.length === 0 && (
-        <p className="library-message">
-          Chưa có lần làm bài nào. <Link to="/library">Vào Kho đề để làm bài</Link>
-        </p>
+        <EmptyState title="Chưa có lần làm bài nào">
+          Bài bạn làm sẽ hiện ở đây, xếp theo tuần. <Link to="/library">Vào Kho đề để làm bài</Link>
+        </EmptyState>
       )}
 
       {groupByWeek(attempts).map((group) => (
@@ -106,7 +108,7 @@ export default function HistoryPage() {
         </section>
       ))}
 
-      {isLoading && <p className="library-message">Đang tải…</p>}
+      {isLoading && <SkeletonRows />}
       {!isLoading && attempts.length < total && (
         <button type="button" className="secondary-button history-more" onClick={() => setPage((current) => current + 1)}>
           Xem thêm

@@ -73,3 +73,5 @@ Chạy trên bản deploy ở mỗi Sprint Review và trước buổi bảo vệ
 | 50 | Mở Trang chủ → "Đặt mục tiêu", chọn Reading 7.0, Listening 7.5, ngày thi | Thẻ mục tiêu cập nhật, hiện "Còn N ngày đến ngày thi" (US46) |
 | 51 | Làm full một đề Reading 40 câu rồi quay lại Trang chủ | Thẻ Reading hiện band vừa đạt và khoảng cách đến mục tiêu |
 | 52 | Để một bài đang làm dở rồi mở Trang chủ | Mục "Đang làm dở" có nút Làm tiếp |
+| 53 | Sau vài lần làm full đề, xem mục "Band theo thời gian" ở Trang chủ | Biểu đồ đường cho Reading và Listening, đường nét đứt là mục tiêu; rê chuột vào điểm thấy band và ngày (US42) |
+| 54 | Thu nhỏ cửa sổ trình duyệt (hoặc mở trên điện thoại) | Thanh tab gọn thành nút ☰, bấm vào mở menu (giao diện điện thoại) |

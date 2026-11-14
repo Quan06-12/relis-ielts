@@ -7,6 +7,8 @@ import ClassLibraryTab from '../features/classes/ClassLibraryTab.jsx'
 import GradebookTab from '../features/classes/GradebookTab.jsx'
 import MembersTab from '../features/classes/MembersTab.jsx'
 import AssignmentsTab from '../features/classes/AssignmentsTab.jsx'
+import { useConfirm, useToast } from '../components/FeedbackProvider.jsx'
+import { SkeletonCards } from '../components/Skeleton.jsx'
 import './ClassDetailPage.css'
 
 // Class detail (US05, US21, US22, US40, US44, US45): class library and assignments for everyone,
@@ -14,6 +16,8 @@ import './ClassDetailPage.css'
 export default function ClassDetailPage() {
   const { classId } = useParams()
   const navigate = useNavigate()
+  const confirm = useConfirm()
+  const toast = useToast()
   const [classInfo, setClassInfo] = useState(null)
   const [tab, setTab] = useState('library')
   const [error, setError] = useState('')
@@ -32,16 +36,28 @@ export default function ClassDetailPage() {
       </main>
     )
   }
-  if (!classInfo) return <main className="page">Đang tải lớp…</main>
+  if (!classInfo) {
+    return (
+      <main className="page">
+        <SkeletonCards count={1} />
+      </main>
+    )
+  }
 
   const isTeacher = classInfo.myRole === 'teacher'
 
   // US10: a student leaves; coming back needs the class code
   async function handleLeave() {
-    const question = `Rời lớp "${classInfo.name}"? Bạn sẽ không thấy bài của lớp nữa (bài đã nộp vẫn còn trong Lịch sử). Muốn vào lại cần mã lớp.`
-    if (!window.confirm(question)) return
+    const isSure = await confirm({
+      title: `Rời lớp "${classInfo.name}"?`,
+      message: 'Bạn sẽ không thấy bài của lớp nữa (bài đã nộp vẫn còn trong Lịch sử). Muốn vào lại cần mã lớp.',
+      confirmLabel: 'Rời lớp',
+      danger: true,
+    })
+    if (!isSure) return
     try {
       await leaveClass(classId)
+      toast(`Đã rời lớp ${classInfo.name}`)
       navigate('/classes')
     } catch (leaveError) {
       setError(getErrorMessage(leaveError))
@@ -98,10 +114,12 @@ export default function ClassDetailPage() {
 // US05: the teacher sees the code and copies it to send to students
 function ClassCode({ code }) {
   const [isCopied, setIsCopied] = useState(false)
+  const toast = useToast()
 
   async function handleCopy() {
     try {
       await navigator.clipboard.writeText(code)
+      toast('Đã sao chép mã lớp, gửi cho học viên để họ vào lớp')
       setIsCopied(true)
       setTimeout(() => setIsCopied(false), 2000)
     } catch {

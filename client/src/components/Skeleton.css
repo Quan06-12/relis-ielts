@@ -1,0 +1,41 @@
+.skeleton {
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, #ece9f5 25%, #f6f4fb 50%, #ece9f5 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.2s linear infinite;
+}
+
+@keyframes skeleton-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skeleton-row {
+  height: 64px;
+}
+
+.skeleton-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.skeleton-card {
+  height: 150px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}

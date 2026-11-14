@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { getGradebook } from '../../api/classes.js'
 import { getErrorMessage } from '../../api/errorMessages.js'
 import { formatScore } from './classDisplay.js'
+import { SkeletonRows } from '../../components/Skeleton.jsx'
 
 // "Gradebook" tab, teacher only (US40): one row per student, one column per class test.
 // A score links to the review page of that attempt (read-only for the teacher).
@@ -17,7 +18,7 @@ export default function GradebookTab({ classId }) {
   }, [classId])
 
   if (error) return <p className="library-message error">{error}</p>
-  if (!gradebook) return <p className="library-message">Đang tải…</p>
+  if (!gradebook) return <SkeletonRows count={4} />
   if (gradebook.rows.length === 0) return <p className="library-message">Lớp chưa có học viên. Gửi mã lớp cho học viên để họ vào lớp.</p>
   if (gradebook.tests.length === 0) return <p className="library-message">Lớp chưa có đề nào trong kho đề lớp.</p>
 

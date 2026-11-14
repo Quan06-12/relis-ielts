@@ -104,3 +104,43 @@
   font: inherit;
   font-weight: 400;
 }
+
+/* US42: band chart */
+.band-chart {
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--white);
+}
+
+.band-chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.band-grid {
+  stroke: var(--border);
+}
+
+.band-axis {
+  fill: var(--text-muted);
+  font-size: 11px;
+}
+
+.band-legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.band-legend i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  vertical-align: middle;
+}

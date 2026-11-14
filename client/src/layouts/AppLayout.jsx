@@ -1,4 +1,5 @@
-import { Link, NavLink, Outlet } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import CubeLogo from '../components/CubeLogo.jsx'
 import AccountMenu from '../components/AccountMenu.jsx'
 import './AppLayout.css'
@@ -12,17 +13,34 @@ const tabs = [
 ]
 
 // Purple navigation bar shared by every page except the login, attempt and review pages.
+// On narrow screens the tabs fold into a ☰ menu.
 export default function AppLayout() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { pathname } = useLocation()
+
+  // Close the phone menu after moving to another page
+  useEffect(() => setIsMenuOpen(false), [pathname])
+
   return (
     <>
       <header className="app-header">
         <nav className="app-nav">
+          <button
+            type="button"
+            className="menu-button"
+            aria-label={isMenuOpen ? 'Đóng menu' : 'Mở menu'}
+            aria-expanded={isMenuOpen}
+            onClick={() => setIsMenuOpen((open) => !open)}
+          >
+            {isMenuOpen ? '✕' : '☰'}
+          </button>
+
           <Link to="/" className="app-logo">
             <CubeLogo />
             <span>Relis</span>
           </Link>
 
-          <div className="app-tabs">
+          <div className={isMenuOpen ? 'app-tabs open' : 'app-tabs'}>
             {tabs.map((tab) => (
               // `end` keeps "Trang chủ" from staying active on every page (all paths start with "/")
               <NavLink key={tab.to} to={tab.to} end={tab.to === '/'} className="app-tab">

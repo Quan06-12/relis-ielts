@@ -6,6 +6,8 @@ import { getErrorMessage } from '../../api/errorMessages.js'
 import ModeDialog from '../attempt/ModeDialog.jsx'
 import { STATUS_LABEL, groupByStatus, timeLeftLabel, defaultDeadlineInput } from './assignmentDisplay.js'
 import { formatScore } from './classDisplay.js'
+import { useConfirm, useToast } from '../../components/FeedbackProvider.jsx'
+import { SkeletonRows } from '../../components/Skeleton.jsx'
 
 // "Assignments" tab: the teacher gives tests with a deadline (US44);
 // a student sees their homework grouped by status, with their score (US45).
@@ -14,6 +16,8 @@ export default function AssignmentsTab({ classId, isTeacher }) {
   const [error, setError] = useState('')
   const [isCreating, setIsCreating] = useState(false)
   const [assignmentToStart, setAssignmentToStart] = useState(null)
+  const confirm = useConfirm()
+  const toast = useToast()
 
   const load = useCallback(() => {
     listAssignments(classId)
@@ -24,17 +28,24 @@ export default function AssignmentsTab({ classId, isTeacher }) {
   useEffect(load, [load])
 
   async function handleDelete(assignment) {
-    if (!window.confirm(`Xoá bài tập "${assignment.test?.title}"? Bài học viên đã làm vẫn được giữ.`)) return
+    const isSure = await confirm({
+      title: 'Xoá bài tập?',
+      message: `Bài tập "${assignment.test?.title}" sẽ bị xoá. Bài học viên đã làm vẫn được giữ.`,
+      confirmLabel: 'Xoá bài tập',
+      danger: true,
+    })
+    if (!isSure) return
     try {
       await deleteAssignment(classId, assignment.id)
       setAssignments((current) => current.filter((item) => item.id !== assignment.id))
+      toast('Đã xoá bài tập')
     } catch (deleteError) {
       setError(getErrorMessage(deleteError))
     }
   }
 
   if (error) return <p className="library-message error">{error}</p>
-  if (!assignments) return <p className="library-message">Đang tải…</p>
+  if (!assignments) return <SkeletonRows />
 
   return (
     <section>
@@ -100,6 +111,7 @@ export default function AssignmentsTab({ classId, isTeacher }) {
           onClose={() => setIsCreating(false)}
           onCreated={() => {
             setIsCreating(false)
+            toast('Đã giao bài cho lớp')
             load()
           }}
         />

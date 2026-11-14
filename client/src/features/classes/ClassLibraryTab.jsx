@@ -3,6 +3,8 @@ import { listClassLibrary, addToClassLibrary, removeFromClassLibrary } from '../
 import { listMyTests } from '../../api/tests.js'
 import { getErrorMessage } from '../../api/errorMessages.js'
 import ModeDialog from '../attempt/ModeDialog.jsx'
+import { useConfirm, useToast } from '../../components/FeedbackProvider.jsx'
+import { SkeletonRows } from '../../components/Skeleton.jsx'
 
 const SKILL_LABEL = { reading: 'Reading', listening: 'Listening' }
 
@@ -14,6 +16,8 @@ export default function ClassLibraryTab({ classId, isTeacher }) {
   const [error, setError] = useState('')
   const [testToStart, setTestToStart] = useState(null)
   const [isAdding, setIsAdding] = useState(false)
+  const confirm = useConfirm()
+  const toast = useToast()
 
   const load = useCallback(() => {
     setIsLoading(true)
@@ -26,10 +30,17 @@ export default function ClassLibraryTab({ classId, isTeacher }) {
   useEffect(load, [load])
 
   async function handleRemove(test) {
-    if (!window.confirm(`Gỡ "${test.title}" khỏi lớp? Bài học viên đã làm vẫn được giữ.`)) return
+    const isSure = await confirm({
+      title: 'Gỡ đề khỏi lớp?',
+      message: `"${test.title}" sẽ không còn trong kho đề lớp. Bài học viên đã làm vẫn được giữ.`,
+      confirmLabel: 'Gỡ đề',
+      danger: true,
+    })
+    if (!isSure) return
     try {
       await removeFromClassLibrary(classId, test.id)
       setTests((current) => current.filter((item) => item.id !== test.id))
+      toast('Đã gỡ đề khỏi lớp')
     } catch (removeError) {
       setError(getErrorMessage(removeError))
     }
@@ -44,7 +55,7 @@ export default function ClassLibraryTab({ classId, isTeacher }) {
       )}
 
       {error && <p className="library-message error">{error}</p>}
-      {isLoading && <p className="library-message">Đang tải…</p>}
+      {isLoading && <SkeletonRows />}
       {!isLoading && tests.length === 0 && (
         <p className="library-message">
           {isTeacher ? 'Lớp chưa có đề nào. Bấm "+ Thêm đề vào lớp" để đưa đề đã xuất bản lên.' : 'Giáo viên chưa đưa đề nào lên lớp.'}
@@ -75,8 +86,9 @@ export default function ClassLibraryTab({ classId, isTeacher }) {
           classId={classId}
           alreadyInClass={new Set(tests.map((test) => test.id))}
           onClose={() => setIsAdding(false)}
-          onAdded={() => {
+          onAdded={(count) => {
             setIsAdding(false)
+            toast(`Đã thêm ${count} đề vào lớp`)
             load()
           }}
         />
@@ -106,7 +118,7 @@ function AddTestsDialog({ classId, alreadyInClass, onClose, onAdded }) {
   async function handleAdd() {
     try {
       await addToClassLibrary(classId, chosen)
-      onAdded()
+      onAdded(chosen.length)
     } catch (addError) {
       setError(getErrorMessage(addError))
     }
