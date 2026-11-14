@@ -1,0 +1,214 @@
+/* Calendar (left) and weekly table (right), like the wireframe */
+.activity-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px;
+  margin-bottom: 28px;
+  align-items: start;
+}
+
+.home-page .activity-row section {
+  margin-bottom: 0;
+}
+
+.activity-hint {
+  margin: 2px 0 0;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.activity-legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.activity-legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--purple);
+}
+
+.activity-body {
+  padding: 16px 20px 20px;
+}
+
+.activity-month {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 17px;
+}
+
+.activity-arrow {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--white);
+  font-size: 18px;
+  line-height: 1;
+}
+
+.activity-grid {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 4px;
+  text-align: center;
+}
+
+.activity-grid thead th {
+  padding: 6px 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.activity-grid tbody th {
+  width: 56px;
+  padding-left: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  text-align: left;
+}
+
+/* The selected week gets a soft band behind it */
+.activity-grid tr.selected-week th,
+.activity-grid tr.selected-week td {
+  background: #f4f2fa;
+}
+
+.activity-grid tr.selected-week th {
+  border-radius: 10px 0 0 10px;
+}
+
+.activity-grid tr.selected-week td:last-child {
+  border-radius: 0 10px 10px 0;
+}
+
+.activity-day {
+  width: 38px;
+  height: 38px;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+}
+
+.activity-day.filled,
+.activity-day.level-3 {
+  background: var(--purple);
+  color: var(--white);
+  font-weight: 700;
+}
+
+.activity-day.level-1 {
+  background: #e3dcfa;
+}
+
+.activity-day.level-2 {
+  background: #a996ec;
+  color: var(--white);
+}
+
+.activity-day.today {
+  border-color: var(--text);
+}
+
+.activity-day.future {
+  color: #b9b3c9;
+}
+
+.activity-summary {
+  display: flex;
+  gap: 4px 16px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.activity-summary strong {
+  color: var(--text);
+}
+
+.segmented.activity-modes {
+  display: flex;
+}
+
+.activity-modes .segmented-tab {
+  flex: 1;
+}
+
+/* Weekly table */
+.week-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.week-table th {
+  padding: 12px 16px;
+  background: #f7f5fc;
+  font-weight: 700;
+  text-align: center;
+}
+
+.week-table td {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.week-table th:first-child,
+.week-table td:first-child {
+  text-align: left;
+}
+
+.week-table td.has-reading {
+  background: #ece8fd;
+}
+
+.week-table td.has-listening {
+  background: #fdeee0;
+}
+
+.week-table tr.today td:first-child {
+  font-weight: 700;
+}
+
+.week-table tr.future td {
+  color: #b9b3c9;
+}
+
+.week-table tfoot td {
+  border-top: 2px solid var(--text);
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .activity-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .activity-day {
+    width: 32px;
+    height: 32px;
+    font-size: 13px;
+  }
+
+  .activity-grid tbody th {
+    width: 44px;
+  }
+}

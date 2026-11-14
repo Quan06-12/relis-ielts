@@ -7,6 +7,7 @@ import {
   submitAttempt,
   reviewAttempt,
   listMyAttempts,
+  getActivity,
 } from '../controllers/attempts.controller.js'
 
 const router = Router()
@@ -14,6 +15,8 @@ const router = Router()
 router.use(requireAuth)
 
 router.get('/', listMyAttempts)
+// Before '/:attemptId', otherwise "activity" would be read as an attempt id
+router.get('/activity', getActivity)
 router.post('/', startAttempt)
 router.get('/:attemptId', getAttempt)
 router.patch('/:attemptId/answers', saveAnswers)

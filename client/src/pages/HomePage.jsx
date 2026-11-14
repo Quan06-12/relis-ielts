@@ -7,6 +7,7 @@ import { getErrorMessage } from '../api/errorMessages.js'
 import { daysUntil, latestBands, gapLabel, BAND_CHOICES, todayLabel, goalProgress, overallBand } from '../features/home/homeStats.js'
 import { scoreLabel } from '../features/history/historyGroups.js'
 import BandChart from '../features/home/BandChart.jsx'
+import ActivityPanels from '../features/home/ActivityPanels.jsx'
 import EmptyState from '../components/EmptyState.jsx'
 import { SkeletonRows } from '../components/Skeleton.jsx'
 import { useToast } from '../components/FeedbackProvider.jsx'
@@ -108,6 +109,8 @@ export default function HomePage() {
           <p className="home-hint">{examLabel(daysLeft)}</p>
         </section>
       </div>
+
+      <ActivityPanels />
 
       <div className="home-row">
         <section>

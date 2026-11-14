@@ -117,3 +117,36 @@ button {
   color: var(--text-muted);
   font-size: 14px;
 }
+
+/* Tabs as one pill group: "Tất cả 5 | Lớp tôi dạy 2 | Lớp tôi học 3" (Classes page, home calendar) */
+.segmented {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 10px;
+  background: #ece8f7;
+}
+
+.segmented-tab {
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.segmented-tab.active {
+  background: var(--white);
+  color: var(--purple);
+  box-shadow: 0 1px 3px rgba(26, 21, 48, 0.1);
+}
+
+.segmented-count {
+  margin-left: 4px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+}

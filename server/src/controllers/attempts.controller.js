@@ -11,6 +11,7 @@ import { checkMode } from '../utils/attemptMode.js'
 import { secondsLeft, isPastDeadline } from '../utils/attemptTimer.js'
 import { listQuestions, toPlayView, toReviewView } from '../utils/testContent.js'
 import { gradeAttempt } from '../utils/grading.js'
+import { activityByDay, currentStreak, dayKey, safeTimeZone } from '../utils/activity.js'
 
 // POST /api/attempts — start taking a test (US24, US25), alone, from a class library (US22)
 // or as a class assignment (US44)
@@ -207,6 +208,43 @@ export async function listMyAttempts(request, response) {
   })
 
   response.json({ items, total, page, limit })
+}
+
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
+const DAY_MS = 24 * 60 * 60 * 1000
+
+// GET /api/attempts/activity?from=2026-10-26&to=2026-12-06&tz=Asia/Ho_Chi_Minh
+// Submissions per day (by skill) and minutes studied, for the home page calendar and weekly table,
+// plus the current streak of days in a row. Days are counted in the viewer's time zone.
+export async function getActivity(request, response) {
+  const { from, to } = request.query
+  if (!DATE_PATTERN.test(from ?? '') || !DATE_PATTERN.test(to ?? '') || from > to) {
+    throw validationError([{ field: 'from', message: 'from and to must be dates (yyyy-mm-dd) with from <= to' }])
+  }
+  if (Date.parse(to) - Date.parse(from) > 62 * DAY_MS) {
+    throw validationError([{ field: 'to', message: 'at most 62 days at a time' }])
+  }
+  const timeZone = safeTimeZone(request.query.tz)
+
+  // A day either side covers every time zone; rows outside from..to are dropped after grouping
+  const attempts = await Attempt.find({
+    userId: request.userId,
+    status: 'submitted',
+    submittedAt: { $gte: new Date(Date.parse(from) - DAY_MS), $lt: new Date(Date.parse(to) + 2 * DAY_MS) },
+  }).select('testId mode startedAt submittedAt')
+  const tests = await Test.find({ _id: { $in: attempts.map((attempt) => attempt.testId) } }).select('skill')
+  const skillByTestId = new Map(tests.map((test) => [String(test._id), test.skill]))
+  const days = activityByDay(attempts, skillByTestId, timeZone).filter((row) => row.date >= from && row.date <= to)
+
+  // The streak can reach back past "from", so it looks at the last 400 days of submissions
+  const recent = await Attempt.find({
+    userId: request.userId,
+    status: 'submitted',
+    submittedAt: { $gte: new Date(Date.now() - 400 * DAY_MS) },
+  }).select('submittedAt')
+  const activeDates = recent.map((attempt) => dayKey(attempt.submittedAt, timeZone))
+
+  response.json({ days, currentStreak: currentStreak(activeDates, dayKey(new Date(), timeZone)) })
 }
 
 // ---- helpers ----

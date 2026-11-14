@@ -171,3 +171,30 @@ test("another user's attempt is not found", async () => {
 
   assert.equal(response.status, 404)
 })
+
+test('US42: activity counts today\'s submission by skill and starts a streak of 1', async () => {
+  const { authHeader, test: savedTest } = await setUp()
+  const started = await request(app).post('/api/attempts').set('Authorization', authHeader).send({ testId: savedTest.id, mode: fullMode })
+  await request(app).post(`/api/attempts/${started.body.attempt.id}/submit`).set('Authorization', authHeader)
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'UTC' }).format(new Date())
+
+  const response = await request(app)
+    .get('/api/attempts/activity')
+    .query({ from: today, to: today, tz: 'UTC' })
+    .set('Authorization', authHeader)
+
+  assert.equal(response.status, 200)
+  assert.equal(response.body.days.length, 1)
+  assert.equal(response.body.days[0].date, today)
+  assert.equal(response.body.days[0].reading, 1)
+  assert.equal(response.body.currentStreak, 1)
+})
+
+test('US42: activity refuses a range that is not two dates', async () => {
+  const { authHeader } = await createSignedInUser()
+
+  const response = await request(app).get('/api/attempts/activity').query({ from: 'yesterday', to: '2026-11-14' }).set('Authorization', authHeader)
+
+  assert.equal(response.status, 400)
+  assert.equal(response.body.error.code, 'VALIDATION_ERROR')
+})
