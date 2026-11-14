@@ -176,3 +176,49 @@ test('US21: removing a test from the class library', async () => {
   assert.equal(removed.status, 204)
   assert.equal(library.body.items.length, 0)
 })
+
+test('US09: the teacher removes a student; the student loses access but keeps their attempts', async () => {
+  const { teacher, student, classInfo, testId } = await setUp()
+  await join(student, classInfo.code)
+  await request(app).post(`/api/classes/${classInfo.id}/library`).set('Authorization', teacher.authHeader).send({ testIds: [testId] })
+  const started = await request(app)
+    .post('/api/attempts')
+    .set('Authorization', student.authHeader)
+    .send({ testId, classId: classInfo.id, mode: { type: 'full', sectionIndexes: [0, 1], timeLimitMin: 60 } })
+  await request(app).post(`/api/attempts/${started.body.attempt.id}/submit`).set('Authorization', student.authHeader)
+
+  const removed = await request(app).delete(`/api/classes/${classInfo.id}/members/${student.user.id}`).set('Authorization', teacher.authHeader)
+  const classPage = await request(app).get(`/api/classes/${classInfo.id}`).set('Authorization', student.authHeader)
+  const history = await request(app).get('/api/attempts').set('Authorization', student.authHeader)
+
+  assert.equal(removed.status, 204)
+  assert.equal(classPage.status, 404)
+  assert.equal(history.body.total, 1)
+})
+
+test('US09: the teacher cannot be removed and students cannot remove anyone', async () => {
+  const { teacher, student, classInfo } = await setUp()
+  await join(student, classInfo.code)
+
+  const removeTeacher = await request(app).delete(`/api/classes/${classInfo.id}/members/${teacher.user.id}`).set('Authorization', teacher.authHeader)
+  const byStudent = await request(app).delete(`/api/classes/${classInfo.id}/members/${student.user.id}`).set('Authorization', student.authHeader)
+
+  assert.equal(removeTeacher.status, 404)
+  assert.equal(byStudent.status, 404)
+})
+
+test('US10: a student leaves and needs the code to come back; the teacher cannot leave', async () => {
+  const { teacher, student, classInfo } = await setUp()
+  await join(student, classInfo.code)
+
+  const left = await request(app).delete(`/api/classes/${classInfo.id}/membership`).set('Authorization', student.authHeader)
+  const myClasses = await request(app).get('/api/classes').set('Authorization', student.authHeader)
+  const rejoined = await join(student, classInfo.code)
+  const teacherLeaves = await request(app).delete(`/api/classes/${classInfo.id}/membership`).set('Authorization', teacher.authHeader)
+
+  assert.equal(left.status, 204)
+  assert.equal(myClasses.body.items.length, 0)
+  assert.equal(rejoined.status, 201)
+  assert.equal(teacherLeaves.status, 409)
+  assert.equal(teacherLeaves.body.error.code, 'TEACHER_CANNOT_LEAVE')
+})

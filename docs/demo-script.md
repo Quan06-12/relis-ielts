@@ -63,6 +63,8 @@ Chạy trên bản deploy ở mỗi Sprint Review và trước buổi bảo vệ
 | 38 | Giáo viên mở tab Bài tập → "+ Giao bài", chọn đề, hạn nộp ngày mai | Bài tập hiện "0/1 đã nộp" và thời gian còn lại (US44) |
 | 39 | Học viên mở tab Bài tập | Bài nằm ở nhóm "Cần làm"; bấm Làm bài → nộp → bài chuyển sang "Đã nộp" kèm điểm (US45) |
 | 40 | Giáo viên mở lại tab Bài tập | "1/1 đã nộp"; Bảng điểm có điểm của học viên |
+| 41 | Giáo viên vào tab Thành viên → Xoá một học viên → xác nhận | Học viên biến mất khỏi danh sách và Bảng điểm; học viên đó mở lại lớp thì báo không tìm thấy, Lịch sử vẫn còn bài cũ (US09) |
+| 42 | Học viên vào lớp → Rời lớp → xác nhận | Về trang Lớp học, lớp không còn trong "Lớp tôi học"; nhập lại mã lớp thì vào được (US10) |
 
 ## 6. Trang chủ và từ vựng (E6)
 

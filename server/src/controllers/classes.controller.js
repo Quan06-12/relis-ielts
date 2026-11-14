@@ -102,6 +102,29 @@ export async function listMembers(request, response) {
   response.json({ items })
 }
 
+// DELETE /api/classes/:classId/members/:userId — teacher removes a student (US09)
+// Their attempts stay in the database, so their own history is not lost.
+export async function removeStudent(request, response) {
+  const { classId, userId } = request.params
+  if (!mongoose.isValidObjectId(userId)) throw notFound('Member')
+
+  const result = await ClassMember.deleteOne({ classId, userId, role: 'student' })
+  if (result.deletedCount === 0) throw notFound('Member')
+
+  response.status(204).end()
+}
+
+// DELETE /api/classes/:classId/membership — a student leaves the class (US10)
+// To come back they need the class code again. Submitted attempts stay in their history.
+export async function leaveClass(request, response) {
+  if (request.classRole === 'teacher') {
+    throw new AppError(409, 'TEACHER_CANNOT_LEAVE', 'The teacher of a class cannot leave it')
+  }
+
+  await ClassMember.deleteOne({ classId: request.params.classId, userId: request.userId })
+  response.status(204).end()
+}
+
 // GET /api/classes/:classId/library — tests in the class library, for every member (US22)
 export async function listClassLibrary(request, response) {
   const items = await ClassLibraryItem.find({ classId: request.params.classId }).sort({ addedAt: -1 })

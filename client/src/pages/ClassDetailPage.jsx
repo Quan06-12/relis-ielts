@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { getClass } from '../api/classes.js'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { getClass, leaveClass } from '../api/classes.js'
 import { getErrorMessage } from '../api/errorMessages.js'
 import { colorOf, studentCountLabel } from '../features/classes/classDisplay.js'
 import ClassLibraryTab from '../features/classes/ClassLibraryTab.jsx'
@@ -13,6 +13,7 @@ import './ClassDetailPage.css'
 // gradebook and members for teachers only.
 export default function ClassDetailPage() {
   const { classId } = useParams()
+  const navigate = useNavigate()
   const [classInfo, setClassInfo] = useState(null)
   const [tab, setTab] = useState('library')
   const [error, setError] = useState('')
@@ -34,6 +35,18 @@ export default function ClassDetailPage() {
   if (!classInfo) return <main className="page">Đang tải lớp…</main>
 
   const isTeacher = classInfo.myRole === 'teacher'
+
+  // US10: a student leaves; coming back needs the class code
+  async function handleLeave() {
+    const question = `Rời lớp "${classInfo.name}"? Bạn sẽ không thấy bài của lớp nữa (bài đã nộp vẫn còn trong Lịch sử). Muốn vào lại cần mã lớp.`
+    if (!window.confirm(question)) return
+    try {
+      await leaveClass(classId)
+      navigate('/classes')
+    } catch (leaveError) {
+      setError(getErrorMessage(leaveError))
+    }
+  }
   const tabs = [
     { id: 'library', label: 'Kho đề lớp' },
     { id: 'assignments', label: 'Bài tập' },
@@ -52,7 +65,11 @@ export default function ClassDetailPage() {
             {isTeacher ? `Bạn là giáo viên · ${studentCountLabel(classInfo.studentCount)}` : 'Bạn là học viên'}
           </p>
         </div>
-        {isTeacher && <ClassCode code={classInfo.code} />}
+        {isTeacher ? (
+          <ClassCode code={classInfo.code} />
+        ) : (
+          <button type="button" className="secondary-button class-leave" onClick={handleLeave}>Rời lớp</button>
+        )}
       </header>
 
       <nav className="library-tabs" role="tablist">

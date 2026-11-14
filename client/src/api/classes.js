@@ -65,3 +65,13 @@ export async function createAssignment(classId, fields) {
 export async function deleteAssignment(classId, assignmentId) {
   await http.delete(`/classes/${classId}/assignments/${assignmentId}`)
 }
+
+// Teacher removes a student (US09); the student's attempts are kept
+export async function removeStudent(classId, userId) {
+  await http.delete(`/classes/${classId}/members/${userId}`)
+}
+
+// A student leaves the class (US10)
+export async function leaveClass(classId) {
+  await http.delete(`/classes/${classId}/membership`)
+}
