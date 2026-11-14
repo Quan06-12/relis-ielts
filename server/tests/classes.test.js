@@ -85,6 +85,9 @@ test('US07: my classes are split by role, students see the teacher name', async 
 
   assert.equal(teaching.body.items.length, 1)
   assert.equal(teaching.body.items[0].studentCount, 1)
+  assert.equal(teaching.body.items[0].openAssignmentCount, 0)
+  assert.equal(studying.body.items[0].assignmentCount, 0)
+  assert.equal(studying.body.items[0].nextDue, null)
   assert.equal(studying.body.items[0].teacherName, 'teacher')
   assert.equal(studying.body.items[0].code, null)
 })

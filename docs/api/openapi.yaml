@@ -887,7 +887,7 @@ paths:
       tags: [Classes]
       summary: Assignments of the class, nearest deadline first (US44, US45)
       description: |
-        Teachers get `submittedCount` and `studentCount`.
+        Teachers get `submittedCount`, `studentCount`, `averageBand` and `averageCorrect`.
         Students get `myStatus` (todo, in_progress, submitted, late, missed), `myAttemptId` and `myResult`.
       responses:
         '200':
@@ -1319,6 +1319,18 @@ components:
         teacherName:
           type: [string, 'null']
           description: Only in GET /classes
+        openAssignmentCount: { type: integer, description: 'GET /classes, teachers: assignments whose deadline has not passed' }
+        recentSubmissionCount: { type: integer, description: 'GET /classes, teachers: student attempts submitted in the last 7 days' }
+        assignmentCount: { type: integer, description: 'GET /classes, students: assignments in the class' }
+        submittedCount: { type: integer, description: 'GET /classes, students: assignments I handed in' }
+        nextDue:
+          description: 'GET /classes, students: the nearest assignment I still have to do'
+          oneOf:
+            - type: 'null'
+            - type: object
+              properties:
+                title: { type: string }
+                deadline: { type: string, format: date-time }
         createdAt: { type: string, format: date-time }
 
     PublicUser:
@@ -1419,10 +1431,17 @@ components:
             id: { $ref: '#/components/schemas/Id' }
             title: { type: string }
             skill: { $ref: '#/components/schemas/Skill' }
+            kind: { type: string, enum: [full, single] }
             durationMin: { type: integer }
             questionCount: { type: integer }
         submittedCount: { type: integer, description: Teachers only }
         studentCount: { type: integer, description: Teachers only }
+        averageBand:
+          type: [number, 'null']
+          description: Teachers only. Average band of the students who submitted (latest submission each), rounded to 0.5; null for tests that are not full
+        averageCorrect:
+          type: [number, 'null']
+          description: Teachers only. Average number of correct answers, one decimal; null when nobody has submitted
         myStatus:
           type: string
           enum: [todo, in_progress, submitted, late, missed]

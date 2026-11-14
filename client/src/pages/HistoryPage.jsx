@@ -53,7 +53,10 @@ export default function HistoryPage() {
   return (
     <main className="page">
       <div className="library-header">
-        <h1>Lịch sử làm bài</h1>
+        <div className="page-heading">
+          <h1>Lịch sử làm bài</h1>
+          <p className="page-subtitle">Mọi lần bạn đã làm, xếp theo thời gian. Bấm "Xem lại" để xem đáp án và giải thích.</p>
+        </div>
         <input
           type="search"
           className="library-search"

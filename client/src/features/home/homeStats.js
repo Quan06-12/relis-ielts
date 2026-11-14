@@ -33,3 +33,25 @@ export function gapLabel(band, goal) {
 
 // Band choices for the goal selects: 4.0 … 9.0
 export const BAND_CHOICES = Array.from({ length: 11 }, (_, index) => 4 + index * 0.5)
+
+const WEEKDAYS = ['Chủ nhật', 'thứ Hai', 'thứ Ba', 'thứ Tư', 'thứ Năm', 'thứ Sáu', 'thứ Bảy']
+
+// "thứ Sáu, 30/10/2026" for the greeting at the top of the home page
+export function todayLabel(now = new Date()) {
+  const day = String(now.getDate()).padStart(2, '0')
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  return `${WEEKDAYS[now.getDay()]}, ${day}/${month}/${now.getFullYear()}`
+}
+
+// How full the progress bar under a goal card is, from 0 to 100 (the current band against the goal)
+export function goalProgress(band, goal) {
+  if (band === null || band === undefined || !goal) return 0
+  return Math.min(100, Math.round((band / goal) * 100))
+}
+
+// Overall shown on the home page: average of the latest Reading and Listening bands,
+// rounded to the nearest 0.5 like IELTS. Null until both skills have a band.
+export function overallBand(bands) {
+  if (bands.reading === null || bands.listening === null) return null
+  return Math.round(((bands.reading + bands.listening) / 2) * 2) / 2
+}

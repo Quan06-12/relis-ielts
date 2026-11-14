@@ -2,82 +2,98 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { listMyClasses, createClass, joinClass } from '../api/classes.js'
 import { getErrorMessage } from '../api/errorMessages.js'
-import { CLASS_COLORS, colorOf, studentCountLabel } from '../features/classes/classDisplay.js'
+import { CLASS_COLORS, colorOf, nextDueBox, splitByRole } from '../features/classes/classDisplay.js'
+import { initialsOf } from '../components/initials.js'
 import { SkeletonCards } from '../components/Skeleton.jsx'
 import EmptyState from '../components/EmptyState.jsx'
 import { useToast } from '../components/FeedbackProvider.jsx'
 import './ClassesPage.css'
 
 const TABS = [
-  { label: 'Lớp tôi dạy', role: 'teacher' },
-  { label: 'Lớp tôi học', role: 'student' },
+  { label: 'Tất cả', key: 'all' },
+  { label: 'Lớp tôi dạy', key: 'teaching' },
+  { label: 'Lớp tôi học', key: 'studying' },
 ]
 
 // Classes page (US04, US06, US07): the classes I teach and the classes I study in.
+// One account can teach one class and study in another, so both lists load together
+// and the tabs only filter on the client.
 export default function ClassesPage() {
   const navigate = useNavigate()
-  const [role, setRole] = useState('teacher')
+  const [tab, setTab] = useState('all')
+  const [search, setSearch] = useState('')
   const [classes, setClasses] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const [openDialog, setOpenDialog] = useState(null) // 'create' | 'join' | null
 
   useEffect(() => {
-    setIsLoading(true)
-    setError('')
-    listMyClasses(role)
+    listMyClasses()
       .then(setClasses)
       .catch((loadError) => setError(getErrorMessage(loadError)))
       .finally(() => setIsLoading(false))
-  }, [role])
+  }, [])
+
+  const keyword = search.trim().toLowerCase()
+  const matching = classes.filter((item) => item.name.toLowerCase().includes(keyword))
+  const { teaching, studying } = splitByRole(matching)
+  const counts = { all: matching.length, teaching: teaching.length, studying: studying.length }
 
   return (
     <main className="page">
       <div className="classes-header">
-        <h1>Lớp học</h1>
+        <div className="page-heading">
+          <h1>Lớp học</h1>
+          <p className="page-subtitle">Một tài khoản có thể dạy lớp này và học lớp khác.</p>
+        </div>
         <div className="classes-actions">
-          <button type="button" className="secondary-button" onClick={() => setOpenDialog('join')}>Nhập mã lớp</button>
+          <button type="button" className="secondary-button" onClick={() => setOpenDialog('join')}>Tham gia bằng mã</button>
           <button type="button" className="primary-button" onClick={() => setOpenDialog('create')}>+ Tạo lớp</button>
         </div>
       </div>
 
-      <div className="library-tabs" role="tablist">
-        {TABS.map((tab) => (
-          <button
-            key={tab.role}
-            type="button"
-            role="tab"
-            aria-selected={role === tab.role}
-            className={role === tab.role ? 'library-tab active' : 'library-tab'}
-            onClick={() => setRole(tab.role)}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div className="classes-toolbar">
+        <div className="segmented" role="tablist">
+          {TABS.map((item) => (
+            <button
+              key={item.key}
+              type="button"
+              role="tab"
+              aria-selected={tab === item.key}
+              className={tab === item.key ? 'segmented-tab active' : 'segmented-tab'}
+              onClick={() => setTab(item.key)}
+            >
+              {item.label} <span className="segmented-count">{counts[item.key]}</span>
+            </button>
+          ))}
+        </div>
+        <input
+          type="search"
+          className="classes-search"
+          placeholder="Tìm theo tên lớp"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          aria-label="Tìm theo tên lớp"
+        />
       </div>
 
       {error && <p className="library-message error">{error}</p>}
       {isLoading && <SkeletonCards />}
       {!isLoading && !error && classes.length === 0 && (
-        <EmptyState kind="classes" title={role === 'teacher' ? 'Bạn chưa dạy lớp nào' : 'Bạn chưa vào lớp nào'}>
-          {role === 'teacher' ? 'Bấm "+ Tạo lớp" để tạo lớp và nhận mã gửi cho học viên.' : 'Hỏi giáo viên mã lớp 6 ký tự, rồi bấm "Nhập mã lớp".'}
+        <EmptyState kind="classes" title="Bạn chưa có lớp nào">
+          Bấm &quot;+ Tạo lớp&quot; để dạy một lớp, hoặc &quot;Tham gia bằng mã&quot; với mã 6 ký tự giáo viên gửi.
         </EmptyState>
       )}
 
-      <div className="classes-grid">
-        {classes.map((item) => (
-          <Link key={item.id} to={`/classes/${item.id}`} className="class-card">
-            <div className="class-card-band" style={{ background: colorOf(item.color) }} />
-            <div className="class-card-body">
-              <h3>{item.name}</h3>
-              {item.description && <p className="class-card-description">{item.description}</p>}
-              <p className="class-card-meta">
-                {item.myRole === 'teacher' ? studentCountLabel(item.studentCount) : `Giáo viên: ${item.teacherName ?? '—'}`}
-              </p>
-            </div>
-          </Link>
-        ))}
-      </div>
+      {!isLoading && tab !== 'studying' && teaching.length > 0 && (
+        <ClassSection title="Lớp tôi dạy" classes={teaching} />
+      )}
+      {!isLoading && tab !== 'teaching' && studying.length > 0 && (
+        <ClassSection title="Lớp tôi học" classes={studying} />
+      )}
+      {!isLoading && classes.length > 0 && counts[tab] === 0 && (
+        <p className="library-message">Không có lớp nào khớp.</p>
+      )}
 
       {openDialog === 'create' && (
         <CreateClassDialog
@@ -92,6 +108,97 @@ export default function ClassesPage() {
         />
       )}
     </main>
+  )
+}
+
+function ClassSection({ title, classes }) {
+  return (
+    <section className="classes-section">
+      <h2>
+        {title} <span>· {classes.length} lớp</span>
+      </h2>
+      <div className="classes-grid">
+        {classes.map((item) =>
+          item.myRole === 'teacher' ? <TeacherClassCard key={item.id} item={item} /> : <StudentClassCard key={item.id} item={item} />,
+        )}
+      </div>
+    </section>
+  )
+}
+
+// Coloured top of a card: role chip, name, description
+function ClassCardHeader({ item }) {
+  return (
+    <div className="class-card-head" style={{ background: colorOf(item.color) }}>
+      <span className="class-card-chip">{item.myRole === 'teacher' ? 'Bạn dạy' : 'Bạn học'}</span>
+      <h3>{item.name}</h3>
+      {item.description && <p>{item.description}</p>}
+    </div>
+  )
+}
+
+// Teacher card: students, open assignments, submissions in the last 7 days, and the class code
+function TeacherClassCard({ item }) {
+  const toast = useToast()
+
+  async function copyCode() {
+    try {
+      await navigator.clipboard.writeText(item.code)
+      toast(`Đã chép mã ${item.code}`)
+    } catch {
+      toast('Không chép được, hãy chép mã bằng tay', 'error')
+    }
+  }
+
+  return (
+    <article className="class-card">
+      <ClassCardHeader item={item} />
+      <div className="class-card-body">
+        <div className="class-stats">
+          <div><strong>{item.studentCount ?? 0}</strong><small>học viên</small></div>
+          <div><strong>{item.openAssignmentCount ?? 0}</strong><small>bài đang mở</small></div>
+          <div className={item.recentSubmissionCount > 0 ? 'highlight' : ''}>
+            <strong>{item.recentSubmissionCount ?? 0}</strong><small>bài mới nộp</small>
+          </div>
+        </div>
+        <div className="class-code-row">
+          Mã lớp <code>{item.code}</code>
+          <button type="button" className="class-copy-button" onClick={copyCode}>Chép mã</button>
+        </div>
+        <Link to={`/classes/${item.id}`} className="class-enter">Vào lớp →</Link>
+      </div>
+    </article>
+  )
+}
+
+// Student card: teacher, the next deadline, and how many assignments are submitted
+function StudentClassCard({ item }) {
+  const due = nextDueBox(item.nextDue)
+  const total = item.assignmentCount ?? 0
+  const submitted = item.submittedCount ?? 0
+
+  return (
+    <article className="class-card">
+      <ClassCardHeader item={item} />
+      <div className="class-card-body">
+        <p className="class-teacher">
+          <span className="class-teacher-avatar">{initialsOf(item.teacherName)}</span>
+          Giáo viên: <strong>{item.teacherName ?? '—'}</strong>
+        </p>
+        <div className={`class-due ${due.tone}`}>
+          <strong>{due.heading}</strong>
+          <span>{due.detail}</span>
+        </div>
+        <div className="class-progress-label">
+          <span>Đã nộp</span>
+          <span><strong>{submitted}</strong> / {total} bài</span>
+        </div>
+        <div className="class-progress">
+          <span style={{ width: total === 0 ? 0 : `${Math.round((submitted / total) * 100)}%` }} />
+        </div>
+        <Link to={`/classes/${item.id}`} className="class-enter">Vào lớp →</Link>
+      </div>
+    </article>
   )
 }
 

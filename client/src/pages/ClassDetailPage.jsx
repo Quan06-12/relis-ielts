@@ -19,7 +19,8 @@ export default function ClassDetailPage() {
   const confirm = useConfirm()
   const toast = useToast()
   const [classInfo, setClassInfo] = useState(null)
-  const [tab, setTab] = useState('library')
+  const [tab, setTab] = useState('assignments')
+  const [isCreatingAssignment, setIsCreatingAssignment] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -63,9 +64,15 @@ export default function ClassDetailPage() {
       setError(getErrorMessage(leaveError))
     }
   }
+
+  function startAssignment() {
+    setTab('assignments')
+    setIsCreatingAssignment(true)
+  }
+
   const tabs = [
-    { id: 'library', label: 'Kho đề lớp' },
     { id: 'assignments', label: 'Bài tập' },
+    { id: 'library', label: 'Kho đề lớp' },
     ...(isTeacher ? [{ id: 'gradebook', label: 'Bảng điểm' }, { id: 'members', label: 'Thành viên' }] : []),
   ]
 
@@ -75,27 +82,30 @@ export default function ClassDetailPage() {
 
       <header className="class-hero" style={{ background: colorOf(classInfo.color) }}>
         <div>
+          <span className="class-hero-chip">{isTeacher ? 'Bạn dạy lớp này' : 'Bạn học lớp này'}</span>
           <h1>{classInfo.name}</h1>
-          {classInfo.description && <p>{classInfo.description}</p>}
           <p className="class-hero-meta">
-            {isTeacher ? `Bạn là giáo viên · ${studentCountLabel(classInfo.studentCount)}` : 'Bạn là học viên'}
+            {[classInfo.description, isTeacher ? studentCountLabel(classInfo.studentCount) : null].filter(Boolean).join(' · ')}
           </p>
         </div>
         {isTeacher ? (
-          <ClassCode code={classInfo.code} />
+          <div className="class-hero-actions">
+            <ClassCode code={classInfo.code} />
+            <button type="button" className="class-hero-button" onClick={startAssignment}>+ Giao bài</button>
+          </div>
         ) : (
-          <button type="button" className="secondary-button class-leave" onClick={handleLeave}>Rời lớp</button>
+          <button type="button" className="class-hero-outline" onClick={handleLeave}>Rời lớp</button>
         )}
       </header>
 
-      <nav className="library-tabs" role="tablist">
+      <nav className="underline-tabs" role="tablist">
         {tabs.map((item) => (
           <button
             key={item.id}
             type="button"
             role="tab"
             aria-selected={tab === item.id}
-            className={tab === item.id ? 'library-tab active' : 'library-tab'}
+            className={tab === item.id ? 'underline-tab active' : 'underline-tab'}
             onClick={() => setTab(item.id)}
           >
             {item.label}
@@ -104,7 +114,15 @@ export default function ClassDetailPage() {
       </nav>
 
       {tab === 'library' && <ClassLibraryTab classId={classId} isTeacher={isTeacher} />}
-      {tab === 'assignments' && <AssignmentsTab classId={classId} isTeacher={isTeacher} />}
+      {tab === 'assignments' && (
+        <AssignmentsTab
+          classId={classId}
+          isTeacher={isTeacher}
+          isCreating={isCreatingAssignment}
+          onCreatingChange={setIsCreatingAssignment}
+          onShowResults={() => setTab('gradebook')}
+        />
+      )}
       {tab === 'gradebook' && <GradebookTab classId={classId} />}
       {tab === 'members' && <MembersTab classId={classId} />}
     </main>
@@ -131,8 +149,8 @@ function ClassCode({ code }) {
     <div className="class-code">
       <span className="class-code-label">Mã lớp</span>
       <strong>{code}</strong>
-      <button type="button" className="secondary-button" onClick={handleCopy}>
-        {isCopied ? 'Đã sao chép' : 'Sao chép'}
+      <button type="button" className="class-hero-outline small" onClick={handleCopy}>
+        {isCopied ? 'Đã chép' : 'Chép mã'}
       </button>
     </div>
   )

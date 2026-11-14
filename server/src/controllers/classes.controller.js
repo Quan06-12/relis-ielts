@@ -7,6 +7,7 @@ import { Attempt } from '../models/Attempt.js'
 import { AppError, notFound, validationError } from '../errors/AppError.js'
 import { generateClassCode, normalizeClassCode } from '../utils/classCode.js'
 import { buildGradebook } from '../utils/gradebook.js'
+import { loadClassCardStats } from '../services/classStats.js'
 import { toSummary } from '../utils/testContent.js'
 
 const DUPLICATE_KEY = 11000 // MongoDB error code when a unique index is violated
@@ -28,7 +29,8 @@ export async function createClass(request, response) {
   response.status(201).json({ class: toClassView(newClass, 'teacher', { studentCount: 0 }) })
 }
 
-// GET /api/classes?role=teacher|student — the classes I teach and the classes I study in (US07)
+// GET /api/classes?role=teacher|student — the classes I teach and the classes I study in (US07),
+// with the numbers shown on each card (open assignments, recent submissions / my progress, next deadline)
 export async function listMyClasses(request, response) {
   const filter = { userId: request.userId }
   if (['teacher', 'student'].includes(request.query.role)) filter.role = request.query.role
@@ -36,10 +38,11 @@ export async function listMyClasses(request, response) {
   const memberships = await ClassMember.find(filter).sort({ joinedAt: -1 })
   const classIds = memberships.map((membership) => membership.classId)
 
-  const [classes, studentCounts, teachers] = await Promise.all([
+  const [classes, studentCounts, teachers, cardStats] = await Promise.all([
     Class.find({ _id: { $in: classIds } }),
     countStudents(classIds),
     findTeacherNames(classIds),
+    loadClassCardStats(memberships, request.userId),
   ])
   const classById = new Map(classes.map((item) => [String(item._id), item]))
 
@@ -50,6 +53,7 @@ export async function listMyClasses(request, response) {
       return toClassView(classById.get(id), membership.role, {
         studentCount: studentCounts.get(id) ?? 0,
         teacherName: teachers.get(id) ?? null,
+        ...cardStats.get(id),
       })
     })
 
