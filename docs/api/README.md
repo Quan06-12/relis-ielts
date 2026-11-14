@@ -52,6 +52,7 @@ Client hiển thị thông báo tiếng Việt dựa trên `code`, không hiển
 | 409 | `ATTEMPT_CLOSED` | Lưu đáp án khi bài đã nộp hoặc đã hết giờ |
 | 409 | `ATTEMPT_NOT_SUBMITTED` | Mở trang Xem lại khi bài còn đang làm |
 | 409 | `ALREADY_MEMBER` | Nhập mã lớp đã tham gia (Sprint 2) |
+| 409 | `TEACHER_CANNOT_LEAVE` | Giáo viên bấm rời lớp của chính mình (US10) |
 | 413 | `FILE_TOO_LARGE` | File upload vượt giới hạn |
 | 422 | `TEST_INCOMPLETE` | Xuất bản đề còn câu chưa có đáp án; `details` liệt kê số câu |
 | 422 | `DEADLINE_PASSED` | Bắt đầu làm bài giao sau hạn khi giáo viên không cho nộp trễ (US44) |
