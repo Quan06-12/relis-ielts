@@ -684,6 +684,41 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
 
+  /classes/{classId}/members/{userId}:
+    parameters:
+      - $ref: '#/components/parameters/ClassId'
+      - name: userId
+        in: path
+        required: true
+        schema: { $ref: '#/components/schemas/Id' }
+    delete:
+      operationId: removeStudent
+      tags: [Classes]
+      summary: Remove a student from the class (US09, teacher only)
+      description: The student's attempts are kept, so their own history is not lost. Teachers cannot be removed.
+      responses:
+        '204': { description: Removed }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /classes/{classId}/membership:
+    parameters:
+      - $ref: '#/components/parameters/ClassId'
+    delete:
+      operationId: leaveClass
+      tags: [Classes]
+      summary: Leave the class (US10, students)
+      description: Submitted attempts stay in the student's history. Joining again needs the class code.
+      responses:
+        '204': { description: Left the class }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: The teacher cannot leave their own class (`TEACHER_CANNOT_LEAVE`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
   /classes/{classId}/library:
     parameters:
       - $ref: '#/components/parameters/ClassId'
