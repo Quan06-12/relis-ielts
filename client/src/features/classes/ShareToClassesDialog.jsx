@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { listMyClasses, addToClassLibrary } from '../../api/classes.js'
 import { getErrorMessage } from '../../api/errorMessages.js'
+import { useToast } from '../../components/FeedbackProvider.jsx'
 
 // "Put in class library" from my own library (US21): choose one or more classes I teach.
 // The server has one endpoint per class, so the client calls it once for each chosen class.
@@ -8,7 +9,7 @@ export default function ShareToClassesDialog({ test, onClose }) {
   const [classes, setClasses] = useState(null)
   const [chosen, setChosen] = useState([])
   const [error, setError] = useState('')
-  const [doneMessage, setDoneMessage] = useState('')
+  const toast = useToast()
 
   useEffect(() => {
     listMyClasses('teacher')
@@ -24,8 +25,8 @@ export default function ShareToClassesDialog({ test, onClose }) {
     setError('')
     try {
       await Promise.all(chosen.map((classId) => addToClassLibrary(classId, [test.id])))
-      setDoneMessage(`Đã đưa đề lên ${chosen.length} lớp.`)
-      setChosen([])
+      toast(`Đã đưa "${test.title}" lên ${chosen.length} lớp`)
+      onClose()
     } catch (shareError) {
       setError(getErrorMessage(shareError))
     }
@@ -50,7 +51,6 @@ export default function ShareToClassesDialog({ test, onClose }) {
           </div>
         )}
 
-        {doneMessage && <p role="status">{doneMessage}</p>}
         {error && <p className="form-error" role="alert">{error}</p>}
 
         <div className="dialog-actions">

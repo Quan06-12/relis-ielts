@@ -6,18 +6,23 @@ import { listMyAttempts } from '../api/attempts.js'
 import { getErrorMessage } from '../api/errorMessages.js'
 import { daysUntil, latestBands, gapLabel, BAND_CHOICES } from '../features/home/homeStats.js'
 import { scoreLabel } from '../features/history/historyGroups.js'
+import BandChart from '../features/home/BandChart.jsx'
+import EmptyState from '../components/EmptyState.jsx'
+import { SkeletonRows } from '../components/Skeleton.jsx'
+import { useToast } from '../components/FeedbackProvider.jsx'
 import './HomePage.css'
 
 const SKILL_LABEL = { reading: 'Reading', listening: 'Listening' }
 
-// Home page (US46): target bands and exam date, latest band against the goal,
-// unfinished attempts to continue and the last few results.
+// Home page (US46, US42): target bands and exam date, latest band against the goal,
+// a chart of bands over time, unfinished attempts to continue and the last few results.
 export default function HomePage() {
   const { user } = useAuth()
   const [recent, setRecent] = useState([])
   const [unfinished, setUnfinished] = useState([])
   const [isEditing, setIsEditing] = useState(false)
   const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     Promise.all([listMyAttempts({ status: 'submitted', limit: 20 }), listMyAttempts({ status: 'in_progress', limit: 5 })])
@@ -26,6 +31,7 @@ export default function HomePage() {
         setUnfinished(inProgress.items)
       })
       .catch((loadError) => setError(getErrorMessage(loadError)))
+      .finally(() => setIsLoading(false))
   }, [])
 
   const goals = user.goals ?? {}
@@ -65,6 +71,11 @@ export default function HomePage() {
         <p className="home-hint">Band gần nhất lấy từ lần làm full đề gần nhất của mỗi kỹ năng.</p>
       </section>
 
+      <section>
+        <h2>Band theo thời gian</h2>
+        {isLoading ? <SkeletonRows count={1} /> : <BandChart attempts={recent} goals={goals} />}
+      </section>
+
       {unfinished.length > 0 && (
         <section>
           <h2>Đang làm dở</h2>
@@ -84,10 +95,12 @@ export default function HomePage() {
           <h2>Kết quả gần đây</h2>
           <Link to="/history">Xem tất cả →</Link>
         </div>
-        {recent.length === 0 ? (
-          <p className="library-message">
-            Chưa có bài nào. <Link to="/library">Vào Kho đề để làm bài đầu tiên</Link>
-          </p>
+        {isLoading ? (
+          <SkeletonRows count={3} />
+        ) : recent.length === 0 ? (
+          <EmptyState title="Chưa có bài nào">
+            <Link to="/library">Vào Kho đề để làm bài đầu tiên</Link>
+          </EmptyState>
         ) : (
           <ul className="home-list">
             {recent.slice(0, 5).map((attempt) => (
@@ -118,6 +131,7 @@ function examLabel(daysLeft) {
 // US46: target band for each skill and overall, and the exam date
 function GoalsDialog({ user, onClose }) {
   const { updateUser } = useAuth()
+  const toast = useToast()
   const [goals, setGoals] = useState({
     reading: user.goals?.reading ?? null,
     listening: user.goals?.listening ?? null,
@@ -131,6 +145,7 @@ function GoalsDialog({ user, onClose }) {
     setError('')
     try {
       updateUser(await updateMyProfile({ goals, examDate: examDate === '' ? null : examDate }))
+      toast('Đã lưu mục tiêu')
       onClose()
     } catch (saveError) {
       setError(getErrorMessage(saveError))

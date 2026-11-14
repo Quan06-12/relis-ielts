@@ -1,0 +1,42 @@
+.toast-stack {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  min-width: 220px;
+  max-width: 360px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--text);
+  color: var(--white);
+  box-shadow: 0 8px 24px rgba(30, 22, 64, 0.2);
+  font-size: 14px;
+  animation: toast-in 0.2s ease-out;
+}
+
+.toast.error {
+  background: #b42318;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.confirm-dialog {
+  max-width: 440px;
+}
+
+.confirm-dialog p {
+  color: var(--text-muted);
+  line-height: 1.5;
+}

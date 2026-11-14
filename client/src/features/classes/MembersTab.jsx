@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { listMembers, removeStudent } from '../../api/classes.js'
 import { getErrorMessage } from '../../api/errorMessages.js'
+import { useConfirm, useToast } from '../../components/FeedbackProvider.jsx'
+import { SkeletonRows } from '../../components/Skeleton.jsx'
 
 const ROLE_LABEL = { teacher: 'Giáo viên', student: 'Học viên' }
 
@@ -8,6 +10,8 @@ const ROLE_LABEL = { teacher: 'Giáo viên', student: 'Học viên' }
 export default function MembersTab({ classId }) {
   const [members, setMembers] = useState(null)
   const [error, setError] = useState('')
+  const confirm = useConfirm()
+  const toast = useToast()
 
   useEffect(() => {
     listMembers(classId)
@@ -16,18 +20,24 @@ export default function MembersTab({ classId }) {
   }, [classId])
 
   async function handleRemove(member) {
-    const question = `Xoá ${member.user.name} khỏi lớp? Học viên sẽ không vào lớp được nữa, nhưng bài đã làm vẫn còn trong lịch sử của họ.`
-    if (!window.confirm(question)) return
+    const isSure = await confirm({
+      title: `Xoá ${member.user.name} khỏi lớp?`,
+      message: 'Học viên sẽ không vào lớp được nữa, nhưng bài đã làm vẫn còn trong lịch sử của họ.',
+      confirmLabel: 'Xoá khỏi lớp',
+      danger: true,
+    })
+    if (!isSure) return
     try {
       await removeStudent(classId, member.user.id)
       setMembers((current) => current.filter((item) => item.user.id !== member.user.id))
+      toast(`Đã xoá ${member.user.name} khỏi lớp`)
     } catch (removeError) {
       setError(getErrorMessage(removeError))
     }
   }
 
   if (error) return <p className="library-message error">{error}</p>
-  if (!members) return <p className="library-message">Đang tải…</p>
+  if (!members) return <SkeletonRows />
 
   return (
     <ul className="member-list">

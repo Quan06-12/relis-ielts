@@ -3,6 +3,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import { listMyClasses, createClass, joinClass } from '../api/classes.js'
 import { getErrorMessage } from '../api/errorMessages.js'
 import { CLASS_COLORS, colorOf, studentCountLabel } from '../features/classes/classDisplay.js'
+import { SkeletonCards } from '../components/Skeleton.jsx'
+import EmptyState from '../components/EmptyState.jsx'
+import { useToast } from '../components/FeedbackProvider.jsx'
 import './ClassesPage.css'
 
 const TABS = [
@@ -54,11 +57,11 @@ export default function ClassesPage() {
       </div>
 
       {error && <p className="library-message error">{error}</p>}
-      {isLoading && <p className="library-message">Đang tải…</p>}
+      {isLoading && <SkeletonCards />}
       {!isLoading && !error && classes.length === 0 && (
-        <p className="library-message">
-          {role === 'teacher' ? 'Bạn chưa dạy lớp nào. Bấm "+ Tạo lớp" để bắt đầu.' : 'Bạn chưa vào lớp nào. Hỏi giáo viên mã lớp rồi bấm "Nhập mã lớp".'}
-        </p>
+        <EmptyState kind="classes" title={role === 'teacher' ? 'Bạn chưa dạy lớp nào' : 'Bạn chưa vào lớp nào'}>
+          {role === 'teacher' ? 'Bấm "+ Tạo lớp" để tạo lớp và nhận mã gửi cho học viên.' : 'Hỏi giáo viên mã lớp 6 ký tự, rồi bấm "Nhập mã lớp".'}
+        </EmptyState>
       )}
 
       <div className="classes-grid">
@@ -94,6 +97,7 @@ export default function ClassesPage() {
 
 // US04: name, short description and one of 5 colours
 function CreateClassDialog({ onClose, onCreated }) {
+  const toast = useToast()
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [color, setColor] = useState('purple')
@@ -105,7 +109,9 @@ function CreateClassDialog({ onClose, onCreated }) {
     setIsSaving(true)
     setError('')
     try {
-      onCreated(await createClass({ name, description, color }))
+      const newClass = await createClass({ name, description, color })
+      toast(`Đã tạo lớp ${newClass.name}`)
+      onCreated(newClass)
     } catch (createError) {
       setError(getErrorMessage(createError))
       setIsSaving(false)
@@ -150,6 +156,7 @@ function CreateClassDialog({ onClose, onCreated }) {
 
 // US06: type the 6-character code the teacher gave
 function JoinClassDialog({ onClose, onJoined }) {
+  const toast = useToast()
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
 
@@ -157,7 +164,9 @@ function JoinClassDialog({ onClose, onJoined }) {
     event.preventDefault()
     setError('')
     try {
-      onJoined(await joinClass(code))
+      const joinedClass = await joinClass(code)
+      toast(`Đã vào lớp ${joinedClass.name}`)
+      onJoined(joinedClass)
     } catch (joinError) {
       const isWrongCode = joinError.response?.status === 404
       setError(isWrongCode ? 'Không có lớp nào với mã này.' : getErrorMessage(joinError))
