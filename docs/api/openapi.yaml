@@ -836,6 +836,49 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
 
+  /classes/{classId}/leaderboard:
+    parameters:
+      - $ref: '#/components/parameters/ClassId'
+    get:
+      operationId: getLeaderboard
+      tags: [Classes]
+      summary: This week's ranking of the class students (any member, home page)
+      description: |
+        Counts what each student submitted in this class from Monday to Sunday of the current week
+        (in the `tz` time zone). Ranked by submissions, then minutes; ties share a rank.
+        `change` is how many places the student moved since last week (positive = up),
+        or `null` when they submitted nothing last week.
+      parameters:
+        - name: tz
+          in: query
+          description: IANA time zone of the viewer; unknown names fall back to Asia/Ho_Chi_Minh
+          schema: { type: string, example: Asia/Ho_Chi_Minh }
+      responses:
+        '200':
+          description: Every student of the class, best first
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      required: [userId, name, count, minutes, averageBand, rank, change]
+                      properties:
+                        userId: { $ref: '#/components/schemas/Id' }
+                        name: { type: string }
+                        avatarUrl: { type: [string, 'null'] }
+                        count: { type: integer, description: Submissions this week }
+                        minutes: { type: integer }
+                        averageBand: { type: [number, 'null'], description: "Mean of this week's full-test bands, rounded to 0.5" }
+                        rank: { type: integer }
+                        change: { type: [integer, 'null'] }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
   /classes/{classId}/gradebook:
     parameters:
       - $ref: '#/components/parameters/ClassId'

@@ -1,6 +1,8 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
+  findQuestion,
+  firstQuestionWithoutAnswer,
   addGroup,
   addQuestion,
   updateQuestion,
@@ -55,4 +57,16 @@ test('questions without an answer are listed by number', () => {
 
   edited = removeQuestion(edited, 0, 0, 1)
   assert.deepEqual(questionsWithoutAnswer(edited), [])
+})
+
+test('findQuestion and firstQuestionWithoutAnswer', () => {
+  const sample = {
+    sections: [
+      { groups: [{ questions: [{ id: 'a', answers: ['TRUE'] }] }] },
+      { groups: [{ questions: [{ id: 'b', answers: ['x'] }, { key: 'new-1', answers: [''] }] }] },
+    ],
+  }
+  assert.deepEqual(findQuestion(sample, 'new-1'), { sectionIndex: 1, groupIndex: 0, questionIndex: 1 })
+  assert.equal(findQuestion(sample, 'zzz'), null)
+  assert.deepEqual(firstQuestionWithoutAnswer(sample), { sectionIndex: 1, key: 'new-1' })
 })

@@ -2,38 +2,52 @@ import { QUESTION_TYPES } from './editorState.js'
 import QuestionEditor from './QuestionEditor.jsx'
 
 // A group of questions sharing one type and instruction, e.g. "Questions 1–5" (US15).
-export default function GroupEditor({ group, numbers, evidenceSource, onChangeGroup, onRemoveGroup, onAddQuestion, onChangeQuestion, onRemoveQuestion }) {
+export default function GroupEditor({ group, groupNumber, numbers, openKey, onToggleQuestion, evidenceText, evidenceLabel, actions }) {
   const typeLabel = QUESTION_TYPES.find((item) => item.value === group.type)?.label
-  const first = numbers[group.questions[0]?.id ?? group.questions[0]?.key]
-  const last = numbers[group.questions.at(-1)?.id ?? group.questions.at(-1)?.key]
+  const keyOf = (question) => question.id ?? question.key
+  const first = numbers[keyOf(group.questions[0] ?? {})]
+  const last = numbers[keyOf(group.questions.at(-1) ?? {})]
 
   return (
     <section className="group-editor">
       <div className="group-editor-header">
         <h3>
-          {group.questions.length > 0 ? `Câu ${first}–${last}` : 'Nhóm trống'} · {typeLabel}
+          Nhóm {groupNumber} · {group.questions.length > 0 ? `Câu ${first}–${last}` : 'chưa có câu'}
         </h3>
-        <button type="button" className="link-button danger" onClick={onRemoveGroup}>Xoá nhóm</button>
+        <span className="group-type">{typeLabel}</span>
       </div>
 
       <label className="editor-field">
-        Hướng dẫn cho nhóm <small>(ví dụ "Do the following statements agree with the information in the passage?")</small>
-        <textarea rows={2} value={group.instruction} onChange={(event) => onChangeGroup({ instruction: event.target.value })} />
+        Hướng dẫn chung của nhóm
+        <textarea
+          rows={2}
+          value={group.instruction}
+          placeholder="Ví dụ: Do the following statements agree with the information given in the passage?"
+          onChange={(event) => actions.changeGroup({ instruction: event.target.value })}
+        />
       </label>
 
-      {group.questions.map((question, questionIndex) => (
-        <QuestionEditor
-          key={question.id ?? question.key}
-          type={group.type}
-          question={question}
-          number={numbers[question.id ?? question.key]}
-          evidenceSource={evidenceSource}
-          onChange={(changes) => onChangeQuestion(questionIndex, changes)}
-          onRemove={() => onRemoveQuestion(questionIndex)}
-        />
-      ))}
+      <div className="question-list">
+        {group.questions.map((question, questionIndex) => (
+          <QuestionEditor
+            key={keyOf(question)}
+            type={group.type}
+            question={question}
+            number={numbers[keyOf(question)]}
+            isOpen={openKey === keyOf(question)}
+            onToggle={() => onToggleQuestion(keyOf(question))}
+            evidenceText={evidenceText}
+            evidenceLabel={evidenceLabel}
+            onChange={(changes) => actions.changeQuestion(questionIndex, changes)}
+            onRemove={() => actions.removeQuestion(questionIndex)}
+          />
+        ))}
+      </div>
 
-      <button type="button" className="editor-button" onClick={onAddQuestion}>+ Thêm câu hỏi</button>
+      <div className="group-editor-footer">
+        <button type="button" className="editor-button" onClick={actions.addQuestion}>+ Thêm câu hỏi</button>
+        <button type="button" className="link-button danger" onClick={actions.removeGroup}>Xoá nhóm</button>
+      </div>
     </section>
   )
 }

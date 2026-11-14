@@ -75,3 +75,10 @@ export async function removeStudent(classId, userId) {
 export async function leaveClass(classId) {
   await http.delete(`/classes/${classId}/membership`)
 }
+
+// GET /classes/:classId/leaderboard — this week's ranking of the students (home page)
+export async function getLeaderboard(classId) {
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const response = await http.get(`/classes/${classId}/leaderboard`, { params: { tz } })
+  return response.data.items
+}
