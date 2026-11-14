@@ -128,3 +128,25 @@ export function questionsWithoutAnswer(test) {
     .filter((question) => !question.answers.some((answer) => answer.trim() !== ''))
     .map((question) => numbers[question.id ?? question.key])
 }
+
+// Where a question is: { sectionIndex, groupIndex, questionIndex }, or null. key = question id or temporary key
+export function findQuestion(test, key) {
+  for (const [sectionIndex, section] of test.sections.entries()) {
+    for (const [groupIndex, group] of section.groups.entries()) {
+      const questionIndex = group.questions.findIndex((question) => (question.id ?? question.key) === key)
+      if (questionIndex !== -1) return { sectionIndex, groupIndex, questionIndex }
+    }
+  }
+  return null
+}
+
+// The first question with no correct answer, as { sectionIndex, key }, or null when all have one
+export function firstQuestionWithoutAnswer(test) {
+  for (const [sectionIndex, section] of test.sections.entries()) {
+    for (const group of section.groups) {
+      const question = group.questions.find((item) => !item.answers.some((answer) => answer.trim() !== ''))
+      if (question) return { sectionIndex, key: question.id ?? question.key }
+    }
+  }
+  return null
+}

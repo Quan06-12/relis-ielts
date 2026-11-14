@@ -225,3 +225,21 @@ test('US10: a student leaves and needs the code to come back; the teacher cannot
   assert.equal(teacherLeaves.status, 409)
   assert.equal(teacherLeaves.body.error.code, 'TEACHER_CANNOT_LEAVE')
 })
+
+test('Leaderboard: members see every student of the class this week; outsiders get 404', async () => {
+  const { teacher, student, classInfo } = await setUp()
+  await join(student, classInfo.code)
+  const outsider = await createSignedInUser('outsider')
+
+  const forStudent = await request(app).get(`/api/classes/${classInfo.id}/leaderboard`).set('Authorization', student.authHeader)
+  const forOutsider = await request(app).get(`/api/classes/${classInfo.id}/leaderboard`).set('Authorization', outsider.authHeader)
+  const forTeacher = await request(app).get(`/api/classes/${classInfo.id}/leaderboard`).set('Authorization', teacher.authHeader)
+
+  assert.equal(forStudent.status, 200)
+  assert.deepEqual(
+    forStudent.body.items.map((row) => [row.name, row.rank, row.count, row.change]),
+    [['student', 1, 0, null]],
+  )
+  assert.equal(forTeacher.status, 200)
+  assert.equal(forOutsider.status, 404)
+})

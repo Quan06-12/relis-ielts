@@ -15,6 +15,7 @@ import {
   leaveClass,
 } from '../controllers/classes.controller.js'
 import { createAssignment, listAssignments, deleteAssignment } from '../controllers/assignments.controller.js'
+import { getLeaderboard } from '../controllers/leaderboard.controller.js'
 
 const router = Router()
 
@@ -34,6 +35,7 @@ router.post('/:classId/library', loadMembership, requireTeacher, addToClassLibra
 router.delete('/:classId/library/:testId', loadMembership, requireTeacher, removeFromClassLibrary)
 router.get('/:classId/gradebook', loadMembership, requireTeacher, getGradebook)
 router.get('/:classId/assignments', loadMembership, listAssignments)
+router.get('/:classId/leaderboard', loadMembership, getLeaderboard)
 router.post('/:classId/assignments', loadMembership, requireTeacher, createAssignment)
 router.delete('/:classId/assignments/:assignmentId', loadMembership, requireTeacher, deleteAssignment)
 

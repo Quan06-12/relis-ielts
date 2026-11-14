@@ -8,6 +8,7 @@ import { daysUntil, latestBands, gapLabel, BAND_CHOICES, todayLabel, goalProgres
 import { scoreLabel } from '../features/history/historyGroups.js'
 import BandChart from '../features/home/BandChart.jsx'
 import ActivityPanels from '../features/home/ActivityPanels.jsx'
+import Leaderboard from '../features/home/Leaderboard.jsx'
 import EmptyState from '../components/EmptyState.jsx'
 import { SkeletonRows } from '../components/Skeleton.jsx'
 import { useToast } from '../components/FeedbackProvider.jsx'
@@ -111,6 +112,8 @@ export default function HomePage() {
       </div>
 
       <ActivityPanels />
+
+      <Leaderboard />
 
       <div className="home-row">
         <section>
