@@ -1,0 +1,139 @@
+.leaderboard {
+  margin-bottom: 28px;
+  overflow: hidden;
+}
+
+.leaderboard-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.leaderboard-class {
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--purple-soft);
+  color: var(--purple);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.leaderboard-week {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.leaderboard-pad {
+  margin: 0;
+  padding: 16px 20px;
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.leaderboard-table th {
+  padding: 12px 20px;
+  background: #f7f5fc;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.leaderboard-table td {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.leaderboard-table th:nth-child(-n + 2),
+.leaderboard-table td:nth-child(-n + 2) {
+  text-align: left;
+}
+
+.leaderboard-table th:last-child,
+.leaderboard-table td:last-child {
+  text-align: right;
+}
+
+.leaderboard-table tr.me td {
+  background: #f7f5fc;
+  font-weight: 600;
+}
+
+.rank-badge {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--white);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.rank-change {
+  margin-left: 10px;
+  font-size: 11px;
+}
+
+.rank-change.up {
+  color: #2e7d32;
+}
+
+.rank-change.down {
+  color: #c62828;
+}
+
+.rank-change.same {
+  color: #b9b3c9;
+}
+
+.leaderboard-student {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.leaderboard-student small {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.leaderboard-avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #e9e4f5;
+  color: var(--purple);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.leaderboard-band {
+  color: var(--purple);
+  font-weight: 700;
+}
+
+@media (max-width: 600px) {
+  .leaderboard-table th,
+  .leaderboard-table td {
+    padding: 10px 8px;
+  }
+
+  .leaderboard-table th:nth-child(4),
+  .leaderboard-table td:nth-child(4) {
+    display: none;
+  }
+}

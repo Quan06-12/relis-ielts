@@ -1,63 +1,36 @@
 import { useState } from 'react'
 import { QUESTION_TYPES } from './editorState.js'
-import FileUploadButton from './FileUploadButton.jsx'
 import GroupEditor from './GroupEditor.jsx'
 
-// One Reading passage or Listening part with its question groups (US13, US14, US15).
-export default function SectionEditor({ skill, section, numbers, actions }) {
+// Right half of the editor: the question groups of the selected passage or part (US13–US15).
+export default function SectionEditor({ skill, section, numbers, openKey, onToggleQuestion, actions }) {
   const [newGroupType, setNewGroupType] = useState('tfng')
-  // Last text selected in the passage / transcript, so a question can use it as evidence (US18)
-  const [selection, setSelection] = useState(null)
-  const sourceText = skill === 'reading' ? section.passage : section.transcript
-
-  function rememberSelection(event) {
-    setSelection({ start: event.target.selectionStart, end: event.target.selectionEnd })
-  }
+  const evidenceText = skill === 'reading' ? section.passage : section.transcript
+  const evidenceLabel = skill === 'reading' ? 'passage' : 'transcript'
 
   return (
     <div className="section-editor">
-      <label className="editor-field">
-        Tiêu đề
-        <input type="text" value={section.title} onChange={(event) => actions.changeSection({ title: event.target.value })} />
-      </label>
-
-      {skill === 'reading' ? (
-        <label className="editor-field">
-          Nội dung passage <small>(xuống dòng để tách đoạn)</small>
-          <textarea rows={14} value={section.passage} onSelect={rememberSelection} onChange={(event) => actions.changeSection({ passage: event.target.value })} />
-        </label>
-      ) : (
-        <>
-          <div className="editor-field">
-            Audio
-            <div className="audio-row">
-              {section.audioUrl && <audio src={section.audioUrl} controls preload="metadata" />}
-              <FileUploadButton
-                kind="audio"
-                accept="audio/mpeg,audio/mp4,audio/x-m4a,audio/aac"
-                label={section.audioUrl ? 'Đổi audio' : 'Tải audio lên (mp3, m4a, tối đa 30 MB)'}
-                onUploaded={({ url, durationSec }) => actions.changeSection({ audioUrl: url, audioDurationSec: durationSec })}
-              />
-            </div>
-          </div>
-          <label className="editor-field">
-            Transcript <small>(chỉ hiện ở trang Xem lại)</small>
-            <textarea rows={10} value={section.transcript} onSelect={rememberSelection} onChange={(event) => actions.changeSection({ transcript: event.target.value })} />
-          </label>
-        </>
+      {section.groups.length === 0 && (
+        <p className="passage-empty">Phần này chưa có câu hỏi. Chọn dạng câu hỏi bên dưới rồi bấm &quot;+ Thêm nhóm câu hỏi&quot;.</p>
       )}
 
       {section.groups.map((group, groupIndex) => (
         <GroupEditor
           key={group.id ?? group.key}
           group={group}
+          groupNumber={groupIndex + 1}
           numbers={numbers}
-          evidenceSource={{ text: sourceText, selection, label: skill === 'reading' ? 'passage' : 'transcript' }}
-          onChangeGroup={(changes) => actions.changeGroup(groupIndex, changes)}
-          onRemoveGroup={() => actions.removeGroup(groupIndex)}
-          onAddQuestion={() => actions.addQuestion(groupIndex)}
-          onChangeQuestion={(questionIndex, changes) => actions.changeQuestion(groupIndex, questionIndex, changes)}
-          onRemoveQuestion={(questionIndex) => actions.removeQuestion(groupIndex, questionIndex)}
+          openKey={openKey}
+          onToggleQuestion={onToggleQuestion}
+          evidenceText={evidenceText}
+          evidenceLabel={evidenceLabel}
+          actions={{
+            changeGroup: (changes) => actions.changeGroup(groupIndex, changes),
+            removeGroup: () => actions.removeGroup(groupIndex),
+            addQuestion: () => actions.addQuestion(groupIndex),
+            changeQuestion: (questionIndex, changes) => actions.changeQuestion(groupIndex, questionIndex, changes),
+            removeQuestion: (questionIndex) => actions.removeQuestion(groupIndex, questionIndex),
+          }}
         />
       ))}
 

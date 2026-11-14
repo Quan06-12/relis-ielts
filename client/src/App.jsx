@@ -30,7 +30,6 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/library" element={<LibraryPage />} />
           <Route path="/tests/new" element={<TestEditorPage />} />
-          <Route path="/tests/:testId/edit" element={<TestEditorPage />} />
           <Route path="/classes" element={<ClassesPage />} />
           <Route path="/classes/:classId" element={<ClassDetailPage />} />
           <Route path="/vocab" element={<VocabPage />} />
@@ -38,7 +37,8 @@ export default function App() {
           <Route path="/history" element={<HistoryPage />} />
         </Route>
 
-        {/* Full-screen pages: no navigation bar while taking or reviewing a test */}
+        {/* Full-screen pages: no navigation bar while editing, taking or reviewing a test */}
+        <Route path="/tests/:testId/edit" element={<TestEditorPage />} />
         <Route path="/attempts/:attemptId" element={<AttemptPage />} />
         <Route path="/attempts/:attemptId/review" element={<ReviewPage />} />
       </Route>
