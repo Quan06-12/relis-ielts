@@ -39,3 +39,11 @@ tests/               # node:test + supertest
 - Lỗi có thể đoán trước thì `throw new AppError(status, code, message)` hoặc dùng `notFound()`, `validationError()`; middleware lỗi trả về đúng format `{ error: { code, message, details } }`.
 - Express 5 tự chuyển lỗi của hàm `async` cho middleware lỗi, nên controller không cần `try/catch`.
 - Không có quyền xem thì trả 404, không trả 403.
+
+## Dữ liệu demo
+
+```bash
+npm run seed:demo -- your.email@gmail.com
+```
+
+Tài khoản phải đăng nhập web một lần trước. Lệnh dùng `MONGODB_URI` trong `.env`, nên chạy với `.env` trỏ tới database nào thì dữ liệu vào database đó (bản deploy dùng chung Atlas với máy bạn nếu cùng chuỗi kết nối). Mọi thứ tạo ra đều có chữ `[Demo]` hoặc `demo-student`, chạy lại sẽ xoá bản cũ rồi tạo lại.
