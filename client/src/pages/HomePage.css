@@ -202,13 +202,13 @@ button.home-exam-box:hover {
 @media (max-width: 900px) {
   .home-row,
   .home-top {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
 @media (max-width: 600px) {
   .home-cards {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
