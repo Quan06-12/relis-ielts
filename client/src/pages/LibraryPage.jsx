@@ -8,6 +8,7 @@ import ModeDialog from '../features/attempt/ModeDialog.jsx'
 import ShareToClassesDialog from '../features/classes/ShareToClassesDialog.jsx'
 import { MENU, QUESTION_TYPE_LABELS, filterByQuestionType, questionTypesIn } from '../features/library/libraryFilters.js'
 import { SkeletonCards } from '../components/Skeleton.jsx'
+import TabSlider, { useTabSlider } from '../components/TabSlider.jsx'
 import './LibraryPage.css'
 
 const ICONS = {
@@ -22,6 +23,7 @@ export default function LibraryPage() {
   const [kind, setKind] = useState('') // '' (all) | 'single' | 'full'
   const [questionType, setQuestionType] = useState('')
   const [done, setDone] = useState('false') // 'false' = Bài chưa làm, 'true' = Bài đã làm
+  const [doneBar, doneBox] = useTabSlider(done)
   const [searchText, setSearchText] = useState('')
   const [search, setSearch] = useState('') // applied when "Tìm kiếm" is pressed
   const [tests, setTests] = useState([])
@@ -106,7 +108,8 @@ export default function LibraryPage() {
 
       <div className="library-main">
         <div className="library-topbar">
-          <div className="library-done-tabs" role="tablist" aria-label="Đã làm hay chưa">
+          <div ref={doneBar} className="library-done-tabs" role="tablist" aria-label="Đã làm hay chưa">
+            <TabSlider box={doneBox} className="done-slider" />
             {[
               { value: 'false', label: 'Bài chưa làm' },
               { value: 'true', label: 'Bài đã làm' },

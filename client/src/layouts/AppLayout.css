@@ -35,6 +35,7 @@
 }
 
 .app-tabs {
+  position: relative;
   display: flex;
   gap: 4px;
 }
@@ -51,6 +52,7 @@
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
+  transition: color 0.25s;
 }
 
 .app-tab:hover {
@@ -200,6 +202,30 @@
   .create-test-button {
     padding: 6px 12px;
     font-size: 14px;
+  }
+}
+
+/* On wide screens one white tab slides between pages instead of each tab painting itself */
+@media (min-width: 861px) {
+  .app-tab {
+    z-index: 1;
+  }
+
+  .app-tab.active,
+  .app-tab.active:hover {
+    background: transparent;
+  }
+
+  .app-tab.active::before,
+  .app-tab.active::after {
+    display: none;
+  }
+}
+
+/* In the folded phone menu the active tab keeps its own background */
+@media (max-width: 860px) {
+  .nav-slider {
+    display: none;
   }
 }
 
