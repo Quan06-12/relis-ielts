@@ -4,7 +4,9 @@
 //
 // The email must belong to an account that has signed in to the web at least once.
 // Running it again first removes the previous demo data, so it can be repeated safely.
-// Everything it creates is marked "[Demo]" (tests, class) or "demo-student" (fake students).
+// Names shown in the app look real (no "demo"), so the data is found again by its exact names
+// (DEMO_TEST_TITLES, CLASS_NAME, VOCAB_SET_NAME) and the fake students by their googleId prefix.
+// Older runs used a "[Demo]" prefix and "demo-student-" ids; those are removed too.
 
 import mongoose from 'mongoose'
 import { connectDatabase } from '../src/config/db.js'
@@ -20,6 +22,7 @@ import { renumberQuestions, listQuestions } from '../src/utils/testContent.js'
 import { gradeAttempt } from '../src/utils/grading.js'
 import { generateClassCode } from '../src/utils/classCode.js'
 import { demoReadingTest, demoShortTest } from './demoData.js'
+import { practiceTests } from './practiceTests.js'
 
 const DAY = 24 * 60 * 60 * 1000
 const daysAgo = (days) => new Date(Date.now() - days * DAY)
@@ -30,6 +33,12 @@ const STUDENTS = [
   { name: 'Trần Gia Bảo', correct: 31 },
   { name: 'Lê Thu Hà', correct: 35 },
 ]
+
+const CLASS_NAME = 'Lớp IELTS 6.5 · Tối 2-4-6'
+const VOCAB_SET_NAME = 'Environment & Climate'
+const DEMO_TEST_TITLES = [demoReadingTest(), demoShortTest(), ...practiceTests()].map((test) => test.title)
+const STUDENT_ID_PREFIX = 'seed-student-'
+const OLD_PREFIX = /^\[Demo\]/ // names used by earlier versions of this script
 
 // Words of the demo vocabulary set (US47, US48)
 const DEMO_WORDS = [
@@ -57,19 +66,24 @@ async function main() {
 
   const fullTest = await createPublishedTest(teacher, demoReadingTest())
   const miniTest = await createPublishedTest(teacher, demoShortTest())
+  // One short test per topic, each with its own cover photo, so the library looks full
+  const topicTests = []
+  for (const content of practiceTests()) {
+    topicTests.push(await createPublishedTest(teacher, content))
+  }
 
   // The teacher's own practice, so Home and History are not empty
   await createSubmittedAttempt({ user: teacher, test: fullTest, correctCount: 30, finishedDaysAgo: 2 })
 
   // A class with three students, both tests in its library, and one assignment
   const demoClass = await createClassWithUniqueCode({
-    name: '[Demo] Lớp IELTS 6.5',
-    description: 'Lớp mẫu cho buổi demo',
+    name: CLASS_NAME,
+    description: 'Luyện Reading tối thứ 2, 4, 6',
     color: 'blue',
     createdBy: teacher._id,
   })
   await ClassMember.create({ classId: demoClass._id, userId: teacher._id, role: 'teacher', joinedAt: daysAgo(6) })
-  for (const test of [fullTest, miniTest]) {
+  for (const test of [fullTest, miniTest, ...topicTests.slice(0, 3)]) {
     await ClassLibraryItem.create({ classId: demoClass._id, testId: test._id, addedBy: teacher._id, addedAt: daysAgo(5) })
   }
   const assignment = await Assignment.create({
@@ -82,8 +96,8 @@ async function main() {
 
   for (const [index, student] of STUDENTS.entries()) {
     const user = await User.create({
-      googleId: `demo-student-${index + 1}`,
-      email: `demo.student${index + 1}@example.com`,
+      googleId: `${STUDENT_ID_PREFIX}${index + 1}`,
+      email: `hocvien${index + 1}@example.com`,
       name: student.name,
     })
     await ClassMember.create({ classId: demoClass._id, userId: user._id, role: 'student', joinedAt: daysAgo(5) })
@@ -91,7 +105,7 @@ async function main() {
   }
 
   // The first student has already done the homework, the others have not
-  const firstStudent = await User.findOne({ googleId: 'demo-student-1' })
+  const firstStudent = await User.findOne({ googleId: `${STUDENT_ID_PREFIX}1` })
   await createSubmittedAttempt({
     user: firstStudent,
     test: miniTest,
@@ -102,19 +116,19 @@ async function main() {
   })
 
   // A vocabulary set, so the "Từ vựng" page has something to show
-  await VocabSet.create({ ownerId: teacher._id, name: '[Demo] Environment', color: 'green', words: DEMO_WORDS })
+  await VocabSet.create({ ownerId: teacher._id, name: VOCAB_SET_NAME, color: 'green', words: DEMO_WORDS })
 
   console.log('Demo data ready:')
-  console.log(`  Tests: "${fullTest.title}" (40 questions), "${miniTest.title}" (13 questions)`)
+  console.log(`  Tests: "${fullTest.title}" (40 questions), "${miniTest.title}" and ${topicTests.length} topic tests, all with covers`)
   console.log(`  Class: "${demoClass.name}", code ${demoClass.code}, ${STUDENTS.length} students, 1 assignment`)
-  console.log(`  Vocabulary: "[Demo] Environment" (${DEMO_WORDS.length} words)`)
+  console.log(`  Vocabulary: "${VOCAB_SET_NAME}" (${DEMO_WORDS.length} words)`)
 }
 
 // Removes what an earlier run created for this teacher, and every fake student
 async function removeOldDemoData(teacher) {
-  const oldTests = await Test.find({ ownerId: teacher._id, title: /^\[Demo\]/ }).select('_id')
-  const oldClasses = await Class.find({ createdBy: teacher._id, name: /^\[Demo\]/ }).select('_id')
-  const fakeStudents = await User.find({ googleId: /^demo-student-/ }).select('_id')
+  const oldTests = await Test.find({ ownerId: teacher._id, $or: [{ title: { $in: DEMO_TEST_TITLES } }, { title: OLD_PREFIX }] }).select('_id')
+  const oldClasses = await Class.find({ createdBy: teacher._id, $or: [{ name: CLASS_NAME }, { name: OLD_PREFIX }] }).select('_id')
+  const fakeStudents = await User.find({ googleId: /^(seed|demo)-student-/ }).select('_id')
 
   const testIds = oldTests.map((test) => test._id)
   const classIds = oldClasses.map((item) => item._id)
@@ -126,10 +140,10 @@ async function removeOldDemoData(teacher) {
     Assignment.deleteMany({ $or: [{ classId: { $in: classIds } }, { testId: { $in: testIds } }] }),
   ])
   await Promise.all([
-    VocabSet.deleteMany({ ownerId: teacher._id, name: /^\[Demo\]/ }),
+    VocabSet.deleteMany({ ownerId: teacher._id, $or: [{ name: VOCAB_SET_NAME }, { name: OLD_PREFIX }] }),
     Test.deleteMany({ _id: { $in: testIds } }),
     Class.deleteMany({ _id: { $in: classIds } }),
-    User.deleteMany({ googleId: /^demo-student-/ }),
+    User.deleteMany({ googleId: /^(seed|demo)-student-/ }),
   ])
 }
 
