@@ -1,0 +1,40 @@
+/* Shared sliding highlight for tab bars. The bar must be position: relative,
+   and its tabs need z-index: 1 so their text stays above the highlight. */
+.tab-slider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 10px 10px 0 0;
+  background: var(--white);
+  pointer-events: none;
+  transition:
+    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Small outward curves at the bottom corners so the tab flows into what is under it */
+.tab-slider::before,
+.tab-slider::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: var(--curve, 12px);
+  height: var(--curve, 12px);
+}
+
+.tab-slider::before {
+  left: calc(var(--curve, 12px) * -1);
+  background: radial-gradient(circle at 0 0, transparent calc(var(--curve, 12px) - 0.5px), var(--white) var(--curve, 12px));
+}
+
+.tab-slider::after {
+  right: calc(var(--curve, 12px) * -1);
+  background: radial-gradient(circle at 100% 0, transparent calc(var(--curve, 12px) - 0.5px), var(--white) var(--curve, 12px));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab-slider {
+    transition: none;
+  }
+}
