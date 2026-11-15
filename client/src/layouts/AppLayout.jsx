@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import CubeLogo from '../components/CubeLogo.jsx'
 import AccountMenu from '../components/AccountMenu.jsx'
+import TabSlider, { useTabSlider } from '../components/TabSlider.jsx'
 import './AppLayout.css'
 
 // Line icons from the wireframe (24×24, drawn with the text colour)
@@ -20,6 +21,7 @@ export default function AppLayout() {
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const createMenu = useRef(null)
   const { pathname } = useLocation()
+  const [tabBar, tabBox] = useTabSlider(pathname)
 
   // Close the menus after moving to another page
   useEffect(() => {
@@ -56,7 +58,8 @@ export default function AppLayout() {
             <span>Relis</span>
           </Link>
 
-          <div className={isMenuOpen ? 'app-tabs open' : 'app-tabs'}>
+          <div ref={tabBar} className={isMenuOpen ? 'app-tabs open' : 'app-tabs'}>
+            <TabSlider box={tabBox} className="nav-slider" />
             {tabs.map((tab) => (
               // `end` keeps "Trang chủ" from staying active on every page (all paths start with "/")
               <NavLink key={tab.to} to={tab.to} end={tab.to === '/'} className="app-tab">
