@@ -176,6 +176,36 @@
   }
 }
 
+/* Phones: the passage tabs and the 40 question numbers each take one row that scrolls sideways,
+   so the passage and the questions keep most of the screen (also used by the review page) */
+@media (max-width: 640px) {
+  .section-tabs {
+    overflow-x: auto;
+    padding: 6px 12px 0;
+    scrollbar-width: none;
+  }
+
+  .section-tab {
+    flex: none;
+    max-width: 62vw;
+    overflow: hidden;
+    padding: 8px 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .question-navigator {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 8px 12px;
+    scrollbar-width: thin;
+  }
+
+  .question-navigator > * {
+    flex: none;
+  }
+}
+
 /* Audio speed (US29) */
 .audio-player {
   display: flex;

@@ -29,14 +29,21 @@ export default function AppLayout() {
     setIsCreateOpen(false)
   }, [pathname])
 
-  // Close the "+ Tạo đề" menu when clicking anywhere else
+  // Close the "+ Tạo đề" menu when clicking anywhere else or pressing Esc
   useEffect(() => {
     if (!isCreateOpen) return undefined
     function closeOnOutsideClick(event) {
       if (!createMenu.current?.contains(event.target)) setIsCreateOpen(false)
     }
+    function closeOnEscape(event) {
+      if (event.key === 'Escape') setIsCreateOpen(false)
+    }
     document.addEventListener('mousedown', closeOnOutsideClick)
-    return () => document.removeEventListener('mousedown', closeOnOutsideClick)
+    document.addEventListener('keydown', closeOnEscape)
+    return () => {
+      document.removeEventListener('mousedown', closeOnOutsideClick)
+      document.removeEventListener('keydown', closeOnEscape)
+    }
   }, [isCreateOpen])
 
   return (

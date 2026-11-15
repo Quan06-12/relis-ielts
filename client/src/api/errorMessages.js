@@ -9,6 +9,7 @@ const messages = {
   DUPLICATE_WORD: 'Từ này đã có trong bộ.',
   TEACHER_CANNOT_LEAVE: 'Giáo viên không rời được lớp của mình.',
   DEADLINE_PASSED: 'Bài tập này đã hết hạn nộp.',
+  NO_QUESTIONS: 'Đề này chưa có câu hỏi nào để làm.',
   FILE_TOO_LARGE: 'File quá lớn.',
   ATTEMPT_NOT_SUBMITTED: 'Bài này chưa nộp nên chưa xem lại được.',
   INTERNAL_ERROR: 'Máy chủ gặp lỗi, vui lòng thử lại sau.',

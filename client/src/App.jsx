@@ -15,6 +15,7 @@ import ReviewPage from './pages/ReviewPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 import PageTitle from './components/PageTitle.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
+import EscapeToClose from './components/EscapeToClose.jsx'
 import LogoFlightLayer from './features/landing/LogoFlightLayer.jsx'
 
 // Route table, same structure as the "Site diagram" tab of the project docs.
@@ -23,6 +24,7 @@ export default function App() {
     <>
       <PageTitle />
       <ScrollToTop />
+      <EscapeToClose />
       {/* Sign-in animation; outside the routes so it keeps going while the page changes */}
       <LogoFlightLayer />
       <Routes>
