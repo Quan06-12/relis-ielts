@@ -55,10 +55,11 @@ The practical lessons are simple. Students who stay up all night before an exam 
 
 export function demoReadingTest() {
   return {
-    title: '[Demo] Reading Practice Test 1',
+    title: 'Reading Practice Test 1',
     skill: 'reading',
     kind: 'full',
     durationMin: 60,
+    coverUrl: '/landing/rooftop.jpg', // photos in client/public/landing
     sections: [
       section('Green Roofs in Growing Cities', PASSAGE_1, [
         {
@@ -222,12 +223,14 @@ export function demoReadingTest() {
 }
 
 // A short single-passage test, for showing "practise one passage" and a class assignment
+// Passage 2 of the full test on its own: a short test to assign as homework
 export function demoShortTest() {
   return {
-    title: '[Demo] Reading Mini Test: Green Roofs',
+    title: 'The Slow Return of the Night Train',
     skill: 'reading',
     kind: 'single',
     durationMin: 20,
-    sections: [demoReadingTest().sections[0]],
+    coverUrl: '/landing/mountains.jpg',
+    sections: [demoReadingTest().sections[1]],
   }
 }
