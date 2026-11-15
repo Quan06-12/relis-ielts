@@ -217,16 +217,20 @@
 /* Phones: the wall fades into the dark page, the title sits over the fade,
    and the glass card stretches across the whole screen width */
 @media (max-width: 640px) {
+  /* Exactly one screen tall, so the page never scrolls; dvh follows the phone's moving address bar */
   .landing {
     display: flex;
     flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
     background: #0b1028;
   }
 
+  /* The wall takes whatever height the text and card leave, from a small strip up to a tall band */
   .landing-wall {
-    flex: none;
-    height: 380px;
-    min-height: 0;
+    flex: 1 1 380px;
+    min-height: 170px;
   }
 
   /* Fade from the photos (top) into the page colour (bottom) */
@@ -240,7 +244,7 @@
   }
 
   .landing-panel {
-    flex: 1;
+    flex: none;
     justify-content: flex-start;
     margin-top: -150px; /* pull the logo and title up over the faded part of the wall */
     padding: 0 0 0;
@@ -270,7 +274,6 @@
 
   /* Edge to edge: only the top corners are rounded and the card runs to the bottom of the screen */
   .login-card {
-    flex: 1;
     padding: 26px 20px 32px;
     border-width: 1px 0 0;
     border-radius: 22px 22px 0 0;
