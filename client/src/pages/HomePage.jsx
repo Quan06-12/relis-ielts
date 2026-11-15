@@ -136,11 +136,11 @@ export default function HomePage() {
             <ul className="home-list">
               {recent.slice(0, 5).map((attempt) => (
                 <li key={attempt.id}>
-                  <span>
+                  <span className="recent-text">
                     {attempt.test?.title}
-                    <small> · {new Date(attempt.submittedAt).toLocaleDateString('vi-VN')}</small>
+                    <small>{new Date(attempt.submittedAt).toLocaleDateString('vi-VN')}</small>
                   </span>
-                  <Link to={`/attempts/${attempt.id}/review`}>{scoreLabel(attempt.result)}</Link>
+                  <Link to={`/attempts/${attempt.id}/review`} className="score-chip">{scoreLabel(attempt.result)}</Link>
                 </li>
               ))}
             </ul>

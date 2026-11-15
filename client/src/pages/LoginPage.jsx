@@ -82,7 +82,11 @@ export default function LoginPage() {
           <span>Relis</span>
         </div>
 
-        <h1>Luyện IELTS như thi thật</h1>
+        {/* On phones "thật" always starts the second line; on wider screens the break is hidden */}
+        <h1>
+          Luyện IELTS như thi <br className="title-break" />
+          thật
+        </h1>
         <p className="landing-lead">Tạo kho đề của riêng bạn, lớp học và theo dõi kết quả cùng một nơi.</p>
 
         <div className="login-card">
