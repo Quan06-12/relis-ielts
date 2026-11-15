@@ -248,6 +248,41 @@ button.home-exam-box:hover {
   color: var(--text-muted);
 }
 
+/* Title on top, date under it; long titles wrap here instead of squeezing the score */
+.recent-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.recent-text small {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+}
+
+/* Buttons in the lists keep their label on one line on phones */
+.home-list .primary-button {
+  flex: none;
+  white-space: nowrap;
+}
+
+/* The score is a small pill that never breaks over two lines */
+.home-list a.score-chip {
+  flex: none;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.home-list a.score-chip:hover {
+  background: #d9ddf3;
+}
+
 .home-list a:not(.primary-button) {
   color: var(--primary);
   font-weight: 600;

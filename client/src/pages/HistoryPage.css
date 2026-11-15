@@ -231,3 +231,31 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Phones: every filter takes the full width, the two tab groups split into equal parts,
+   and the time range sits next to the search box */
+@media (max-width: 640px) {
+  .history-filters {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .history-filters .segmented {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+  }
+
+  .history-filters .segmented-tab {
+    padding: 8px 6px;
+    white-space: nowrap;
+  }
+
+  .history-search {
+    min-width: 0;
+    max-width: none;
+    margin-left: 0;
+  }
+}
