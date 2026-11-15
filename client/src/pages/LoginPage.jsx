@@ -8,7 +8,6 @@ import TestWall from '../features/landing/TestWall.jsx'
 import { startLogoFlight } from '../features/landing/logoFlight.js'
 import './LoginPage.css'
 
-const FEATURES = ['Đồng hồ đếm ngược, chấm và quy đổi band như thi thật', 'Xem lại từng câu với bằng chứng và giải thích', 'Tạo lớp, giao bài, bảng điểm và bảng xếp hạng']
 
 // Landing page and sign-in in one (US01): everyone who is not signed in arrives here.
 // Left: a still 3D wall of IELTS tests; right: what Relis is and "Continue with Google".
@@ -65,28 +64,18 @@ export default function LoginPage() {
       <section className="landing-panel">
         <div className="login-brand rl-spin">
           <span ref={brandCube} className="login-brand-cube">
-            <CubeLogo size={34} />
+            <CubeLogo size={56} />
           </span>
           <span>Relis</span>
         </div>
 
-        <h1>
-          Luyện IELTS
-          <br />
-          như thi thật
-        </h1>
-        <p className="landing-lead">
-          Kho đề Reading và Listening của riêng bạn, lớp học để giao bài và theo dõi kết quả, tất cả ở một nơi.
-        </p>
-        <ul className="landing-features">
-          {FEATURES.map((feature) => (
-            <li key={feature}>{feature}</li>
-          ))}
-        </ul>
+        <h1>Luyện IELTS như thi thật</h1>
+        <p className="landing-lead">Tạo kho đề của riêng bạn, lớp học và theo dõi kết quả cùng một nơi.</p>
 
         <div className="login-card">
-          <h2>Bắt đầu miễn phí</h2>
-          <p>Đăng nhập hoặc tạo tài khoản bằng Google. Một tài khoản dùng được cho mọi lớp, dù bạn học hay dạy.</p>
+          <p className="login-eyebrow">Bắt đầu miễn phí</p>
+          <h2>Chào mừng bạn</h2>
+          <p>Đăng nhập hoặc tạo tài khoản bằng Google.</p>
 
           {state === 'signing-in' ? (
             <div className="login-connecting" role="status">
