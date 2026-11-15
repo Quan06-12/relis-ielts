@@ -88,7 +88,7 @@ export default function LoginPage() {
                 onError={() => setState('cancelled')}
                 text="continue_with"
                 shape="rectangular"
-                width="320"
+                width="400"
                 locale="vi"
               />
             </div>
