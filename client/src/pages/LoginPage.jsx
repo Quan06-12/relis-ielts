@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
 import { useAuth } from '../auth/AuthContext.jsx'
@@ -21,6 +21,19 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [lastCredential, setLastCredential] = useState(null) // kept so "Thử lại" can send it again
   const brandCube = useRef(null)
+  // The Google button has a fixed width in pixels; measure its box so it fits phones too
+  const buttonBox = useRef(null)
+  const [buttonWidth, setButtonWidth] = useState(null)
+
+  useEffect(() => {
+    const box = buttonBox.current
+    if (!box) return undefined
+    const measure = () => setButtonWidth(Math.min(400, Math.floor(box.clientWidth)))
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(box)
+    return () => observer.disconnect()
+  }, [state])
   // True while we sign in from this page, so the plain redirect below does not skip the transition
   const isSigningInHere = useRef(false)
 
@@ -82,15 +95,17 @@ export default function LoginPage() {
               <span className="login-spinner" aria-hidden="true" /> Đang kết nối với Google…
             </div>
           ) : (
-            <div className="login-google-button">
-              <GoogleLogin
-                onSuccess={(googleResponse) => signInWith(googleResponse.credential)}
-                onError={() => setState('cancelled')}
-                text="continue_with"
-                shape="rectangular"
-                width="400"
-                locale="vi"
-              />
+            <div className="login-google-button" ref={buttonBox}>
+              {buttonWidth && (
+                <GoogleLogin
+                  onSuccess={(googleResponse) => signInWith(googleResponse.credential)}
+                  onError={() => setState('cancelled')}
+                  text="continue_with"
+                  shape="rectangular"
+                  width={String(buttonWidth)}
+                  locale="vi"
+                />
+              )}
             </div>
           )}
 
