@@ -21,7 +21,7 @@
   flex-direction: column;
   justify-content: center;
   width: 100%;
-  max-width: 520px;
+  max-width: 528px; /* card content = 400px, the widest Google button, so it lines up with the text */
   margin: 0 auto;
   padding: 48px 40px;
 }
@@ -29,9 +29,9 @@
 .login-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 28px;
-  font-size: 30px;
+  gap: 18px;
+  margin-bottom: 36px;
+  font-size: 64px;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
@@ -46,9 +46,10 @@
 }
 
 .landing-panel h1 {
-  margin: 0 0 16px;
-  font-size: 56px;
-  line-height: 1.05;
+  margin: 0 0 12px;
+  font-size: 38px;
+  line-height: 1.1;
+  white-space: nowrap;
   letter-spacing: -0.03em;
 }
 
@@ -59,46 +60,42 @@
   line-height: 1.6;
 }
 
-.landing-features {
-  display: grid;
-  gap: 8px;
-  margin: 0 0 28px;
-  padding: 0;
-  list-style: none;
-  color: #bcc3e4;
-  font-size: 14px;
-}
-
-.landing-features li::before {
-  content: '✓';
-  margin-right: 10px;
-  color: #ffc531;
-  font-weight: 700;
-}
-
 .login-card {
   padding: 24px 24px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 16px;
-  background: var(--white);
-  color: var(--text);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  /* See-through like the wireframe: frosted glass over the dark page */
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+  color: var(--white);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+.login-eyebrow {
+  margin: 0 0 4px !important;
+  color: var(--yellow) !important;
+  font-size: 12px !important;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .login-card h2 {
   margin: 0 0 6px;
-  font-size: 20px;
+  font-size: 24px;
 }
 
 .login-card > p {
   margin: 0;
-  color: var(--text-muted);
+  color: #d0d6f0;
   font-size: 14px;
   line-height: 1.55;
 }
 
+/* Left-aligned and as wide as the text above and below */
 .login-google-button {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: 44px;
   margin-top: 18px;
 }
@@ -114,6 +111,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   background: #f1f3f9;
+  color: var(--text);
   font-size: 14px;
   font-weight: 600;
 }
@@ -171,7 +169,7 @@
 
 .login-terms {
   margin: 14px 0 0 !important;
-  color: var(--text-muted);
+  color: #b3bad8 !important;
   font-size: 12px !important;
 }
 
@@ -191,7 +189,12 @@
   }
 
   .landing-panel h1 {
-    font-size: 40px;
+    font-size: 30px;
+    white-space: normal;
+  }
+
+  .login-brand {
+    font-size: 44px;
   }
 }
 
