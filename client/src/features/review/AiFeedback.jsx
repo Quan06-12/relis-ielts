@@ -4,8 +4,12 @@ import { getErrorMessage } from '../../api/errorMessages.js'
 
 // AI feedback box on the review page (US49). The feedback is made once on the server and stored,
 // so after the first time it simply comes back with the review.
+// On a phone the review page has little height, so the feedback starts folded and the questions stay visible
+const startsOpen = () => typeof window === 'undefined' || window.matchMedia('(min-width: 900px)').matches
+
 export default function AiFeedback({ attemptId, initialFeedback }) {
   const [feedback, setFeedback] = useState(initialFeedback)
+  const [isOpen] = useState(startsOpen)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -34,8 +38,10 @@ export default function AiFeedback({ attemptId, initialFeedback }) {
   }
 
   return (
-    <section className="ai-feedback">
-      <h2>✨ Nhận xét AI</h2>
+    <details className="ai-feedback" open={isOpen}>
+      <summary>
+        <h2>✨ Nhận xét AI</h2>
+      </summary>
       <p>{feedback.summary}</p>
       {feedback.weakTypes.length > 0 && (
         <p>
@@ -50,6 +56,6 @@ export default function AiFeedback({ attemptId, initialFeedback }) {
         </ul>
       )}
       <p className="ai-feedback-note">Nhận xét do AI tạo, chỉ để tham khảo.</p>
-    </section>
+    </details>
   )
 }

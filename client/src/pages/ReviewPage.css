@@ -150,9 +150,19 @@
   font-size: 14px;
 }
 
+.ai-feedback summary {
+  cursor: pointer;
+}
+
+/* The heading sits inside the summary, next to the fold arrow */
 .ai-feedback h2 {
-  margin: 0 0 6px;
+  display: inline;
+  margin: 0;
   font-size: 16px;
+}
+
+.ai-feedback[open] summary {
+  margin-bottom: 6px;
 }
 
 .ai-feedback p {
@@ -167,4 +177,23 @@
 .ai-feedback-note {
   color: var(--text-muted);
   font-size: 12px;
+}
+
+/* Phones: the summary boxes take less room and long feedback scrolls inside its box,
+   so the passage and the questions keep most of the screen */
+@media (max-width: 900px) {
+  .review-summary {
+    margin: 8px 12px;
+    padding: 10px 14px;
+  }
+
+  .ai-feedback {
+    margin: 0 12px 8px;
+    padding: 10px 14px;
+  }
+
+  .ai-feedback[open] {
+    max-height: 35vh;
+    overflow-y: auto;
+  }
 }
