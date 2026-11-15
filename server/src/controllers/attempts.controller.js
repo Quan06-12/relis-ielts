@@ -46,6 +46,10 @@ export async function startAttempt(request, response) {
     : await findTestUserCanTake(testId, request.userId)
   if (!test) throw notFound('Test')
   const cleanMode = checkMode(mode, test)
+  // A draft with no questions yet (or only empty parts chosen) cannot be taken
+  if (listQuestions(test.sections, cleanMode.sectionIndexes).length === 0) {
+    throw new AppError(422, 'NO_QUESTIONS', 'The chosen parts of this test have no questions yet')
+  }
 
   if (assignmentId === null && classId !== null && !(await canTakeFromClass(classId, test._id, request.userId))) {
     // Started from a class library: remember the class so the teacher's gradebook can find it (US40)

@@ -14,9 +14,9 @@ export function typeInfo(value) {
   return WORD_TYPES.find((type) => type.value === value) ?? WORD_TYPES.at(-1)
 }
 
-// "0 words", "1 word", "5 words" (the wireframe keeps this in English, like IELTS)
+// "0 từ", "5 từ": the same wording as the vocabulary set page
 export function wordCountLabel(count) {
-  return `${count} ${count === 1 ? 'word' : 'words'}`
+  return `${count} từ`
 }
 
 // "sustainable · mitigate · biodiversity", or a hint when the set is empty

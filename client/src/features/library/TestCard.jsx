@@ -12,12 +12,17 @@ export default function TestCard({ test, onStart, onDelete, onShare }) {
   const menu = useRef(null)
   const canStart = test.questionCount > 0
 
-  // Close the ⋯ menu when clicking elsewhere
+  // Close the ⋯ menu when clicking elsewhere or pressing Esc
   useEffect(() => {
     if (!isMenuOpen) return undefined
     const close = (event) => !menu.current?.contains(event.target) && setIsMenuOpen(false)
+    const closeOnEscape = (event) => event.key === 'Escape' && setIsMenuOpen(false)
     document.addEventListener('mousedown', close)
-    return () => document.removeEventListener('mousedown', close)
+    document.addEventListener('keydown', closeOnEscape)
+    return () => {
+      document.removeEventListener('mousedown', close)
+      document.removeEventListener('keydown', closeOnEscape)
+    }
   }, [isMenuOpen])
 
   return (

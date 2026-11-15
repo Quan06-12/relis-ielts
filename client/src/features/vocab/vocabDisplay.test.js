@@ -3,9 +3,9 @@ import assert from 'node:assert/strict'
 import { typeInfo, wordCountLabel, previewLabel, filterWords, wordForm } from './vocabDisplay.js'
 
 test('wordCountLabel and previewLabel', () => {
-  assert.equal(wordCountLabel(0), '0 words')
-  assert.equal(wordCountLabel(1), '1 word')
-  assert.equal(wordCountLabel(5), '5 words')
+  assert.equal(wordCountLabel(0), '0 từ')
+  assert.equal(wordCountLabel(1), '1 từ')
+  assert.equal(wordCountLabel(5), '5 từ')
   assert.equal(previewLabel(['a', 'b']), 'a · b')
   assert.equal(previewLabel([]), 'Chưa có từ nào')
 })

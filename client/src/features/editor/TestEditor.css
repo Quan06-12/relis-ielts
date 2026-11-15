@@ -173,6 +173,7 @@ fieldset.editor-field {
 }
 
 .status-chip {
+  white-space: nowrap;
   padding: 1px 8px;
   border-radius: 999px;
   background: var(--primary-soft);
@@ -637,5 +638,18 @@ fieldset.editor-field {
 
   .passage-scroll {
     max-height: 60vh;
+  }
+}
+
+/* Phones: the question text gets its own line, the chips wrap below it,
+   instead of the text being squeezed to nothing */
+@media (max-width: 640px) {
+  .question-row {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+
+  .question-row-prompt {
+    flex-basis: calc(100% - 38px);
   }
 }
