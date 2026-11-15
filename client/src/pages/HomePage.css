@@ -18,11 +18,21 @@
   margin: 0;
 }
 
-/* Band chart and recent results side by side */
+/* Band chart and recent results side by side, their boxes always the same height */
 .home-row {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
   gap: 20px;
+}
+
+.home-row > section {
+  display: flex;
+  flex-direction: column;
+}
+
+/* The box under each heading grows to the height of the taller one */
+.home-row > section > :last-child {
+  flex: 1;
 }
 
 /* Goals (left, wider) and exam date (right), like the wireframe */
@@ -253,6 +263,9 @@ button.home-exam-box:hover {
 
 /* US42: band chart */
 .band-chart {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* stays centred when the box is stretched to match its neighbour */
   margin: 0;
   padding: 16px;
   border: 1px solid var(--border);
