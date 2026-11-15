@@ -17,13 +17,24 @@
   display: grid;
   grid-template-columns: 260px minmax(0, 1fr);
   align-items: start;
-  gap: 24px;
+  gap: 28px;
+}
+
+/* Use the full width so the menu sits against the left edge, like the nav bar.
+   `.page` is doubled up to win over the shared centred .page rule. */
+.page.library-page {
+  max-width: none;
+  padding-left: 28px;
+  padding-right: 28px;
 }
 
 /* ---- left menu ---- */
 .library-menu {
+  /* Stay below the sticky header (56px bar + 9px strip) while the cards scroll */
   position: sticky;
-  top: 16px;
+  top: 81px;
+  max-height: calc(100vh - 97px);
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -100,8 +111,21 @@
   font-weight: 700;
 }
 
+/* Radio-style marker: a grey ring, turning into a ring with a dot for the chosen item */
 .menu-dot {
-  color: var(--tone);
+  flex: none;
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #c5cad8;
+  border-radius: 50%;
+  background: var(--white);
+}
+
+.menu-item.active .menu-dot {
+  border-color: var(--tone);
+  /* White gap between the ring and the inner dot */
+  background: radial-gradient(circle, var(--tone) 0 3.5px, var(--white) 4px);
 }
 
 .menu-select {
@@ -222,7 +246,13 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .page.library-page {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
   .library-menu {
     position: static;
+    max-height: none;
   }
 }

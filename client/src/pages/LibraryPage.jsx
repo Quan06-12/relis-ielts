@@ -79,10 +79,10 @@ export default function LibraryPage() {
               {isOpen && (
                 <div className="menu-items">
                   <button type="button" className={kind === '' ? 'menu-item active' : 'menu-item'} onClick={() => choose(item.skill, '')}>
-                    <span className="menu-dot" aria-hidden="true">▦</span> Tất cả đề
+                    <span className="menu-dot" aria-hidden="true" /> Tất cả đề
                   </button>
                   <button type="button" className={kind === 'single' ? 'menu-item active' : 'menu-item'} onClick={() => choose(item.skill, 'single')}>
-                    <span className="menu-dot" aria-hidden="true">▤</span> Bài lẻ ({item.partWord})
+                    <span className="menu-dot" aria-hidden="true" /> Bài lẻ ({item.partWord})
                   </button>
                   <label className="menu-select">
                     Loại câu hỏi:
@@ -94,7 +94,7 @@ export default function LibraryPage() {
                     </select>
                   </label>
                   <button type="button" className={kind === 'full' ? 'menu-item active' : 'menu-item'} onClick={() => choose(item.skill, 'full')}>
-                    <span className="menu-dot" aria-hidden="true">▣</span> Full đề
+                    <span className="menu-dot" aria-hidden="true" /> Full đề
                   </button>
                 </div>
               )}
