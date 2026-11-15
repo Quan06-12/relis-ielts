@@ -16,6 +16,16 @@ export function loadConfig() {
     // Checked here so the server refuses to start without them (sign-in would fail anyway)
     googleClientId: required('GOOGLE_CLIENT_ID'),
     jwtSecret: required('JWT_SECRET'),
-    clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
+    clientUrl: parseClientUrls(process.env.CLIENT_URL),
   }
+}
+
+// CLIENT_URL may list several sites separated by commas (e.g. the own domain and the vercel.app address).
+// One site stays a plain string, which is what the cors package expects in that case.
+export function parseClientUrls(value) {
+  const urls = String(value || 'http://localhost:5173')
+    .split(',')
+    .map((url) => url.trim().replace(/\/+$/, ''))
+    .filter(Boolean)
+  return urls.length === 1 ? urls[0] : urls
 }
