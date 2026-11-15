@@ -37,6 +37,19 @@ test('US24: starting an attempt returns the attempt and the test without answers
   assert.equal(JSON.stringify(response.body.test).includes('answers'), false)
 })
 
+test('a test without any question cannot be started', async () => {
+  const { authHeader } = await createSignedInUser()
+  const created = await request(app).post('/api/tests').set('Authorization', authHeader).send({ title: 'Empty', skill: 'reading', kind: 'full' })
+
+  const response = await request(app)
+    .post('/api/attempts')
+    .set('Authorization', authHeader)
+    .send({ testId: created.body.test.id, mode: { type: 'full', sectionIndexes: [0, 1, 2], timeLimitMin: 60 } })
+
+  assert.equal(response.status, 422)
+  assert.equal(response.body.error.code, 'NO_QUESTIONS')
+})
+
 test('US33: starting the same test again while unfinished returns 409 with the attempt id', async () => {
   const { authHeader, test: savedTest } = await setUp()
   const first = await request(app).post('/api/attempts').set('Authorization', authHeader).send({ testId: savedTest.id, mode: fullMode })

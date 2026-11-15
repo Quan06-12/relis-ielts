@@ -395,7 +395,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
         '422':
-          description: Assignment deadline passed and late work not allowed (`DEADLINE_PASSED`)
+          description: Assignment deadline passed and late work not allowed (`DEADLINE_PASSED`), or the chosen parts have no questions (`NO_QUESTIONS`)
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }

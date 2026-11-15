@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext.jsx'
 import { initialsOf } from './initials.js'
 import './AccountMenu.css'
@@ -9,6 +9,24 @@ export default function AccountMenu() {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
   const [isOpen, setIsOpen] = useState(false)
+  const box = useRef(null)
+  const { pathname } = useLocation()
+
+  // Close after moving to another page
+  useEffect(() => setIsOpen(false), [pathname])
+
+  // Close when clicking anywhere else or pressing Esc
+  useEffect(() => {
+    if (!isOpen) return undefined
+    const closeOnOutsideClick = (event) => !box.current?.contains(event.target) && setIsOpen(false)
+    const closeOnEscape = (event) => event.key === 'Escape' && setIsOpen(false)
+    document.addEventListener('mousedown', closeOnOutsideClick)
+    document.addEventListener('keydown', closeOnEscape)
+    return () => {
+      document.removeEventListener('mousedown', closeOnOutsideClick)
+      document.removeEventListener('keydown', closeOnEscape)
+    }
+  }, [isOpen])
 
   function handleSignOut() {
     signOut()
@@ -16,7 +34,7 @@ export default function AccountMenu() {
   }
 
   return (
-    <div className="account-menu">
+    <div className="account-menu" ref={box}>
       <button
         type="button"
         className="account-avatar"

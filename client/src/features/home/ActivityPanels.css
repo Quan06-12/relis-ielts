@@ -213,8 +213,11 @@
     font-size: 13px;
   }
 
+  /* "Tuần 1" stays on one line */
   .activity-grid tbody th {
     width: 44px;
+    font-size: 11px;
+    white-space: nowrap;
   }
 
   .week-table th,
