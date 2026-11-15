@@ -21,7 +21,7 @@
   flex-direction: column;
   justify-content: center;
   width: 100%;
-  max-width: 528px; /* card content = 400px, the widest Google button, so it lines up with the text */
+  max-width: 546px; /* 40 + 32 + 400 + 32 + 40 (+ borders): card content = 400px, the widest Google button */
   margin: 0 auto;
   padding: 48px 40px;
 }
@@ -61,7 +61,7 @@
 }
 
 .login-card {
-  padding: 24px 24px 18px;
+  padding: 32px;
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 16px;
   /* See-through like the wireframe: frosted glass over the dark page */
