@@ -30,7 +30,7 @@
   margin-left: 12px;
   padding: 2px 10px;
   border-radius: 999px;
-  background: var(--purple);
+  background: var(--primary);
   color: var(--white);
   font-weight: 700;
 }
@@ -73,7 +73,7 @@
 }
 
 .review-question.selected {
-  background: #f3f0ff;
+  background: #eef1ff;
 }
 
 .review-line {
@@ -144,9 +144,9 @@
 .ai-feedback {
   margin: 0 24px 12px;
   padding: 12px 16px;
-  border: 1px solid #d9d0ff;
+  border: 1px solid #d3dafa;
   border-radius: var(--radius);
-  background: #f7f4ff;
+  background: #f5f7ff;
   font-size: 14px;
 }
 

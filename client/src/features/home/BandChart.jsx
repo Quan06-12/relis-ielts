@@ -3,7 +3,7 @@ import { BAND_MIN, BAND_MAX, bandSeries, toPoints, bandToY } from './bandChart.j
 const WIDTH = 520
 const HEIGHT = 180
 const PAD = { left: 36, right: 16, top: 12, bottom: 12 }
-const COLORS = { reading: '#5b3fd6', listening: '#c2410c' }
+const COLORS = { reading: '#283593', listening: '#c2410c' }
 const LABELS = { reading: 'Reading', listening: 'Listening' }
 
 // US42: band of each full test over time, one line per skill, with the goal as a dashed line.

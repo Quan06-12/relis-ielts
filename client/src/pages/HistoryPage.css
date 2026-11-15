@@ -17,7 +17,7 @@
 }
 
 .history-stat.reading {
-  background: #ece8fd;
+  background: #e6e9f8;
 }
 
 .history-stat.listening {
@@ -35,7 +35,7 @@
 }
 
 .history-stat.reading strong {
-  color: var(--purple);
+  color: var(--primary);
 }
 
 .history-stat.listening strong {
@@ -124,8 +124,8 @@
 }
 
 .history-card {
-  --tone: var(--purple);
-  --tint: #e9e4fb;
+  --tone: var(--primary);
+  --tint: #e3e7f8;
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 12px;

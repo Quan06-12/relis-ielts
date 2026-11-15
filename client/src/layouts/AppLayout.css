@@ -11,7 +11,7 @@
   gap: 4px;
   height: 56px;
   padding: 0 28px;
-  background: var(--purple);
+  background: var(--nav);
   color: var(--white);
 }
 
@@ -60,7 +60,7 @@
 /* NavLink adds the "active" class to the tab of the current page */
 .app-tab.active {
   background: var(--white);
-  color: var(--purple);
+  color: var(--primary);
   font-weight: 700;
 }
 
@@ -139,7 +139,7 @@
 }
 
 .create-dropdown a:hover {
-  background: var(--purple-soft);
+  background: var(--primary-soft);
 }
 
 /* ☰ button, only on narrow screens */
@@ -180,7 +180,7 @@
     flex-direction: column;
     gap: 0;
     padding: 8px;
-    background: var(--purple);
+    background: var(--nav);
     box-shadow: 0 8px 20px rgba(30, 22, 64, 0.25);
   }
 

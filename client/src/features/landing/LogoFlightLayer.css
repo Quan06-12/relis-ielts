@@ -1,0 +1,46 @@
+/* The sign-in logo flight (LogoFlightLayer.jsx) */
+.logo-flight {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.logo-flight-backdrop {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(circle at center, #1d2766 0%, #0b1028 70%);
+}
+
+.logo-flight-cube {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: center;
+}
+
+/* White lines on the dark layer; faces in the same dark colour hide the back edges */
+.logo-flight .rl-light {
+  --rl-bg: #111836;
+}
+
+/* A calm, steady tumble for the whole flight (two turns in total) */
+.logo-flight .rl-cube {
+  animation: rl-spin-steady var(--spin-ms) linear infinite;
+}
+
+@keyframes rl-spin-steady {
+  from {
+    transform: rotate3d(1, 1, 0, 0deg) rotateX(-35.26deg) rotateY(-45deg);
+  }
+  to {
+    transform: rotate3d(1, 1, 0, 360deg) rotateX(-35.26deg) rotateY(-45deg);
+  }
+}
+
+/* The small cubes on the pages stay hidden until the big one has landed */
+.logo-flying .login-brand .rl-scene,
+.logo-flying .app-logo .rl-scene {
+  visibility: hidden;
+}
