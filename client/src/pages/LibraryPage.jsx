@@ -6,26 +6,24 @@ import { getErrorMessage } from '../api/errorMessages.js'
 import TestCard from '../features/library/TestCard.jsx'
 import ModeDialog from '../features/attempt/ModeDialog.jsx'
 import ShareToClassesDialog from '../features/classes/ShareToClassesDialog.jsx'
+import { MENU, QUESTION_TYPE_LABELS, filterByQuestionType, questionTypesIn } from '../features/library/libraryFilters.js'
+import { SkeletonCards } from '../components/Skeleton.jsx'
 import './LibraryPage.css'
 
-const SKILL_TABS = [
-  { label: 'Tất cả', value: '' },
-  { label: 'Reading', value: 'reading' },
-  { label: 'Listening', value: 'listening' },
-]
+const ICONS = {
+  reading: 'M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2zM4 21V5M8 7h6M8 11h6',
+  listening: 'M3 18v-6a9 9 0 0 1 18 0v6M3 18a2 2 0 0 0 2 2h1v-6H5a2 2 0 0 0-2 2zm18 0a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2z',
+}
 
-const DONE_TABS = [
-  { label: 'Tất cả', value: '' },
-  { label: 'Chưa làm', value: 'false' },
-  { label: 'Đã làm', value: 'true' },
-]
-
-// My test library: filter, start, edit, delete or share a test with my classes (US20–US23).
+// My test library (US20–US23): a menu on the left (Reading / Listening, single sections or full tests,
+// question type), "not done / done" tabs and a search box on top, and the tests as cards.
 export default function LibraryPage() {
-  const [skill, setSkill] = useState('')
-  const [kind, setKind] = useState('') // '' | 'full' | 'single'
-  const [done, setDone] = useState('') // '' | 'true' (Đã làm) | 'false' (Chưa làm)
-  const [search, setSearch] = useState('')
+  const [skill, setSkill] = useState('reading') // 'reading' | 'listening'
+  const [kind, setKind] = useState('') // '' (all) | 'single' | 'full'
+  const [questionType, setQuestionType] = useState('')
+  const [done, setDone] = useState('false') // 'false' = Bài chưa làm, 'true' = Bài đã làm
+  const [searchText, setSearchText] = useState('')
+  const [search, setSearch] = useState('') // applied when "Tìm kiếm" is pressed
   const [tests, setTests] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
@@ -37,11 +35,17 @@ export default function LibraryPage() {
     setIsLoading(true)
     setError('')
     // US23: every filter is sent together, so they combine
-    listMyTests({ skill: skill || undefined, kind: kind || undefined, done: done || undefined, q: search || undefined, limit: 50 })
+    listMyTests({ skill, kind: kind || undefined, done, q: search || undefined, limit: 50 })
       .then((page) => setTests(page.items))
       .catch((loadError) => setError(getErrorMessage(loadError)))
       .finally(() => setIsLoading(false))
   }, [skill, kind, done, search])
+
+  function choose(nextSkill, nextKind) {
+    setSkill(nextSkill)
+    setKind(nextKind)
+    setQuestionType('')
+  }
 
   // US20: delete after confirming. A test someone already took is hidden by the server instead.
   async function handleConfirmDelete() {
@@ -55,69 +59,110 @@ export default function LibraryPage() {
     }
   }
 
+  const shown = filterByQuestionType(tests, questionType)
+
   return (
-    <main className="page">
-      <div className="library-header">
-        <h1>Kho đề</h1>
-        <input
-          type="search"
-          className="library-search"
-          placeholder="Tìm theo tên đề"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-        />
-      </div>
+    <main className="page library-page">
+      <aside className="library-menu" aria-label="Lọc đề">
+        {MENU.map((item) => {
+          const isOpen = skill === item.skill
+          return (
+            <section key={item.skill} className={isOpen ? `menu-group open ${item.skill}` : `menu-group ${item.skill}`}>
+              <button type="button" className="menu-group-head" aria-expanded={isOpen} onClick={() => choose(item.skill, '')}>
+                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d={ICONS[item.skill]} />
+                </svg>
+                {item.label}
+                <span className="menu-caret" aria-hidden="true">{isOpen ? '▴' : '▾'}</span>
+              </button>
 
-      <div className="library-tabs" role="tablist">
-        {SKILL_TABS.map((tab) => (
-          <button
-            key={tab.value}
-            type="button"
-            role="tab"
-            aria-selected={skill === tab.value}
-            className={skill === tab.value ? 'library-tab active' : 'library-tab'}
-            onClick={() => setSkill(tab.value)}
+              {isOpen && (
+                <div className="menu-items">
+                  <button type="button" className={kind === '' ? 'menu-item active' : 'menu-item'} onClick={() => choose(item.skill, '')}>
+                    <span className="menu-dot" aria-hidden="true">▦</span> Tất cả đề
+                  </button>
+                  <button type="button" className={kind === 'single' ? 'menu-item active' : 'menu-item'} onClick={() => choose(item.skill, 'single')}>
+                    <span className="menu-dot" aria-hidden="true">▤</span> Bài lẻ ({item.partWord})
+                  </button>
+                  <label className="menu-select">
+                    Loại câu hỏi:
+                    <select value={questionType} onChange={(event) => setQuestionType(event.target.value)}>
+                      <option value="">Tất cả</option>
+                      {questionTypesIn(tests).map((type) => (
+                        <option key={type} value={type}>{QUESTION_TYPE_LABELS[type] ?? type}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <button type="button" className={kind === 'full' ? 'menu-item active' : 'menu-item'} onClick={() => choose(item.skill, 'full')}>
+                    <span className="menu-dot" aria-hidden="true">▣</span> Full đề
+                  </button>
+                </div>
+              )}
+            </section>
+          )
+        })}
+        <Link to="/tests/new" className="menu-create">+ Tạo đề mới</Link>
+      </aside>
+
+      <div className="library-main">
+        <div className="library-topbar">
+          <div className="library-done-tabs" role="tablist" aria-label="Đã làm hay chưa">
+            {[
+              { value: 'false', label: 'Bài chưa làm' },
+              { value: 'true', label: 'Bài đã làm' },
+            ].map((tab) => (
+              <button
+                key={tab.value}
+                type="button"
+                role="tab"
+                aria-selected={done === tab.value}
+                className={done === tab.value ? 'done-tab active' : 'done-tab'}
+                onClick={() => setDone(tab.value)}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+          <form
+            className="library-search"
+            role="search"
+            onSubmit={(event) => {
+              event.preventDefault()
+              setSearch(searchText.trim())
+            }}
           >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="library-filters">
-        <div className="library-tabs" role="tablist" aria-label="Đã làm hay chưa">
-          {DONE_TABS.map((tab) => (
-            <button
-              key={tab.value}
-              type="button"
-              role="tab"
-              aria-selected={done === tab.value}
-              className={done === tab.value ? 'library-tab active' : 'library-tab'}
-              onClick={() => setDone(tab.value)}
-            >
-              {tab.label}
-            </button>
-          ))}
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <circle cx="11" cy="11" r="7" />
+              <path d="M20 20l-3.5-3.5" />
+            </svg>
+            <input type="search" placeholder="Tìm theo tên đề" value={searchText} onChange={(event) => setSearchText(event.target.value)} aria-label="Tìm theo tên đề" />
+            <button type="submit">Tìm kiếm</button>
+          </form>
         </div>
-        <select value={kind} onChange={(event) => setKind(event.target.value)} aria-label="Loại đề">
-          <option value="">Mọi loại đề</option>
-          <option value="full">Full đề</option>
-          <option value="single">Đề lẻ</option>
-        </select>
-      </div>
 
-      {error && <p className="library-message error">{error}</p>}
-      {isLoading && <p className="library-message">Đang tải…</p>}
+        <Link to="/history" className="library-history-link">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2" />
+          </svg>
+          Xem lịch sử làm bài
+        </Link>
 
-      {!isLoading && !error && tests.length === 0 && (
-        <p className="library-message">
-          {skill || kind || done || search ? 'Không có đề nào khớp bộ lọc.' : <>Chưa có đề nào. <Link to="/tests/new">Tạo đề đầu tiên</Link></>}
-        </p>
-      )}
+        {error && <p className="library-message error">{error}</p>}
+        {isLoading && <SkeletonCards />}
 
-      <div className="library-grid">
-        {tests.map((test) => (
-          <TestCard key={test.id} test={test} onStart={setTestToStart} onDelete={setTestToDelete} onShare={setTestToShare} />
-        ))}
+        {!isLoading && !error && shown.length === 0 && (
+          <p className="library-message">
+            {done === 'true' ? 'Chưa có đề nào bạn đã làm trong mục này.' : <>Không có đề nào ở đây. <Link to="/tests/new">Tạo đề mới</Link></>}
+          </p>
+        )}
+
+        {!isLoading && (
+          <div className="library-grid">
+            {shown.map((test) => (
+              <TestCard key={test.id} test={test} onStart={setTestToStart} onDelete={setTestToDelete} onShare={setTestToShare} />
+            ))}
+          </div>
+        )}
       </div>
 
       {testToStart && <ModeDialog testId={testToStart.id} onClose={() => setTestToStart(null)} />}
