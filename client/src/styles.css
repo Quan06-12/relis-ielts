@@ -1,16 +1,18 @@
 /* Design tokens taken from the wireframe */
 :root {
-  --purple: #5b3fd6;
-  --purple-dark: #3f28a8;
-  --purple-soft: #f0ecfd;
+  /* Navy blue, the same family as the landing page (was purple before the redesign) */
+  --primary: #283593;
+  --primary-dark: #1a237e;
+  --primary-soft: #e8eaf6;
+  --nav: #111836; /* the top bar, close to the landing page background */
   --yellow: #ffc531;
-  --reading: #5b3fd6;
+  --reading: #283593;
   --listening: #c2410c;
   --overall: #2f7a3b;
-  --text: #1a1530;
-  --text-muted: #514a66;
-  --border: #ddd6ee;
-  --background: #f7f5fc;
+  --text: #141a33;
+  --text-muted: #4d5470;
+  --border: #d9dcec;
+  --background: #f5f6fb;
   --white: #ffffff;
   --radius: 12px;
   font-family: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -36,7 +38,7 @@ button {
 }
 
 :focus-visible {
-  outline: 2px solid var(--purple);
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 
@@ -58,7 +60,7 @@ button {
 
 .primary-button {
   border: none;
-  background: var(--purple);
+  background: var(--primary);
   color: var(--white);
 }
 
@@ -124,7 +126,7 @@ button {
   gap: 4px;
   padding: 4px;
   border-radius: 10px;
-  background: #ece8f7;
+  background: #e8eaf4;
 }
 
 .segmented-tab {
@@ -140,7 +142,7 @@ button {
 
 .segmented-tab.active {
   background: var(--white);
-  color: var(--purple);
+  color: var(--primary);
   box-shadow: 0 1px 3px rgba(26, 21, 48, 0.1);
 }
 
@@ -155,15 +157,15 @@ button {
 .chip {
   padding: 2px 8px;
   border-radius: 6px;
-  background: #f0eef6;
+  background: #eef0f6;
   color: var(--text-muted);
   font-size: 12px;
   font-weight: 600;
 }
 
 .chip.reading {
-  background: var(--purple-soft);
-  color: var(--purple);
+  background: var(--primary-soft);
+  color: var(--primary);
 }
 
 .chip.listening {

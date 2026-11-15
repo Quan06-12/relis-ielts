@@ -67,7 +67,7 @@
   --tone: var(--reading);
   padding: 14px 16px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #e9e4fb, #f7f5fe);
+  background: linear-gradient(135deg, #e3e7f8, #f6f7fd);
 }
 
 .home-card.listening {
@@ -175,12 +175,12 @@ button.home-exam-box {
 }
 
 button.home-exam-box:hover {
-  border-color: var(--purple);
+  border-color: var(--primary);
 }
 
 .home-exam-box.soft {
   border-color: transparent;
-  background: var(--purple-soft);
+  background: var(--primary-soft);
 }
 
 .home-exam-box small {
@@ -239,7 +239,7 @@ button.home-exam-box:hover {
 }
 
 .home-list a:not(.primary-button) {
-  color: var(--purple);
+  color: var(--primary);
   font-weight: 600;
 }
 

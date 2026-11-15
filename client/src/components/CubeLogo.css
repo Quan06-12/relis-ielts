@@ -18,7 +18,7 @@
   height: var(--s);
   transform-style: preserve-3d;
   transform: rotate3d(1, 1, 0, 0deg) rotateX(-35.26deg) rotateY(-45deg);
-  transition: transform 1.1s cubic-bezier(0.45, 0, 0.2, 1);
+  transition: transform 1.4s cubic-bezier(0.45, 0, 0.35, 1);
 }
 
 .rl-spin:hover .rl-cube,
@@ -54,20 +54,21 @@
 .rl-top { transform: rotateX(90deg) translateZ(calc(var(--s) / 2)); }
 .rl-bottom { transform: rotateX(-90deg) translateZ(calc(var(--s) / 2)); }
 
-/* White lines on the purple bar and login page */
+/* White lines on the navy bar and landing page */
 .rl-light {
-  --rl-bg: var(--purple);
+  --rl-bg: var(--nav);
   color: var(--white);
 }
 
-/* Purple lines on white */
+/* Navy lines on white */
 .rl-violet {
   --rl-bg: var(--white);
-  color: var(--purple);
+  color: var(--primary);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .rl-cube {
     transition: none;
   }
+
 }

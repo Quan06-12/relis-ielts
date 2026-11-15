@@ -14,8 +14,8 @@
   padding: 4px 10px;
   border: 0;
   border-radius: 999px;
-  background: var(--purple-soft);
-  color: var(--purple);
+  background: var(--primary-soft);
+  color: var(--primary);
   font: inherit;
   font-size: 13px;
   font-weight: 600;
@@ -39,7 +39,7 @@
 
 .leaderboard-table th {
   padding: 12px 20px;
-  background: #f7f5fc;
+  background: #f5f6fb;
   color: var(--text-muted);
   font-size: 12px;
   font-weight: 600;
@@ -65,7 +65,7 @@
 }
 
 .leaderboard-table tr.me td {
-  background: #f7f5fc;
+  background: #f5f6fb;
   font-weight: 600;
 }
 
@@ -95,7 +95,7 @@
 }
 
 .rank-change.same {
-  color: #b9b3c9;
+  color: #b3b7c8;
 }
 
 .leaderboard-student {
@@ -115,14 +115,14 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #e9e4f5;
-  color: var(--purple);
+  background: #e3e6f3;
+  color: var(--primary);
   font-size: 10px;
   font-weight: 700;
 }
 
 .leaderboard-band {
-  color: var(--purple);
+  color: var(--primary);
   font-weight: 700;
 }
 

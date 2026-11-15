@@ -11,8 +11,8 @@
   overflow: hidden;
   border: 0;
   border-radius: 50%;
-  background: #e9e4f5;
-  color: var(--purple);
+  background: #e3e6f3;
+  color: var(--primary);
   font-size: 12px;
   font-weight: 700;
 }

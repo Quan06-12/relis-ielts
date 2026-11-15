@@ -18,8 +18,8 @@
 }
 
 .editor-button.primary {
-  border-color: var(--purple);
-  background: var(--purple);
+  border-color: var(--primary);
+  background: var(--primary);
   color: var(--white);
 }
 
@@ -38,7 +38,7 @@
   padding: 0;
   border: none;
   background: none;
-  color: var(--purple);
+  color: var(--primary);
   font-size: 13px;
   font-weight: 600;
 }
@@ -74,8 +74,8 @@
 
 .editor-field textarea:focus,
 .editor-field input[type='text']:focus {
-  outline: 2px solid var(--purple-soft);
-  border-color: var(--purple);
+  outline: 2px solid var(--primary-soft);
+  border-color: var(--primary);
 }
 
 fieldset.editor-field {
@@ -125,8 +125,8 @@ fieldset.editor-field {
 }
 
 .editor-close:hover {
-  border-color: var(--purple);
-  color: var(--purple);
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 .editor-thumb {
@@ -135,9 +135,9 @@ fieldset.editor-field {
   flex: none;
   width: 72px;
   height: 48px;
-  border: 1px dashed #c9c0e4;
+  border: 1px dashed #c3c8e2;
   border-radius: 8px;
-  background: #f4f2fa center / cover no-repeat;
+  background: #f1f3f9 center / cover no-repeat;
   color: var(--text-muted);
   font-size: 11px;
 }
@@ -160,7 +160,7 @@ fieldset.editor-field {
 
 .editor-title:focus {
   outline: none;
-  border-bottom-color: var(--purple);
+  border-bottom-color: var(--primary);
 }
 
 .editor-meta {
@@ -175,8 +175,8 @@ fieldset.editor-field {
 .status-chip {
   padding: 1px 8px;
   border-radius: 999px;
-  background: var(--purple-soft);
-  color: var(--purple);
+  background: var(--primary-soft);
+  color: var(--primary);
   font-size: 12px;
   font-weight: 600;
 }
@@ -225,8 +225,8 @@ fieldset.editor-field {
 .setting-chip {
   padding: 5px 12px;
   border-radius: 8px;
-  background: var(--purple-soft);
-  color: var(--purple);
+  background: var(--primary-soft);
+  color: var(--primary);
   font-weight: 600;
 }
 
@@ -242,7 +242,7 @@ fieldset.editor-field {
   margin: 0 0 0 auto;
   padding: 6px 12px;
   border-radius: 8px;
-  background: #ece8fc;
+  background: #e6e9f8;
   color: var(--text);
 }
 
@@ -295,9 +295,9 @@ fieldset.editor-field {
 }
 
 .passage-tab.active {
-  border-color: var(--purple);
-  background: var(--purple-soft);
-  color: var(--purple);
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--primary);
 }
 
 .passage-scroll {
@@ -386,7 +386,7 @@ fieldset.editor-field {
 
 /* Evidence already attached: dotted underline; the open question's evidence is highlighted */
 .evidence-mark {
-  border-bottom: 2px dotted #8f7fd0;
+  border-bottom: 2px dotted #7d89c9;
 }
 
 .evidence-mark.active {
@@ -451,7 +451,7 @@ fieldset.editor-field {
 }
 
 .question-editor.open {
-  border: 2px solid var(--purple);
+  border: 2px solid var(--primary);
 }
 
 /* Closed question: one clickable line */
@@ -477,7 +477,7 @@ fieldset.editor-field {
   height: 28px;
   border: 1px solid var(--border);
   border-radius: 50%;
-  color: var(--purple);
+  color: var(--primary);
   font-size: 13px;
   font-weight: 700;
 }
