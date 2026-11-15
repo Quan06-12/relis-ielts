@@ -1,41 +1,65 @@
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { QUESTION_TYPE_LABELS } from './libraryFilters.js'
 import './TestCard.css'
 
 const SKILL_LABEL = { reading: 'Reading', listening: 'Listening' }
-const KIND_LABEL = { full: 'Full test', single: 'Đề lẻ' }
 
-// One test in the library grid: cover, band stamp, title and actions (US20, US22).
-// onShare puts a published test in one or more class libraries (US21).
+// One test in the library (US20–US22): cover with time and question count, a coloured tag
+// (Full test / Bài lẻ), the title, the question types, "Làm bài" and a ⋯ menu (edit, share, delete).
 export default function TestCard({ test, onStart, onDelete, onShare }) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const menu = useRef(null)
   const canStart = test.questionCount > 0
 
+  // Close the ⋯ menu when clicking elsewhere
+  useEffect(() => {
+    if (!isMenuOpen) return undefined
+    const close = (event) => !menu.current?.contains(event.target) && setIsMenuOpen(false)
+    document.addEventListener('mousedown', close)
+    return () => document.removeEventListener('mousedown', close)
+  }, [isMenuOpen])
+
   return (
-    <article className="test-card">
-      <div className={`test-card-cover ${test.skill}`} style={test.coverUrl ? { backgroundImage: `url('${test.coverUrl}')` } : undefined}>
+    <article className={`test-card ${test.skill}`}>
+      <div className="test-card-cover" style={test.coverUrl ? { backgroundImage: `url('${test.coverUrl}')` } : undefined}>
         {!test.coverUrl && <span className="test-card-skill-mark">{SKILL_LABEL[test.skill]}</span>}
+        <span className="cover-chip">⏱ {test.durationMin} phút · {test.questionCount} câu</span>
+        {test.status === 'draft' && <span className="draft-chip">Nháp</span>}
+        {/* Band stamp: only for tests the user finished as a full test */}
+        {test.lastBand !== null && (
+          <span className="band-stamp" title="Band lần làm full gần nhất">{test.lastBand.toFixed(1)}</span>
+        )}
+        <span className="kind-tag">{test.kind === 'full' ? 'Full test' : 'Bài lẻ'}</span>
       </div>
 
-      {/* Band stamp: only for tests the user finished as a full test */}
-      {test.lastBand !== null && (
-        <span className="band-stamp" title="Band lần làm full gần nhất">{test.lastBand.toFixed(1)}</span>
-      )}
-
       <div className="test-card-body">
-        <h3>{test.title}</h3>
-        <p className="test-card-meta">
-          {SKILL_LABEL[test.skill]} · {KIND_LABEL[test.kind]} · {test.questionCount} câu
-          {test.status === 'draft' && <span className="draft-chip">Nháp</span>}
-        </p>
+        <h3 title={test.title}>{test.title}</h3>
+        <ul className="test-card-types">
+          {(test.questionTypes ?? []).slice(0, 3).map((type) => (
+            <li key={type}>{QUESTION_TYPE_LABELS[type] ?? type}</li>
+          ))}
+          {(test.questionTypes ?? []).length === 0 && <li className="muted">Chưa có câu hỏi</li>}
+        </ul>
 
         <div className="test-card-actions">
           <button type="button" className="primary-button" onClick={() => onStart(test)} disabled={!canStart}>
             Làm bài
           </button>
-          <Link to={`/tests/${test.id}/edit`} className="secondary-button">Sửa</Link>
-          {test.status === 'published' && (
-            <button type="button" className="secondary-button" onClick={() => onShare(test)}>Đưa lên lớp</button>
-          )}
-          <button type="button" className="secondary-button danger" onClick={() => onDelete(test)}>Xoá</button>
+          <div className="card-menu" ref={menu}>
+            <button type="button" className="card-menu-button" aria-label="Thêm thao tác" aria-expanded={isMenuOpen} onClick={() => setIsMenuOpen((open) => !open)}>
+              ⋯
+            </button>
+            {isMenuOpen && (
+              <div className="card-menu-list" role="menu">
+                <Link role="menuitem" to={`/tests/${test.id}/edit`}>Sửa đề</Link>
+                {test.status === 'published' && (
+                  <button type="button" role="menuitem" onClick={() => { setIsMenuOpen(false); onShare(test) }}>Đưa lên lớp</button>
+                )}
+                <button type="button" role="menuitem" className="danger" onClick={() => { setIsMenuOpen(false); onDelete(test) }}>Xoá đề</button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </article>

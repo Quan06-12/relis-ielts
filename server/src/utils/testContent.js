@@ -113,6 +113,8 @@ export function toSummary(test, lastBand = null) {
     coverUrl: test.coverUrl,
     durationMin: test.durationMin,
     questionCount: test.questionCount,
+    // Question types used in the test, in order, each once (shown as bullets on the card)
+    questionTypes: [...new Set((test.sections ?? []).flatMap((section) => section.groups.map((group) => group.type)))],
     updatedAt: test.updatedAt,
     lastBand,
   }
