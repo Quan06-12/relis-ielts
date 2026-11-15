@@ -102,7 +102,7 @@
   align-items: center;
   padding: 10px 6px;
   border-radius: 10px;
-  background: #f4f2fa;
+  background: #f1f3f9;
 }
 
 .class-stats div.highlight {
@@ -130,8 +130,8 @@
 .class-code-row code {
   padding: 3px 8px;
   border-radius: 6px;
-  background: var(--purple-soft);
-  color: var(--purple);
+  background: var(--primary-soft);
+  color: var(--primary);
   font-weight: 700;
   letter-spacing: 0.12em;
 }
@@ -141,7 +141,7 @@
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--white);
-  color: var(--purple);
+  color: var(--primary);
   font: inherit;
   font-size: 12px;
   font-weight: 600;
@@ -149,7 +149,7 @@
 
 .class-enter {
   margin-top: auto;
-  color: var(--purple);
+  color: var(--primary);
   font-size: 14px;
   font-weight: 700;
   text-decoration: none;
@@ -178,8 +178,8 @@
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: #e9e4f5;
-  color: var(--purple);
+  background: #e3e6f3;
+  color: var(--primary);
   font-size: 10px;
   font-weight: 700;
 }
@@ -232,7 +232,7 @@
 .class-progress {
   height: 6px;
   border-radius: 999px;
-  background: #ece8f7;
+  background: #e8eaf4;
   overflow: hidden;
 }
 
@@ -240,7 +240,7 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--purple);
+  background: var(--primary);
 }
 
 /* Create / join dialogs */

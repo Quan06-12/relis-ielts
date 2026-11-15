@@ -1,7 +1,7 @@
 .class-back {
   display: inline-block;
   margin-bottom: 14px;
-  color: var(--purple);
+  color: var(--primary);
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
@@ -74,7 +74,7 @@
   border: 0;
   border-radius: 10px;
   background: var(--white);
-  color: var(--purple);
+  color: var(--primary);
   font: inherit;
   font-weight: 700;
 }
@@ -116,8 +116,8 @@
 }
 
 .underline-tab.active {
-  border-bottom-color: var(--purple);
-  color: var(--purple);
+  border-bottom-color: var(--primary);
+  color: var(--primary);
 }
 
 /* Assignment cards */
@@ -181,7 +181,7 @@
 .assignment-bar {
   height: 6px;
   border-radius: 999px;
-  background: #ece8f7;
+  background: #e8eaf4;
   overflow: hidden;
 }
 
@@ -189,7 +189,7 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--purple);
+  background: var(--primary);
 }
 
 .assignment-average {
@@ -219,7 +219,7 @@
   padding: 0;
   border: 0;
   background: none;
-  color: var(--purple);
+  color: var(--primary);
   font: inherit;
   font-size: 14px;
   font-weight: 700;
@@ -301,7 +301,7 @@
 
 .class-test-band {
   font-weight: 700;
-  color: var(--purple);
+  color: var(--primary);
 }
 
 .pick-list {
@@ -350,7 +350,7 @@
 }
 
 .gradebook a {
-  color: var(--purple);
+  color: var(--primary);
   font-weight: 600;
 }
 
@@ -384,7 +384,7 @@
 .member-avatar {
   display: grid;
   place-items: center;
-  background: var(--purple);
+  background: var(--primary);
   color: var(--white);
   font-weight: 700;
 }
@@ -415,7 +415,7 @@
 
 .assignment-count {
   font-weight: 600;
-  color: var(--purple);
+  color: var(--primary);
 }
 
 .assignment-status {

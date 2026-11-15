@@ -15,7 +15,7 @@
 }
 
 .vocab-card {
-  --set-color: var(--purple);
+  --set-color: var(--primary);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -65,16 +65,16 @@
 
 .vocab-add-card {
   min-height: 200px;
-  border: 1px dashed #c9c0e4;
+  border: 1px dashed #c3c8e2;
   border-radius: 14px;
   background: transparent;
-  color: var(--purple);
+  color: var(--primary);
   font: inherit;
   font-weight: 700;
 }
 
 .vocab-add-card:hover {
-  background: var(--purple-soft);
+  background: var(--primary-soft);
 }
 
 .vocab-cover-field {
@@ -129,7 +129,7 @@
 
 .vocab-table th {
   padding: 12px 18px;
-  background: #f7f5fc;
+  background: #f5f6fb;
   font-size: 13px;
   text-align: left;
 }
@@ -145,7 +145,7 @@
 
 .vocab-table tbody tr:hover,
 .vocab-table tbody tr.selected {
-  background: #f4f2fa;
+  background: #f1f3f9;
 }
 
 .vocab-note {
@@ -156,7 +156,7 @@
   margin-left: 6px;
   padding: 1px 6px;
   border-radius: 4px;
-  background: #ece8f7;
+  background: #e8eaf4;
   color: var(--text-muted);
   font-size: 11px;
   font-weight: 600;
@@ -243,8 +243,8 @@
 .type-chip {
   padding: 2px 8px;
   border-radius: 6px;
-  background: var(--purple-soft);
-  color: var(--purple);
+  background: var(--primary-soft);
+  color: var(--primary);
   font-size: 12px;
   font-weight: 700;
 }
@@ -259,7 +259,7 @@
   margin-bottom: 14px;
   padding: 12px 16px;
   border-radius: 10px;
-  background: #f4f2fa;
+  background: #f1f3f9;
 }
 
 .word-block small {

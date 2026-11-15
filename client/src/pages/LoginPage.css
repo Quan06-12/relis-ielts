@@ -1,83 +1,92 @@
-/* Login page (US01), laid out like the wireframe: purple page, a framed area,
-   drawing and pitch on the left, logo and a white card on the right */
-.login-page {
+/* Landing + sign-in page (US01): dark page, the 3D wall of tests on the left, pitch and Google card on the right */
+.landing {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* wall and sign-in take half each */
   min-height: 100vh;
-  padding: 20px;
-  background: var(--purple);
+  overflow: hidden;
+  background: radial-gradient(circle at 20% 30%, #1d2766 0%, #0b1028 55%);
   color: var(--white);
 }
 
-.login-frame {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  gap: 48px;
-  min-height: calc(100vh - 40px);
-  padding: 32px 64px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 24px;
-  background: linear-gradient(160deg, #6a4fe6, #5b3fd6 60%);
-  box-shadow: inset 0 0 0 6px rgba(255, 255, 255, 0.04);
+.landing-wall {
+  position: relative;
+  min-height: 100vh;
 }
 
-.login-intro {
-  max-width: 520px;
-}
-
-.exam-illustration {
-  display: block;
-  width: 100%;
-  max-width: 420px;
-  margin-bottom: 24px;
-  filter: drop-shadow(0 12px 24px rgba(20, 8, 70, 0.35));
-}
-
-.login-intro h1 {
-  margin: 0 0 10px;
-  font-size: 36px;
-  letter-spacing: -0.01em;
-}
-
-.login-subtitle {
-  margin: 0 0 18px;
-  color: #e4dcff;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.login-intro p:last-child {
-  max-width: 460px;
-  color: #efeaff;
-  line-height: 1.6;
-}
-
-.login-panel {
+.landing-panel {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 28px;
-  max-width: 460px;
+  justify-content: center;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 48px 40px;
 }
 
 .login-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 52px;
+  gap: 10px;
+  margin-bottom: 28px;
+  font-size: 30px;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
 
+.login-brand-cube {
+  display: inline-flex;
+}
+
+/* The cube's faces take this colour so they hide the back edges on the dark page */
+.landing .rl-light {
+  --rl-bg: #0b1028;
+}
+
+.landing-panel h1 {
+  margin: 0 0 16px;
+  font-size: 56px;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.landing-lead {
+  margin: 0 0 18px;
+  color: #d0d6f0;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.landing-features {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 28px;
+  padding: 0;
+  list-style: none;
+  color: #bcc3e4;
+  font-size: 14px;
+}
+
+.landing-features li::before {
+  content: '✓';
+  margin-right: 10px;
+  color: #ffc531;
+  font-weight: 700;
+}
+
 .login-card {
-  padding: 28px 28px 22px;
-  border-radius: 18px;
+  padding: 24px 24px 18px;
+  border-radius: 16px;
   background: var(--white);
   color: var(--text);
-  box-shadow: 0 20px 50px rgba(20, 8, 70, 0.3);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
 }
 
 .login-card h2 {
-  margin: 0 0 8px;
-  font-size: 24px;
+  margin: 0 0 6px;
+  font-size: 20px;
 }
 
 .login-card > p {
@@ -91,7 +100,7 @@
   display: flex;
   justify-content: center;
   min-height: 44px;
-  margin-top: 22px;
+  margin-top: 18px;
 }
 
 /* Shown instead of the Google button while the server checks the account */
@@ -101,10 +110,10 @@
   justify-content: center;
   gap: 10px;
   height: 44px;
-  margin-top: 22px;
+  margin-top: 18px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: #f4f2fa;
+  background: #f1f3f9;
   font-size: 14px;
   font-weight: 600;
 }
@@ -112,8 +121,8 @@
 .login-spinner {
   width: 16px;
   height: 16px;
-  border: 2px solid #d4cdea;
-  border-top-color: var(--purple);
+  border: 2px solid #cfd4ea;
+  border-top-color: var(--primary);
   border-radius: 50%;
   animation: login-spin 0.8s linear infinite;
 }
@@ -161,24 +170,28 @@
 }
 
 .login-terms {
-  margin: 16px 0 0 !important;
+  margin: 14px 0 0 !important;
   color: var(--text-muted);
   font-size: 12px !important;
 }
 
+/* Phones and small tablets: the wall becomes a short band on top, the text goes below */
 @media (max-width: 900px) {
-  .login-frame {
+  .landing {
     grid-template-columns: 1fr;
-    gap: 24px;
-    padding: 28px 20px;
   }
 
-  .login-panel {
-    order: -1;
+  .landing-wall {
+    min-height: 300px;
   }
 
-  .exam-illustration {
-    display: none;
+  .landing-panel {
+    max-width: none;
+    padding: 0 20px 40px;
+  }
+
+  .landing-panel h1 {
+    font-size: 40px;
   }
 }
 

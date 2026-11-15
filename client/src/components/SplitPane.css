@@ -51,7 +51,7 @@
 
 .split-pane-bar:hover,
 .split-pane-bar:focus-visible {
-  background: var(--purple);
+  background: var(--primary);
   outline: none;
 }
 

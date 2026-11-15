@@ -14,18 +14,21 @@ import AttemptPage from './pages/AttemptPage.jsx'
 import ReviewPage from './pages/ReviewPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 import PageTitle from './components/PageTitle.jsx'
+import LogoFlightLayer from './features/landing/LogoFlightLayer.jsx'
 
 // Route table, same structure as the "Site diagram" tab of the project docs.
 export default function App() {
   return (
     <>
       <PageTitle />
+      {/* Sign-in animation; outside the routes so it keeps going while the page changes */}
+      <LogoFlightLayer />
       <Routes>
       <Route path="/login" element={<LoginPage />} />
 
       {/* Everything below needs a signed-in user (US02) */}
       <Route element={<RequireAuth />}>
-        {/* Pages that show the purple navigation bar */}
+        {/* Pages that show the navy navigation bar */}
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/library" element={<LibraryPage />} />

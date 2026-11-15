@@ -19,6 +19,6 @@
 }
 
 .empty-state-text a {
-  color: var(--purple);
+  color: var(--primary);
   font-weight: 600;
 }
