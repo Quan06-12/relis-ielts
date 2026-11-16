@@ -2,15 +2,18 @@ import { useState } from 'react'
 import { requestFeedback } from '../../api/attempts.js'
 import { getErrorMessage } from '../../api/errorMessages.js'
 
-// AI feedback on the review page (US49). The feedback is made once on the server and stored,
+// AI feedback box on the review page (US49). The feedback is made once on the server and stored,
 // so after the first time it simply comes back with the review.
-// The button sits in the score line and the feedback inside the score box (ReviewPage).
-export function useAiFeedback(attemptId, initialFeedback) {
+// On a phone the review page has little height, so the feedback starts folded and the questions stay visible
+const startsOpen = () => typeof window === 'undefined' || window.matchMedia('(min-width: 900px)').matches
+
+export default function AiFeedback({ attemptId, initialFeedback }) {
   const [feedback, setFeedback] = useState(initialFeedback)
+  const [isOpen] = useState(startsOpen)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
-  async function request() {
+  async function handleRequest() {
     setIsLoading(true)
     setError('')
     try {
@@ -22,30 +25,23 @@ export function useAiFeedback(attemptId, initialFeedback) {
     }
   }
 
-  return { feedback, isLoading, error, request }
-}
+  if (!feedback) {
+    return (
+      <section className="ai-feedback">
+        <p>Nhận xét từ AI dựa trên số câu đúng của từng dạng câu hỏi.</p>
+        <button type="button" className="primary-button" onClick={handleRequest} disabled={isLoading}>
+          {isLoading ? 'AI đang nhận xét…' : '✨ Nhận xét bằng AI'}
+        </button>
+        {error && <p className="form-error" role="alert">{error}</p>}
+      </section>
+    )
+  }
 
-// "✨ Nhận xét bằng AI" in the score line. It sits inside <summary>, so the click must not fold the box.
-export function AiFeedbackButton({ isLoading, onRequest }) {
   return (
-    <button
-      type="button"
-      className="primary-button ai-feedback-button"
-      disabled={isLoading}
-      onClick={(event) => {
-        event.preventDefault()
-        onRequest()
-      }}
-    >
-      {isLoading ? 'AI đang nhận xét…' : '✨ Nhận xét bằng AI'}
-    </button>
-  )
-}
-
-export function AiFeedbackPanel({ feedback }) {
-  return (
-    <section className="ai-feedback">
-      <h2>✨ Nhận xét AI</h2>
+    <details className="ai-feedback" open={isOpen}>
+      <summary>
+        <h2>✨ Nhận xét AI</h2>
+      </summary>
       <p>{feedback.summary}</p>
       {feedback.weakTypes.length > 0 && (
         <p>
@@ -60,6 +56,6 @@ export function AiFeedbackPanel({ feedback }) {
         </ul>
       )}
       <p className="ai-feedback-note">Nhận xét do AI tạo, chỉ để tham khảo.</p>
-    </section>
+    </details>
   )
 }
