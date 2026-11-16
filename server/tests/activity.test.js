@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { dayKey, safeTimeZone, attemptMinutes, activityByDay, currentStreak } from '../src/utils/activity.js'
+import { dayKey, safeTimeZone, attemptMinutes, activityByDay, currentStreak, lastMonths, studyTimeByMonth } from '../src/utils/activity.js'
 
 test('dayKey uses the time zone: 20:00 UTC is already the next day in Vietnam', () => {
   const moment = new Date('2026-11-13T20:00:00Z')
@@ -39,4 +39,34 @@ test('currentStreak counts back from today, or from yesterday when today is stil
   assert.equal(currentStreak(days, '2026-11-14'), 3)
   assert.equal(currentStreak(days, '2026-11-15'), 0)
   assert.equal(currentStreak([], '2026-11-15'), 0)
+})
+
+test('lastMonths lists the months up to today, across a new year', () => {
+  assert.deepEqual(lastMonths('2026-02-10', 3), ['2025-12', '2026-01', '2026-02'])
+})
+
+test('studyTimeByMonth adds minutes per skill and keeps empty months', () => {
+  const at = (submittedAt, minutes, testId) => ({
+    testId,
+    mode: { timeLimitMin: 60 },
+    startedAt: new Date(Date.parse(submittedAt) - minutes * 60000).toISOString(),
+    submittedAt,
+  })
+  const skills = new Map([['r', 'reading'], ['l', 'listening']])
+  const attempts = [
+    at('2026-10-05T03:00:00Z', 40, 'r'),
+    at('2026-10-20T03:00:00Z', 20, 'l'),
+    // 31/10 20:00 UTC is already 1/11 in Vietnam
+    at('2026-10-31T20:00:00Z', 30, 'r'),
+    // Older than the chart: ignored
+    at('2026-06-01T03:00:00Z', 50, 'r'),
+  ]
+
+  const rows = studyTimeByMonth(attempts, skills, 'Asia/Ho_Chi_Minh', ['2026-09', '2026-10', '2026-11'])
+
+  assert.deepEqual(rows, [
+    { month: '2026-09', readingMinutes: 0, listeningMinutes: 0 },
+    { month: '2026-10', readingMinutes: 40, listeningMinutes: 20 },
+    { month: '2026-11', readingMinutes: 30, listeningMinutes: 0 },
+  ])
 })

@@ -52,3 +52,10 @@ export async function getActivity(from, to) {
   const response = await http.get('/attempts/activity', { params: { from, to, tz } })
   return response.data // { days: [{ date, reading, listening, minutes }], currentStreak }
 }
+
+// Minutes per month for the last few months, split by skill (home page "Thời gian học" chart)
+export async function getStudyTime(months) {
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const response = await http.get('/attempts/study-time', { params: { months, tz } })
+  return response.data // { months: [{ month, readingMinutes, listeningMinutes }] }
+}

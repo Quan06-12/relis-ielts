@@ -8,6 +8,7 @@ import {
   reviewAttempt,
   listMyAttempts,
   getActivity,
+  getStudyTime,
 } from '../controllers/attempts.controller.js'
 
 const router = Router()
@@ -15,8 +16,9 @@ const router = Router()
 router.use(requireAuth)
 
 router.get('/', listMyAttempts)
-// Before '/:attemptId', otherwise "activity" would be read as an attempt id
+// Before '/:attemptId', otherwise "activity" and "study-time" would be read as attempt ids
 router.get('/activity', getActivity)
+router.get('/study-time', getStudyTime)
 router.post('/', startAttempt)
 router.get('/:attemptId', getAttempt)
 router.patch('/:attemptId/answers', saveAnswers)
