@@ -15,49 +15,15 @@
 }
 
 .review-summary summary {
-  display: flex;
-  align-items: center;
-  gap: 12px;
   cursor: pointer;
   font-size: 16px;
-  list-style: none;
 }
 
-/* Our own fold arrow, since the flex summary hides the default marker */
-.review-summary summary::-webkit-details-marker {
-  display: none;
-}
-
-.review-score::before {
-  content: '▸';
-  display: inline-block;
-  margin-right: 8px;
-  transition: transform 0.15s;
-}
-
-.review-summary[open] .review-score::before {
-  transform: rotate(90deg);
-}
-
-.ai-feedback-button {
-  margin-left: auto;
-  padding: 6px 14px;
-  font-size: 14px;
-}
-
-.review-summary-body ul {
+.review-summary ul {
   margin: 8px 0 0;
   padding-left: 20px;
   color: var(--text-muted);
   font-size: 14px;
-}
-
-/* With feedback: details on the left, the AI box on the right; long feedback scrolls inside */
-.review-summary-body.with-ai {
-  display: grid;
-  grid-template-columns: minmax(200px, 0.6fr) minmax(0, 1.4fr);
-  align-items: start;
-  gap: 16px;
 }
 
 .review-band {
@@ -137,7 +103,6 @@
 /* ---- Options: right one in green, my wrong choice in red ---- */
 
 .option-rows.review .option-row {
-  position: relative; /* keeps the hidden "(bạn chọn)" text inside the row */
   cursor: default;
 }
 
@@ -231,11 +196,15 @@
   padding-left: 20px;
 }
 
-.review-muted {
+.review-muted,
+.review-hint {
   color: var(--text-muted);
   font-size: 13px;
 }
 
+.review-hint {
+  margin: 0 24px 8px;
+}
 
 /* ---- Bottom bar: one box per part, numbers in coloured circles ---- */
 
@@ -322,19 +291,27 @@
 
 /* AI feedback (US49) */
 .ai-feedback {
-  max-height: 180px;
-  margin-top: 8px;
-  overflow-y: auto;
-  padding: 10px 14px;
+  margin: 0 24px 12px;
+  padding: 12px 16px;
   border: 1px solid #d3dafa;
-  border-radius: 10px;
+  border-radius: var(--radius);
   background: #f5f7ff;
   font-size: 14px;
 }
 
+.ai-feedback summary {
+  cursor: pointer;
+}
+
+/* The heading sits inside the summary, next to the fold arrow */
 .ai-feedback h2 {
-  margin: 0 0 4px;
-  font-size: 15px;
+  display: inline;
+  margin: 0;
+  font-size: 16px;
+}
+
+.ai-feedback[open] summary {
+  margin-bottom: 6px;
 }
 
 .ai-feedback p {
@@ -351,20 +328,22 @@
   font-size: 12px;
 }
 
-/* Phones: a smaller box; the AI part goes under the details */
+/* Phones: the summary boxes take less room and long feedback scrolls inside its box,
+   so the passage and the questions keep most of the screen */
 @media (max-width: 900px) {
   .review-summary {
     margin: 8px 12px;
     padding: 10px 14px;
   }
 
-  .review-summary-body.with-ai {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0;
+  .ai-feedback {
+    margin: 0 12px 8px;
+    padding: 10px 14px;
   }
 
-  .ai-feedback {
-    max-height: 30vh;
+  .ai-feedback[open] {
+    max-height: 35vh;
+    overflow-y: auto;
   }
 }
 
