@@ -11,7 +11,7 @@ import { checkMode } from '../utils/attemptMode.js'
 import { secondsLeft, isPastDeadline } from '../utils/attemptTimer.js'
 import { listQuestions, toPlayView, toReviewView } from '../utils/testContent.js'
 import { gradeAttempt } from '../utils/grading.js'
-import { activityByDay, currentStreak, dayKey, safeTimeZone } from '../utils/activity.js'
+import { activityByDay, currentStreak, dayKey, lastMonths, safeTimeZone, studyTimeByMonth } from '../utils/activity.js'
 
 // POST /api/attempts — start taking a test (US24, US25), alone, from a class library (US22)
 // or as a class assignment (US44)
@@ -249,6 +249,25 @@ export async function getActivity(request, response) {
   const activeDates = recent.map((attempt) => dayKey(attempt.submittedAt, timeZone))
 
   response.json({ days, currentStreak: currentStreak(activeDates, dayKey(new Date(), timeZone)) })
+}
+
+// GET /api/attempts/study-time?months=5&tz=Asia/Ho_Chi_Minh
+// Minutes studied per month, split into Reading and Listening, for the last few months (US42, home page chart)
+export async function getStudyTime(request, response) {
+  const count = Math.min(Math.max(Number(request.query.months) || 5, 1), 12)
+  const timeZone = safeTimeZone(request.query.tz)
+  const months = lastMonths(dayKey(new Date(), timeZone), count)
+
+  // A day before the first month covers every time zone; attempts outside the months are skipped when grouping
+  const attempts = await Attempt.find({
+    userId: request.userId,
+    status: 'submitted',
+    submittedAt: { $gte: new Date(Date.parse(`${months[0]}-01`) - DAY_MS) },
+  }).select('testId mode startedAt submittedAt')
+  const tests = await Test.find({ _id: { $in: attempts.map((attempt) => attempt.testId) } }).select('skill')
+  const skillByTestId = new Map(tests.map((test) => [String(test._id), test.skill]))
+
+  response.json({ months: studyTimeByMonth(attempts, skillByTestId, timeZone, months) })
 }
 
 // ---- helpers ----

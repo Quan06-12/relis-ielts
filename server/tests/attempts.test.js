@@ -211,3 +211,14 @@ test('US42: activity refuses a range that is not two dates', async () => {
   assert.equal(response.status, 400)
   assert.equal(response.body.error.code, 'VALIDATION_ERROR')
 })
+
+test('US42: study time lists the last months with minutes per skill', async () => {
+  const { authHeader } = await setUp()
+
+  const response = await request(app).get('/api/attempts/study-time?months=3&tz=Asia/Ho_Chi_Minh').set('Authorization', authHeader)
+
+  assert.equal(response.status, 200)
+  assert.equal(response.body.months.length, 3)
+  assert.deepEqual(Object.keys(response.body.months[0]).sort(), ['listeningMinutes', 'month', 'readingMinutes'])
+})
+
