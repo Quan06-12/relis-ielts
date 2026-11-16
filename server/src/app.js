@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import healthRoutes from './routes/health.routes.js'
+import docsRoutes from './routes/docs.routes.js'
 import { createAuthRoutes } from './routes/auth.routes.js'
 import testsRoutes from './routes/tests.routes.js'
 import attemptsRoutes from './routes/attempts.routes.js'
@@ -30,6 +31,7 @@ export function createApp({
   app.use(express.json({ limit: '1mb' }))
 
   app.use('/api/health', healthRoutes)
+  app.use('/api/docs', docsRoutes)
   app.use('/api/auth', createAuthRoutes({ verifyGoogleCredential }))
   app.use('/api/tests', testsRoutes)
   app.use('/api/uploads', createUploadRoutes({ saveFile }))
