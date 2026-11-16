@@ -23,6 +23,7 @@ import { gradeAttempt } from '../src/utils/grading.js'
 import { generateClassCode } from '../src/utils/classCode.js'
 import { demoReadingTest, demoShortTest } from './demoData.js'
 import { practiceTests } from './practiceTests.js'
+import { listeningTests } from './listeningTests.js'
 
 const DAY = 24 * 60 * 60 * 1000
 const daysAgo = (days) => new Date(Date.now() - days * DAY)
@@ -36,7 +37,7 @@ const STUDENTS = [
 
 const CLASS_NAME = 'Lớp IELTS 6.5 · Tối 2-4-6'
 const VOCAB_SET_NAME = 'Environment & Climate'
-const DEMO_TEST_TITLES = [demoReadingTest(), demoShortTest(), ...practiceTests()].map((test) => test.title)
+const DEMO_TEST_TITLES = [demoReadingTest(), demoShortTest(), ...practiceTests(), ...listeningTests()].map((test) => test.title)
 const STUDENT_ID_PREFIX = 'seed-student-'
 const OLD_PREFIX = /^\[Demo\]/ // names used by earlier versions of this script
 
@@ -72,6 +73,12 @@ async function main() {
     topicTests.push(await createPublishedTest(teacher, content))
   }
 
+  // Listening: a full test of four parts and the same four parts as single tests, with recordings
+  const listening = []
+  for (const content of listeningTests()) {
+    listening.push(await createPublishedTest(teacher, content))
+  }
+
   // The teacher's own practice, so Home and History are not empty
   await createSubmittedAttempt({ user: teacher, test: fullTest, correctCount: 30, finishedDaysAgo: 2 })
 
@@ -83,7 +90,7 @@ async function main() {
     createdBy: teacher._id,
   })
   await ClassMember.create({ classId: demoClass._id, userId: teacher._id, role: 'teacher', joinedAt: daysAgo(6) })
-  for (const test of [fullTest, miniTest, ...topicTests.slice(0, 3)]) {
+  for (const test of [fullTest, miniTest, listening[0], ...topicTests.slice(0, 3)]) {
     await ClassLibraryItem.create({ classId: demoClass._id, testId: test._id, addedBy: teacher._id, addedAt: daysAgo(5) })
   }
   const assignment = await Assignment.create({
@@ -120,6 +127,7 @@ async function main() {
 
   console.log('Demo data ready:')
   console.log(`  Tests: "${fullTest.title}" (40 questions), "${miniTest.title}" and ${topicTests.length} topic tests, all with covers`)
+  console.log(`  Listening: "${listening[0].title}" (40 questions) and ${listening.length - 1} single parts, with recordings`)
   console.log(`  Class: "${demoClass.name}", code ${demoClass.code}, ${STUDENTS.length} students, 1 assignment`)
   console.log(`  Vocabulary: "${VOCAB_SET_NAME}" (${DEMO_WORDS.length} words)`)
 }
