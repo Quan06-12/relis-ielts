@@ -3,8 +3,10 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getReview } from '../api/attempts.js'
 import { getErrorMessage } from '../api/errorMessages.js'
 import { questionsOf } from '../features/attempt/answers.js'
-import { answerStatus, formatDuration } from '../features/review/reviewHelpers.js'
-import ReviewQuestion from '../features/review/ReviewQuestion.jsx'
+import { formatDuration } from '../features/review/reviewHelpers.js'
+import ReviewGroup from '../features/review/ReviewGroup.jsx'
+import ReviewNavigator from '../features/review/ReviewNavigator.jsx'
+import { scrollToQuestion } from '../features/attempt/scrollToQuestion.js'
 import MarkedText from '../features/review/MarkedText.jsx'
 import AiFeedback from '../features/review/AiFeedback.jsx'
 import SplitPane from '../components/SplitPane.jsx'
@@ -46,27 +48,30 @@ export default function ReviewPage() {
   const evidence = selected && selected.sectionPosition === currentSection ? selected.evidence : null
   const sectionWord = test.skill === 'reading' ? 'Passage' : 'Part'
 
-  function selectQuestion(question) {
-    setSelectedId(question.id)
+  // Open a question's explanation (from the bubble or the bottom bar); a second click closes it
+  function selectQuestion(picked, { toggle = false } = {}) {
+    // The groups hand over their own question objects; the full list also knows the section
+    const question = allQuestions.find((item) => item.id === picked.id)
+    setSelectedId(toggle && question.id === selectedId ? null : question.id)
     setCurrentSection(question.sectionPosition)
-    setTimeout(() => document.getElementById(`question-${question.number}`)?.scrollIntoView({ block: 'center' }), 0)
+    setTimeout(() => scrollToQuestion(question.number), 0)
+  }
+
+  function pickSection(position) {
+    setCurrentSection(position)
+    setSelectedId(null)
   }
 
   const questionList = (
     <div className="attempt-questions">
       {section.groups.map((group, groupIndex) => (
-        <section key={groupIndex} className="question-group">
-          <p className="question-instruction">{group.instruction}</p>
-          {group.questions.map((question) => (
-            <ReviewQuestion
-              key={question.id}
-              question={question}
-              answer={answerById.get(question.id)}
-              isSelected={question.id === selectedId}
-              onSelect={() => setSelectedId(question.id)}
-            />
-          ))}
-        </section>
+        <ReviewGroup
+          key={groupIndex}
+          group={group}
+          answerById={answerById}
+          selectedId={selectedId}
+          onSelect={(question) => selectQuestion(question, { toggle: true })}
+        />
       ))}
     </div>
   )
@@ -101,22 +106,8 @@ export default function ReviewPage() {
       {/* Only the person who took the test can ask for AI feedback (US49) */}
       {viewerRole === 'owner' && <AiFeedback attemptId={attempt.id} initialFeedback={attempt.feedback ?? null} />}
 
-      {selected === null && <p className="review-hint">Bấm vào một câu để xem giải thích và vị trí bằng chứng.</p>}
+      {selected === null && <p className="review-hint">Bấm vào biểu tượng bong bóng cạnh đáp án để xem giải thích và vị trí bằng chứng.</p>}
 
-      {test.sections.length > 1 && (
-        <nav className="section-tabs">
-          {test.sections.map((item, position) => (
-            <button
-              key={item.index}
-              type="button"
-              className={position === currentSection ? 'section-tab active' : 'section-tab'}
-              onClick={() => setCurrentSection(position)}
-            >
-              {item.title || `${sectionWord} ${item.index + 1}`}
-            </button>
-          ))}
-        </nav>
-      )}
 
       {test.skill === 'reading' ? (
         // US38: drag the bar to change the widths of the passage and the questions
@@ -154,19 +145,15 @@ export default function ReviewPage() {
         </main>
       )}
 
-      {/* Navigator: green = right, red = wrong, grey = left empty */}
-      <footer className="question-navigator">
-        {allQuestions.map((question) => (
-          <button
-            key={question.id}
-            type="button"
-            className={`navigator-dot review-${answerStatus(answerById.get(question.id))}`}
-            onClick={() => selectQuestion(question)}
-          >
-            {question.number}
-          </button>
-        ))}
-      </footer>
+      <ReviewNavigator
+        sectionCount={test.sections.length}
+        questions={allQuestions}
+        answerById={answerById}
+        currentSection={currentSection}
+        selectedId={selectedId}
+        onPickSection={pickSection}
+        onPickQuestion={(question) => selectQuestion(question)}
+      />
 
     </div>
   )

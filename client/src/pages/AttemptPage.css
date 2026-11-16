@@ -48,27 +48,6 @@
   color: #9b1c1c;
 }
 
-.section-tabs {
-  display: flex;
-  gap: 4px;
-  padding: 8px 24px 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.section-tab {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 8px 8px 0 0;
-  background: transparent;
-  color: var(--text-muted);
-}
-
-.section-tab.active {
-  background: var(--background);
-  color: var(--primary);
-  font-weight: 600;
-}
-
 .attempt-reading {
   flex: 1;
   display: flex;
@@ -104,19 +83,27 @@
 }
 
 .question-group {
-  margin-bottom: 28px;
+  margin-bottom: 32px;
+}
+
+/* "Questions 1–7" */
+.question-heading {
+  margin: 0 0 6px;
+  font-size: 17px;
 }
 
 .question-instruction {
-  font-weight: 600;
+  margin: 0 0 14px;
+  white-space: pre-line;
 }
 
 .question {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .question-prompt {
   margin: 0 0 8px;
+  font-weight: 500;
 }
 
 .question-number {
@@ -132,39 +119,175 @@
   font-size: 13px;
 }
 
-.answer-options {
-  display: grid;
-  gap: 6px;
-  padding-left: 32px;
+/* ---- Completion and short answer: a box of notes with a gap in each line ---- */
+
+.notes-box {
+  padding: 14px 20px 6px;
+  border: 1px solid #8a8fa8;
+  border-radius: 4px;
+  background: var(--white);
 }
 
-.answer-text {
-  margin-left: 32px;
-  padding: 6px 10px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+.notes-box ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.notes-box li {
+  margin-bottom: 14px;
+  line-height: 2.1;
+}
+
+.gap-input {
+  width: 170px;
+  max-width: 100%;
+  margin: 0 4px;
+  padding: 2px 10px;
+  border: 1px solid #5a6078;
+  border-radius: 5px;
   font: inherit;
+  line-height: 1.5;
+  text-align: center;
 }
 
-.question-navigator {
+/* The question number waits inside the empty gap */
+.gap-input::placeholder {
+  color: #5a6078;
+  font-weight: 700;
+}
+
+.gap-input:focus {
+  border-color: var(--primary);
+  outline: 2px solid #c5cae9;
+  text-align: left;
+}
+
+.gap-input:focus::placeholder {
+  color: transparent;
+}
+
+/* ---- Options: full-width rows, the chosen one shaded ---- */
+
+.option-rows {
+  display: grid;
+  gap: 4px;
+}
+
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.option-row:hover {
+  background: #f1f2f7;
+}
+
+.option-row.chosen {
+  background: #e4e6ef;
+}
+
+.option-row input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--primary);
+}
+
+/* ---- Bottom bar while taking a test: parts, numbers and the submit tick ---- */
+
+.part-navigator {
+  display: flex;
+  align-items: stretch;
+  min-height: 56px;
+  border-top: 1px solid var(--border);
+  background: #f7f8fb;
+}
+
+.part-segment {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 0 16px;
+  border: none;
+  border-right: 1px solid #eceef5;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 15px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.part-segment span {
+  color: var(--text-muted);
+}
+
+.part-segment:hover {
+  background: #eef0f7;
+}
+
+.part-segment.current {
+  flex: 3 1 auto;
+  justify-content: flex-start;
+  background: var(--white);
+  cursor: default;
+}
+
+.part-numbers {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  padding: 10px 24px;
-  border-top: 1px solid var(--border);
+  gap: 2px;
+  min-width: 0;
 }
 
-.navigator-dot {
-  width: 32px;
-  height: 32px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--white);
-  font-size: 13px;
+.part-number {
+  min-width: 26px;
+  height: 30px;
+  padding: 0 4px;
+  border: 2px solid transparent;
+  border-radius: 5px;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
 }
 
-.navigator-dot.answered {
-  border-color: var(--primary);
+.part-number:hover {
+  background: #eef0f7;
+}
+
+/* Answered: underlined, as in the real test */
+.part-number.answered {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.part-number.current {
+  border-color: #3b82f6;
+}
+
+.part-submit {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  border: none;
+  background: #e9ebf2;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.part-submit:hover {
   background: var(--primary);
   color: var(--white);
 }
@@ -176,65 +299,37 @@
   }
 }
 
-/* Phones: the passage tabs and the 40 question numbers each take one row that scrolls sideways,
-   so the passage and the questions keep most of the screen (also used by the review page) */
+/* Phones: the other parts shrink to "1/13", the numbers of the current part scroll sideways */
 @media (max-width: 640px) {
-  .section-tabs {
+  .part-segment {
+    flex: none;
+    flex-direction: column;
+    gap: 0;
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+
+  .part-segment.current {
+    flex: 1 1 0;
+    flex-direction: row;
+    gap: 8px;
     overflow-x: auto;
-    padding: 6px 12px 0;
     scrollbar-width: none;
   }
 
-  .section-tab {
-    flex: none;
-    max-width: 62vw;
-    overflow: hidden;
-    padding: 8px 12px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .question-navigator {
+  .part-numbers {
     flex-wrap: nowrap;
-    overflow-x: auto;
-    padding: 8px 12px;
-    scrollbar-width: thin;
   }
 
-  .question-navigator > * {
-    flex: none;
+  .part-submit {
+    width: 48px;
   }
-}
 
-/* Audio speed (US29) */
-.audio-player {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
+  .notes-box {
+    padding: 12px 14px 4px;
+  }
 
-.audio-player .attempt-audio {
-  flex: 1;
-  min-width: 260px;
-}
-
-.audio-speeds {
-  display: flex;
-  gap: 4px;
-}
-
-.speed-button {
-  padding: 4px 10px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--white);
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.speed-button.active {
-  border-color: var(--primary);
-  background: var(--primary);
-  color: var(--white);
+  .gap-input {
+    width: 130px;
+  }
 }
