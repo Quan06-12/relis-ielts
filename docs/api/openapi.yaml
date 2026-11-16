@@ -9,17 +9,17 @@ info:
     Covers Sprint 0 (auth), Sprint 1 (tests, uploads, attempts), Sprint 2 (classes; grading, review, history), Sprint 3 (assignments, home goals) and Sprint 4 (AI feedback).
 
 servers:
+  - url: https://relis-ielts-api.onrender.com/api
+    description: Production (Render)
   - url: http://localhost:5000/api
     description: Local
-  - url: https://relis-api.onrender.com/api
-    description: Production (Render) – update once deployed
 
 security:
   - bearerAuth: []
 
 tags:
   - name: System
-    description: Health check
+    description: Health check and this documentation
   - name: Auth
     description: Google sign-in and the current user (owner A)
   - name: Tests
@@ -49,6 +49,32 @@ paths:
                 type: object
                 properties:
                   ok: { type: boolean, const: true }
+
+  /docs:
+    get:
+      operationId: getDocs
+      tags: [System]
+      summary: This documentation as a Swagger UI page
+      security: []
+      responses:
+        '200':
+          description: HTML page that loads /docs/openapi.yaml
+          content:
+            text/html:
+              schema: { type: string }
+
+  /docs/openapi.yaml:
+    get:
+      operationId: getOpenApiContract
+      tags: [System]
+      summary: The raw OpenAPI contract (this file)
+      security: []
+      responses:
+        '200':
+          description: OpenAPI 3.1 document
+          content:
+            text/yaml:
+              schema: { type: string }
 
   /auth/google:
     post:
