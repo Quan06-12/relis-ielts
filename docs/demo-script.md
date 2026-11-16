@@ -5,7 +5,7 @@ Chạy trên bản deploy ở mỗi Sprint Review và trước buổi bảo vệ
 ## 0. Chuẩn bị
 
 - Web: https://relis-ielts.vercel.app · API: https://relis-ielts-api.onrender.com
-- Tạo dữ liệu mẫu (đăng nhập web bằng tài khoản giáo viên một lần trước): trong `server/` chạy `npm run seed:demo -- <email giáo viên>`. Lệnh tạo 10 đề có ảnh bìa (1 đề full 40 câu "Reading Practice Test 1", 1 đề lẻ 13 câu và 8 đề lẻ theo chủ đề), lớp "Lớp IELTS 6.5 · Tối 2-4-6" có 3 học viên đã làm bài và 1 bài tập, cùng bộ từ "Environment & Climate". Chạy lại lệnh sẽ xoá dữ liệu demo cũ rồi tạo lại.
+- Tạo dữ liệu mẫu (đăng nhập web bằng tài khoản giáo viên một lần trước): trong `server/` chạy `npm run seed:demo -- <email giáo viên>`. Lệnh tạo 15 đề có ảnh bìa: Reading gồm 1 đề full 40 câu "Reading Practice Test 1", 1 đề lẻ 13 câu và 8 đề lẻ theo chủ đề; Listening gồm 1 đề full 40 câu "Listening Practice Test 1" và 4 part lẻ, có audio trong `client/public/listening`, lớp "Lớp IELTS 6.5 · Tối 2-4-6" có 3 học viên đã làm bài và 1 bài tập, cùng bộ từ "Environment & Climate". Chạy lại lệnh sẽ xoá dữ liệu demo cũ rồi tạo lại.
 - Mở https://relis-ielts-api.onrender.com/api/health trước vài phút (gói Free ngủ sau 15 phút).
 - Hai cửa sổ trình duyệt: **Giáo viên** và **Học viên**, hai tài khoản Google khác nhau.
 - Dữ liệu mẫu: chạy script seed (làm ở Sprint 3) để có đề full, đề lẻ, đề nháp, lịch sử và một lớp có bài giao.
