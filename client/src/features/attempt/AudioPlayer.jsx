@@ -35,7 +35,7 @@ export default function AudioPlayer({ src }) {
             aria-pressed={value === speed}
             onClick={() => changeSpeed(value)}
           >
-            {value.toFixed(value % 1 === 0 ? 1 : 2)}x
+            {value % 1 === 0 ? value.toFixed(1) : value}x
           </button>
         ))}
       </div>
