@@ -8,7 +8,7 @@ import ReviewGroup from '../features/review/ReviewGroup.jsx'
 import ReviewNavigator from '../features/review/ReviewNavigator.jsx'
 import { scrollToQuestion } from '../features/attempt/scrollToQuestion.js'
 import MarkedText from '../features/review/MarkedText.jsx'
-import AiFeedback from '../features/review/AiFeedback.jsx'
+import { useAiFeedback, AiFeedbackButton, AiFeedbackPanel } from '../features/review/AiFeedback.jsx'
 import SplitPane from '../components/SplitPane.jsx'
 import './AttemptPage.css'
 import './ReviewPage.css'
@@ -89,24 +89,7 @@ export default function ReviewPage() {
         )}
       </header>
 
-      {/* Score summary, folded into one line instead of a separate result page (US35) */}
-      <details className="review-summary" open>
-        <summary>
-          <strong>{attempt.result.correct}/{attempt.result.total}</strong> câu đúng
-          {attempt.result.band !== null && <span className="review-band">Band {attempt.result.band.toFixed(1)}</span>}
-        </summary>
-        <ul>
-          <li>{attempt.mode.type === 'full' ? 'Làm full đề' : `Luyện ${test.sections.length} ${sectionWord.toLowerCase()}`}</li>
-          <li>Thời gian làm: {formatDuration(attempt.startedAt, attempt.submittedAt)}</li>
-          <li>Nộp lúc {new Date(attempt.submittedAt).toLocaleString('vi-VN')}</li>
-          {attempt.result.band === null && <li>Band chỉ tính khi làm full đề 40 câu.</li>}
-        </ul>
-      </details>
-
-      {/* Only the person who took the test can ask for AI feedback (US49) */}
-      {viewerRole === 'owner' && <AiFeedback attemptId={attempt.id} initialFeedback={attempt.feedback ?? null} />}
-
-      {selected === null && <p className="review-hint">Bấm vào biểu tượng bong bóng cạnh đáp án để xem giải thích và vị trí bằng chứng.</p>}
+      <ScoreBox attempt={attempt} sectionCount={test.sections.length} sectionWord={sectionWord} canAskAi={viewerRole === 'owner'} />
 
 
       {test.skill === 'reading' ? (
@@ -156,6 +139,40 @@ export default function ReviewPage() {
       />
 
     </div>
+  )
+}
+
+// Score, band and details in one foldable box (US35). The AI feedback (US49) lives in the same box:
+// its button sits on the score line, and the feedback appears next to the details,
+// so the passage and the questions keep most of the screen.
+function ScoreBox({ attempt, sectionCount, sectionWord, canAskAi }) {
+  const ai = useAiFeedback(attempt.id, attempt.feedback ?? null)
+  // Open on wide screens; on a phone it starts folded to one line so the test keeps the screen
+  const [startsOpen] = useState(() => window.matchMedia('(min-width: 900px)').matches)
+
+  return (
+    <details className="review-summary" open={startsOpen}>
+      <summary>
+        <span className="review-score">
+          <strong>{attempt.result.correct}/{attempt.result.total}</strong> câu đúng
+          {attempt.result.band !== null && <span className="review-band">Band {attempt.result.band.toFixed(1)}</span>}
+        </span>
+        {/* Only the person who took the test can ask for AI feedback */}
+        {canAskAi && !ai.feedback && <AiFeedbackButton isLoading={ai.isLoading} onRequest={ai.request} />}
+      </summary>
+
+      <div className={ai.feedback ? 'review-summary-body with-ai' : 'review-summary-body'}>
+        <ul>
+          <li>{attempt.mode.type === 'full' ? 'Làm full đề' : `Luyện ${sectionCount} ${sectionWord.toLowerCase()}`}</li>
+          <li>Thời gian làm: {formatDuration(attempt.startedAt, attempt.submittedAt)}</li>
+          <li>Nộp lúc {new Date(attempt.submittedAt).toLocaleString('vi-VN')}</li>
+          {attempt.result.band === null && <li>Band chỉ tính khi làm full đề 40 câu.</li>}
+          <li>Bấm bong bóng cạnh đáp án để xem giải thích và bằng chứng.</li>
+        </ul>
+        {ai.feedback && <AiFeedbackPanel feedback={ai.feedback} />}
+      </div>
+      {ai.error && <p className="form-error" role="alert">{ai.error}</p>}
+    </details>
   )
 }
 
