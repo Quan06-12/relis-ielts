@@ -54,3 +54,25 @@ export function currentStreak(activeDates, today) {
   }
   return streak
 }
+
+// The last `count` months up to the month of `today` ("2026-11-14"), oldest first: ["2026-07", ..., "2026-11"]
+export function lastMonths(today, count) {
+  const [year, month] = today.split('-').map(Number)
+  return Array.from({ length: count }, (_, index) => {
+    const date = new Date(Date.UTC(year, month - 1 - (count - 1 - index), 1))
+    return date.toISOString().slice(0, 7)
+  })
+}
+
+// Minutes studied per month and skill, for the "Thời gian học" chart on the home page.
+// Every month of `months` gets a row, also the empty ones: [{ month, readingMinutes, listeningMinutes }]
+export function studyTimeByMonth(attempts, skillByTestId, timeZone, months) {
+  const byMonth = new Map(months.map((month) => [month, { month, readingMinutes: 0, listeningMinutes: 0 }]))
+  for (const attempt of attempts) {
+    const row = byMonth.get(dayKey(new Date(attempt.submittedAt), timeZone).slice(0, 7))
+    const skill = skillByTestId.get(String(attempt.testId))
+    if (!row || (skill !== 'reading' && skill !== 'listening')) continue
+    row[`${skill}Minutes`] += attemptMinutes(attempt)
+  }
+  return [...byMonth.values()]
+}

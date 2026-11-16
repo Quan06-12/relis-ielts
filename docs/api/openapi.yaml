@@ -440,6 +440,43 @@ paths:
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { $ref: '#/components/responses/Unauthorized' }
 
+  /attempts/study-time:
+    get:
+      operationId: getStudyTime
+      tags: [Attempts]
+      summary: Minutes studied per month, split by skill, for the home page chart (US42)
+      description: |
+        Adds up the minutes of my submitted attempts (start to submit, each capped at its time limit)
+        per month in the given time zone. Every month of the range has a row, also months with nothing.
+      parameters:
+        - name: months
+          in: query
+          description: How many months, ending with the current one (1–12)
+          schema: { type: integer, minimum: 1, maximum: 12, default: 5 }
+        - name: tz
+          in: query
+          description: IANA time zone of the viewer; unknown names fall back to Asia/Ho_Chi_Minh
+          schema: { type: string, example: Asia/Ho_Chi_Minh }
+      responses:
+        '200':
+          description: One row per month, oldest first
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [months]
+                properties:
+                  months:
+                    type: array
+                    items:
+                      type: object
+                      required: [month, readingMinutes, listeningMinutes]
+                      properties:
+                        month: { type: string, example: '2026-11' }
+                        readingMinutes: { type: integer }
+                        listeningMinutes: { type: integer }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
   /attempts/{attemptId}:
     parameters:
       - $ref: '#/components/parameters/AttemptId'

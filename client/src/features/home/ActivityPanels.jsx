@@ -7,10 +7,10 @@ import {
   weekOf,
   weekRows,
   formatMinutes,
-  timeLevel,
   activeDaysInMonth,
   displayDate,
 } from './activityCalendar.js'
+import StudyTimeChart from './StudyTimeChart.jsx'
 import './ActivityPanels.css'
 
 const WEEKDAYS = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']
@@ -50,60 +50,78 @@ export default function ActivityPanels() {
   return (
     <div className="activity-row">
       <section className="home-panel activity-calendar">
-        <div className="home-panel-header">
-          <div>
-            <h2>Biểu đồ &quot;chăm chỉ&quot; của bạn</h2>
-            <p className="activity-hint">Bấm vào một ngày để xem thống kê tuần đó</p>
+        {mode === 'days' ? (
+          <div className="home-panel-header">
+            <div>
+              <h2>Biểu đồ &quot;chăm chỉ&quot; của bạn</h2>
+              <p className="activity-hint">Bấm vào một ngày để xem thống kê tuần đó</p>
+            </div>
+            <span className="activity-legend"><i /> Có nộp bài</span>
           </div>
-          <span className="activity-legend"><i /> {mode === 'days' ? 'Có nộp bài' : 'Đậm = học lâu hơn'}</span>
-        </div>
+        ) : (
+          <div className="home-panel-header">
+            <div>
+              <h2>Thời gian học</h2>
+              <p className="activity-hint">Số giờ luyện Reading và Listening theo tháng</p>
+            </div>
+            <span className="study-legend">
+              <span><i className="reading" /> Reading</span>
+              <span><i className="listening" /> Listening</span>
+            </span>
+          </div>
+        )}
 
         <div className="activity-body">
-          {error && <p className="library-message error">{error}</p>}
-          <div className="activity-month">
-            <button type="button" className="activity-arrow" onClick={() => changeMonth(-1)} aria-label="Tháng trước">‹</button>
-            <strong>Tháng {month.index + 1} / {month.year}</strong>
-            <button type="button" className="activity-arrow" onClick={() => changeMonth(1)} aria-label="Tháng sau">›</button>
-          </div>
+          {mode === 'time' && <StudyTimeChart />}
+          {mode === 'days' && (
+            <>
+              {error && <p className="library-message error">{error}</p>}
+              <div className="activity-month">
+                <button type="button" className="activity-arrow" onClick={() => changeMonth(-1)} aria-label="Tháng trước">‹</button>
+                <strong>Tháng {month.index + 1} / {month.year}</strong>
+                <button type="button" className="activity-arrow" onClick={() => changeMonth(1)} aria-label="Tháng sau">›</button>
+              </div>
 
-          <table className="activity-grid">
-            <thead>
-              <tr>
-                <th aria-label="Tuần" />
-                {WEEKDAYS.map((day) => <th key={day}>{day}</th>)}
-              </tr>
-            </thead>
-            <tbody>
-              {weeks.map((week, weekIndex) => (
-                <tr key={week[0].key} className={selectedWeek.includes(week[0].key) ? 'selected-week' : ''}>
-                  <th scope="row">Tuần {weekIndex + 1}</th>
-                  {week.map((cell) => {
-                    const row = byDate.get(cell.key)
-                    const count = row ? row.reading + row.listening : 0
-                    return (
-                      <td key={cell.key}>
-                        {cell.inMonth && (
-                          <button
-                            type="button"
-                            className={dayClass(cell.key, today, mode, row, count)}
-                            onClick={() => setSelectedDay(cell.key)}
-                            title={row ? `${count} bài · ${formatMinutes(row.minutes)}` : 'Chưa nộp bài'}
-                          >
-                            {cell.day}
-                          </button>
-                        )}
-                      </td>
-                    )
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+              <table className="activity-grid">
+                <thead>
+                  <tr>
+                    <th aria-label="Tuần" />
+                    {WEEKDAYS.map((day) => <th key={day}>{day}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {weeks.map((week, weekIndex) => (
+                    <tr key={week[0].key} className={selectedWeek.includes(week[0].key) ? 'selected-week' : ''}>
+                      <th scope="row">Tuần {weekIndex + 1}</th>
+                      {week.map((cell) => {
+                        const row = byDate.get(cell.key)
+                        const count = row ? row.reading + row.listening : 0
+                        return (
+                          <td key={cell.key}>
+                            {cell.inMonth && (
+                              <button
+                                type="button"
+                                className={dayClass(cell.key, today, count)}
+                                onClick={() => setSelectedDay(cell.key)}
+                                title={row ? `${count} bài · ${formatMinutes(row.minutes)}` : 'Chưa nộp bài'}
+                              >
+                                {cell.day}
+                              </button>
+                            )}
+                          </td>
+                        )
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
 
-          <p className="activity-summary">
-            <span>Tháng này: <strong>{activeDaysInMonth(activity.days, month.year, month.index)} ngày</strong> có nộp bài</span>
-            <span>Chuỗi hiện tại: <strong>{activity.currentStreak} ngày</strong></span>
-          </p>
+              <p className="activity-summary">
+                <span>Tháng này: <strong>{activeDaysInMonth(activity.days, month.year, month.index)} ngày</strong> có nộp bài</span>
+                <span>Chuỗi hiện tại: <strong>{activity.currentStreak} ngày</strong></span>
+              </p>
+            </>
+          )}
 
           <div className="segmented activity-modes" role="tablist">
             <button type="button" role="tab" aria-selected={mode === 'days'} className={mode === 'days' ? 'segmented-tab active' : 'segmented-tab'} onClick={() => setMode('days')}>
@@ -156,11 +174,10 @@ export default function ActivityPanels() {
   )
 }
 
-// CSS classes of one day: filled when there is a submission ("days" mode) or shaded by minutes ("time" mode)
-function dayClass(key, today, mode, row, count) {
+// CSS classes of one day: filled when there is a submission
+function dayClass(key, today, count) {
   const classes = ['activity-day']
-  if (mode === 'days' && count > 0) classes.push('filled')
-  if (mode === 'time' && row) classes.push(`level-${timeLevel(row.minutes)}`)
+  if (count > 0) classes.push('filled')
   if (key === today) classes.push('today')
   if (key > today) classes.push('future')
   return classes.join(' ')
