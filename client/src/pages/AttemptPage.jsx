@@ -3,8 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { getAttempt, saveAnswers, submitAttempt } from '../api/attempts.js'
 import { getErrorMessage } from '../api/errorMessages.js'
 import { useCountdown } from '../features/attempt/useCountdown.js'
-import { questionsOf, isAnswered, countUnanswered, formatClock } from '../features/attempt/answers.js'
+import { questionsOf, countUnanswered, formatClock } from '../features/attempt/answers.js'
 import QuestionGroup from '../features/attempt/QuestionGroup.jsx'
+import PartNavigator from '../features/attempt/PartNavigator.jsx'
+import { scrollToQuestion } from '../features/attempt/scrollToQuestion.js'
 import AudioPlayer from '../features/attempt/AudioPlayer.jsx'
 import SplitPane from '../components/SplitPane.jsx'
 import { backupPending, loadPending, clearPending } from '../features/attempt/pendingBackup.js'
@@ -24,6 +26,7 @@ export default function AttemptPage() {
   const [answers, setAnswers] = useState({})            // { questionId: ["value"] }
   const [initialSeconds, setInitialSeconds] = useState(null)
   const [currentSection, setCurrentSection] = useState(0)
+  const [currentNumber, setCurrentNumber] = useState(1) // the question being worked on, boxed in the bottom bar
   const [isConfirmingSubmit, setIsConfirmingSubmit] = useState(false)
   const [error, setError] = useState('')
 
@@ -67,8 +70,10 @@ export default function AttemptPage() {
         const notYetSaved = loadPending(attemptId)
         pendingChanges.current = notYetSaved
 
+        const chosenSections = attempt.mode.sectionIndexes.map((index) => loadedTest.sections[index])
         setTest(loadedTest)
-        setSections(attempt.mode.sectionIndexes.map((index) => loadedTest.sections[index]))
+        setSections(chosenSections)
+        setCurrentNumber(questionsOf(chosenSections)[0]?.number ?? 1)
         setAnswers({
           ...Object.fromEntries(attempt.answers.map((answer) => [answer.questionId, answer.value])),
           ...notYetSaved,
@@ -121,9 +126,21 @@ export default function AttemptPage() {
 
   function jumpToQuestion(question) {
     setCurrentSection(question.sectionPosition)
-    // Wait for the section to render before scrolling to the question
-    setTimeout(() => document.getElementById(`question-${question.number}`)?.scrollIntoView({ block: 'center' }), 0)
+    setCurrentNumber(question.number)
+    // Wait for the section to render before scrolling to the question and putting the cursor in it
+    setTimeout(() => {
+      scrollToQuestion(question.number)
+      document.getElementById(`question-${question.number}`)?.querySelector('input')?.focus({ preventScroll: true })
+    }, 0)
   }
+
+  // Another part from the bottom bar: show it from its first question
+  function pickSection(position) {
+    const first = allQuestions.find((question) => question.sectionPosition === position)
+    if (first) jumpToQuestion(first)
+  }
+
+  const groupProps = { answers, onAnswer: handleAnswer, onFocusQuestion: (question) => setCurrentNumber(question.number) }
 
   return (
     <div className="attempt-page">
@@ -139,20 +156,6 @@ export default function AttemptPage() {
 
       {error && <p className="attempt-error" role="alert">{error}</p>}
 
-      {sections.length > 1 && (
-        <nav className="section-tabs">
-          {sections.map((item, position) => (
-            <button
-              key={position}
-              type="button"
-              className={position === currentSection ? 'section-tab active' : 'section-tab'}
-              onClick={() => setCurrentSection(position)}
-            >
-              {item.title || `${sectionWord} ${position + 1}`}
-            </button>
-          ))}
-        </nav>
-      )}
 
       {test.skill === 'reading' ? (
         // US27: passage on the left, questions on the right, each scrolls on its own;
@@ -171,7 +174,7 @@ export default function AttemptPage() {
             second={
               <div className="attempt-questions">
                 {section.groups.map((group, index) => (
-                  <QuestionGroup key={index} group={group} answers={answers} onAnswer={handleAnswer} />
+                  <QuestionGroup key={index} group={group} {...groupProps} />
                 ))}
               </div>
             }
@@ -187,25 +190,23 @@ export default function AttemptPage() {
           )}
           <div className="attempt-questions">
             {section.groups.map((group, index) => (
-              <QuestionGroup key={index} group={group} answers={answers} onAnswer={handleAnswer} />
+              <QuestionGroup key={index} group={group} {...groupProps} />
             ))}
           </div>
         </main>
       )}
 
-      {/* Question navigator: answered questions are filled in */}
-      <footer className="question-navigator">
-        {allQuestions.map((question) => (
-          <button
-            key={question.id}
-            type="button"
-            className={isAnswered(answers[question.id]) ? 'navigator-dot answered' : 'navigator-dot'}
-            onClick={() => jumpToQuestion(question)}
-          >
-            {question.number}
-          </button>
-        ))}
-      </footer>
+      <PartNavigator
+        sections={sections}
+        sectionWord={sectionWord}
+        questions={allQuestions}
+        answers={answers}
+        currentSection={currentSection}
+        currentNumber={currentNumber}
+        onPickSection={pickSection}
+        onPickQuestion={jumpToQuestion}
+        onSubmit={() => setIsConfirmingSubmit(true)}
+      />
 
       {/* US32: confirm before handing in early, showing how many questions are empty */}
       {isConfirmingSubmit && (

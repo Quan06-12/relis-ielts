@@ -1,4 +1,5 @@
 import { splitByEvidence } from './reviewHelpers.js'
+import { scrollWithinColumn } from '../attempt/scrollToQuestion.js'
 
 // A passage or transcript with the evidence of the selected question in yellow (US37).
 // Line breaks typed in the editor are kept with `white-space: pre-wrap`.
@@ -12,7 +13,7 @@ export default function MarkedText({ text, evidence }) {
   return (
     <div className="marked-text">
       {parts.before}
-      <mark ref={(element) => element?.scrollIntoView({ block: 'center', behavior: 'smooth' })}>{parts.marked}</mark>
+      <mark ref={(element) => scrollWithinColumn(element, { center: true })}>{parts.marked}</mark>
       {parts.after}
     </div>
   )
