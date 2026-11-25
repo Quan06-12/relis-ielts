@@ -11,6 +11,7 @@ import AudioPlayer from '../features/attempt/AudioPlayer.jsx'
 import SplitPane from '../components/SplitPane.jsx'
 import { backupPending, loadPending, clearPending } from '../features/attempt/pendingBackup.js'
 import HighlightablePassage from '../features/attempt/HighlightablePassage.jsx'
+import PaneTabs from '../features/attempt/PaneTabs.jsx'
 import { loadHighlights, saveHighlights, clearHighlights, loadNotes, saveNotes, clearNotes } from '../features/attempt/highlights.js'
 import './AttemptPage.css'
 
@@ -36,6 +37,8 @@ export default function AttemptPage() {
   // What the learner sees next to the clock: { state: 'saved' | 'saving' | 'error', at }
   const [saveStatus, setSaveStatus] = useState(null)
   const [isLeaving, setIsLeaving] = useState(false)
+  // Phones show the passage or the questions, one at a time
+  const [mobilePane, setMobilePane] = useState('passage')
   // US43: { [section position]: [{ start, end }] }, kept in the browser for this attempt
   const [highlights, setHighlights] = useState(() => loadHighlights(attemptId))
   // Notes on words of the passage: { [section position]: [{ start, end, text }] }, kept the same way
@@ -165,6 +168,7 @@ export default function AttemptPage() {
   const sectionWord = test.skill === 'reading' ? 'Passage' : 'Part'
 
   function jumpToQuestion(question) {
+    setMobilePane('questions')
     setCurrentSection(question.sectionPosition)
     setCurrentNumber(question.number)
     // Wait for the section to render before scrolling to the question and putting the cursor in it
@@ -219,7 +223,8 @@ export default function AttemptPage() {
       {test.skill === 'reading' ? (
         // US27: passage on the left, questions on the right, each scrolls on its own;
         // US38: the bar between them can be dragged
-        <main className="attempt-reading">
+        <main className="attempt-reading" data-pane={mobilePane}>
+          <PaneTabs pane={mobilePane} onChange={setMobilePane} questionsLabel={`Câu hỏi (${countUnanswered(questionsOf([section]), answers)} trống)`} />
           <SplitPane
             label="Đổi độ rộng bài đọc và câu hỏi"
             first={

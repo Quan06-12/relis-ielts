@@ -64,7 +64,10 @@ export default function HomePage() {
             <div className="home-panel-actions">
               {/* The exam date used to have its own box; now it is a chip next to the goals */}
               <button type="button" className="exam-chip" onClick={() => setIsEditing(true)} title="Đổi ngày thi">
-                <span aria-hidden="true">📅</span> {examChipText(user.examDate, daysLeft)}
+                <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4" />
+                </svg>
+                {examChipText(user.examDate, daysLeft)}
               </button>
               <button type="button" className="secondary-button" onClick={() => setIsEditing(true)}>
                 {goals.overall || goals.reading || goals.listening ? 'Sửa mục tiêu' : 'Đặt mục tiêu'}
@@ -91,18 +94,25 @@ export default function HomePage() {
                       <strong>{current !== null ? current.toFixed(1) : '—'}</strong>
                     </div>
                   </div>
-                  <p className="home-card-note">{gapText(current, goal)}</p>
-                  <div className="home-card-bar">
-                    <span style={{ width: `${goalProgress(current, goal)}%` }} />
-                  </div>
+                  {goal ? (
+                    <>
+                      <p className="home-card-note">{gapText(current, goal)}</p>
+                      <div className="home-card-bar">
+                        <span style={{ width: `${goalProgress(current, goal)}%` }} />
+                      </div>
+                    </>
+                  ) : (
+                    // No goal yet: one clear action instead of a dash, a note and an empty bar
+                    <button type="button" className="home-card-set" onClick={() => setIsEditing(true)}>+ Đặt mục tiêu</button>
+                  )}
                 </div>
               )
             })}
           </div>
           <p className="home-hint">“Hiện tại” lấy từ lần làm full đề gần nhất của mỗi kỹ năng; Overall là trung bình Reading và Listening.</p>
+          <StreakStrip />
         </section>
 
-        <StreakStrip />
       </div>
 
       <div className="home-row">

@@ -10,6 +10,7 @@ import ReviewNavigator from '../features/review/ReviewNavigator.jsx'
 import { scrollToQuestion } from '../features/attempt/scrollToQuestion.js'
 import MarkedText from '../features/review/MarkedText.jsx'
 import WordPicker from '../features/vocab/WordPicker.jsx'
+import PaneTabs from '../features/attempt/PaneTabs.jsx'
 import { useAiFeedback, AiFeedbackButton, AiFeedbackPanel } from '../features/review/AiFeedback.jsx'
 import SplitPane from '../components/SplitPane.jsx'
 import './AttemptPage.css'
@@ -27,6 +28,7 @@ export default function ReviewPage() {
   const [error, setError] = useState('')
   const [currentSection, setCurrentSection] = useState(0)
   const [selectedId, setSelectedId] = useState(null)
+  const [mobilePane, setMobilePane] = useState('questions')
 
   useEffect(() => {
     getReview(attemptId)
@@ -123,7 +125,8 @@ export default function ReviewPage() {
 
       {test.skill === 'reading' ? (
         // US38: drag the bar to change the widths of the passage and the questions
-        <main className="attempt-reading">
+        <main className="attempt-reading" data-pane={mobilePane}>
+          <PaneTabs pane={mobilePane} onChange={setMobilePane} />
           <SplitPane
             label="Đổi độ rộng bài đọc và câu hỏi"
             first={

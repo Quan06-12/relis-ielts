@@ -8,7 +8,7 @@ const SKILL_LABEL = { reading: 'Reading', listening: 'Listening' }
 // One test in the library (US20–US22): cover with time and question count, a coloured tag
 // (Full test / Bài lẻ), the title, the question types, "Làm bài" and a ⋯ menu (edit, share, delete).
 // A system test cannot be edited or deleted, so its menu only has "Đưa lên lớp".
-export default function TestCard({ test, onStart, onDelete, onShare }) {
+export default function TestCard({ test, onStart, onDelete, onShare, showSystemChip = true }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const menu = useRef(null)
   const canStart = test.questionCount > 0
@@ -30,9 +30,9 @@ export default function TestCard({ test, onStart, onDelete, onShare }) {
     <article className={`test-card ${test.skill}`}>
       <div className="test-card-cover" style={test.coverUrl ? { backgroundImage: `url('${test.coverUrl}')` } : undefined}>
         {!test.coverUrl && <span className="test-card-skill-mark">{SKILL_LABEL[test.skill]}</span>}
-        <span className="cover-chip">⏱ {test.durationMin} phút · {test.questionCount} câu</span>
         {test.status === 'draft' && <span className="draft-chip">Nháp</span>}
-        {test.isSystem && <span className="draft-chip system-chip">Đề Relis</span>}
+        {/* Inside "Kho đề Relis" every card is a Relis test, so the chip only shows elsewhere */}
+        {test.isSystem && showSystemChip && <span className="draft-chip system-chip">Đề Relis</span>}
         {/* Band stamp: only for tests the user finished as a full test */}
         {test.lastBand !== null && (
           <span className="band-stamp" title="Band lần làm full gần nhất">{test.lastBand.toFixed(1)}</span>
@@ -42,6 +42,7 @@ export default function TestCard({ test, onStart, onDelete, onShare }) {
 
       <div className="test-card-body">
         <h3 title={test.title}>{test.title}</h3>
+        <p className="test-card-meta">{test.durationMin} phút · {test.questionCount} câu</p>
         <ul className="test-card-types">
           {(test.questionTypes ?? []).slice(0, 3).map((type) => (
             <li key={type}>{QUESTION_TYPE_LABELS[type] ?? type}</li>

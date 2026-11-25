@@ -35,10 +35,10 @@
   flex: 1;
 }
 
-/* Goals (left, wider) and exam date (right), like the wireframe */
+/* Goals panel across the page, with the exam date chip and the practice streak inside */
 .home-top {
   display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 20px;
   margin-bottom: 28px;
 }
@@ -491,51 +491,53 @@
   border-style: solid;
 }
 
-/* ---- Streak strip ---- */
-.streak-body {
-  padding: 16px 20px 0;
+/* ---- Streak: the last row of the goals panel ---- */
+.streak-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 18px;
+  padding: 12px 20px 16px;
+  border-top: 1px solid var(--border);
 }
 
 .streak-count {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  margin: 0 0 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
   color: var(--text-muted);
-  font-size: 15px;
+  font-size: 14px;
+}
+
+.streak-count svg {
+  color: #c2410c;
 }
 
 .streak-count strong {
   color: var(--text);
-  font-size: 34px;
-  line-height: 1;
-}
-
-.streak-flame {
-  font-size: 24px;
+  font-size: 18px;
 }
 
 .streak-days {
-  display: grid;
-  grid-template-columns: repeat(14, minmax(0, 1fr));
+  display: flex;
+  flex: 1;
   gap: 4px;
+  min-width: 180px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .streak-days li {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
+  flex: 1;
+  max-width: 18px;
 }
 
 .streak-dot {
-  width: 100%;
-  max-width: 22px;
+  display: block;
   aspect-ratio: 1;
-  border-radius: 6px;
+  border-radius: 4px;
   background: #e6e8f2;
 }
 
@@ -545,16 +547,39 @@
 
 .streak-days li.today .streak-dot {
   outline: 2px solid var(--yellow);
-  outline-offset: 2px;
+  outline-offset: 1px;
 }
 
-.streak-days small {
+.streak-week {
+  margin: 0;
   color: var(--text-muted);
-  font-size: 10px;
+  font-size: 13px;
 }
 
-.streak-panel .home-hint {
-  margin: 14px 0 16px;
+/* A goal card without a goal: one quiet action */
+.home-card-set {
+  margin-top: 2px;
+  padding: 6px 0;
+  border: 0;
+  background: none;
+  color: var(--tone);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.home-card-set:hover {
+  text-decoration: underline;
+}
+
+.home-hint + .streak-row {
+  margin-top: 4px;
+}
+
+.exam-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 @media (max-width: 900px) {
@@ -575,20 +600,10 @@
     scroll-snap-align: start;
   }
 
-  .streak-days small {
-    display: none;
+}
+
+@media (max-width: 600px) {
+  .home-card-set {
+    font-size: 12.5px;
   }
-}
-
-/* The streak panel is as tall as the goals panel; keep its content in the middle */
-.streak-panel {
-  display: flex;
-  flex-direction: column;
-}
-
-.streak-panel .streak-body {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  justify-content: center;
 }

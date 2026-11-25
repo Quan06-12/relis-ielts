@@ -5,8 +5,8 @@ import { streakDays, lastWeekTotals } from './homeToday.js'
 
 const DAYS_SHOWN = 14
 
-// Practice streak (US42, short form): the current run of days with a submission and the last
-// two weeks as a strip of dots, filled on the days something was handed in.
+// Practice streak (US42, short form), shown as the last row of the goals panel: the current run of days
+// with a submission and the last two weeks as dots, filled on the days something was handed in.
 export default function StreakStrip() {
   const [activity, setActivity] = useState(null)
 
@@ -24,31 +24,25 @@ export default function StreakStrip() {
   const streak = activity?.currentStreak ?? 0
 
   return (
-    <section className="home-panel streak-panel">
-      <div className="home-panel-header">
-        <h2>Chuỗi ngày luyện tập</h2>
-      </div>
-      <div className="streak-body">
-        <p className="streak-count">
-          <span className="streak-flame" aria-hidden="true">🔥</span>
-          <strong>{streak}</strong> ngày liên tiếp
-        </p>
-        <ol className="streak-days" aria-label={`${DAYS_SHOWN} ngày gần nhất`}>
-          {days.map((day) => (
-            <li
-              key={day.key}
-              className={`${day.active ? 'active' : ''} ${day.isToday ? 'today' : ''}`}
-              title={`${day.dayOfMonth}/${day.key.slice(5, 7)}: ${day.active ? `${day.submissions} bài` : 'chưa nộp bài'}`}
-            >
-              <span className="streak-dot" />
-              <small>{day.weekday}</small>
-            </li>
-          ))}
-        </ol>
-        <p className="home-hint">
-          7 ngày qua: {week.submissions} bài nộp · {formatMinutes(week.minutes)} luyện tập
-        </p>
-      </div>
-    </section>
+    <div className="streak-row">
+      <p className="streak-count" title="Số ngày liên tiếp có nộp bài">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5.5 2 1.5 3 3 3-1-3 0-6 0-8.5z" />
+        </svg>
+        <strong>{streak}</strong> ngày liên tiếp
+      </p>
+      <ol className="streak-days" aria-label={`${DAYS_SHOWN} ngày gần nhất`}>
+        {days.map((day) => (
+          <li
+            key={day.key}
+            className={`${day.active ? 'active' : ''} ${day.isToday ? 'today' : ''}`}
+            title={`${day.dayOfMonth}/${day.key.slice(5, 7)}: ${day.active ? `${day.submissions} bài` : 'chưa nộp bài'}`}
+          >
+            <span className="streak-dot" />
+          </li>
+        ))}
+      </ol>
+      <p className="streak-week">7 ngày qua: {week.submissions} bài · {formatMinutes(week.minutes)}</p>
+    </div>
   )
 }
