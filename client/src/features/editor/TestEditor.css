@@ -2,8 +2,121 @@
 
 .new-test-form {
   display: grid;
-  gap: 16px;
-  max-width: 520px;
+  gap: 22px;
+  max-width: 640px;
+}
+
+/* "Kỹ năng" and "Loại đề": two large cards each instead of plain radio buttons */
+.choice-tiles {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.choice-tiles legend {
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.choice-tiles-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.choice-tile {
+  --tone: var(--primary);
+  --tint: var(--primary-soft);
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  background: var(--white);
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.choice-tile.listening {
+  --tone: #c2410c;
+  --tint: #fdeee0;
+}
+
+.choice-tile:hover {
+  border-color: var(--tone);
+}
+
+.choice-tile.selected {
+  border-color: var(--tone);
+  box-shadow: 0 0 0 3px var(--tint);
+}
+
+/* The radio stays in the page for the keyboard but is not drawn */
+.choice-tile input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.choice-tile:has(input:focus-visible) {
+  outline: 3px solid var(--tone);
+  outline-offset: 2px;
+}
+
+.choice-tile-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--tint);
+  color: var(--tone);
+}
+
+.choice-tile-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.choice-tile-text strong {
+  font-size: 16px;
+}
+
+.choice-tile-text span {
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.choice-tile-check {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: none;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--tone);
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.choice-tile.selected .choice-tile-check {
+  display: grid;
+}
+
+@media (max-width: 560px) {
+  .choice-tiles-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .editor-button {
@@ -84,11 +197,6 @@ fieldset.editor-field {
   border-radius: 10px;
 }
 
-.choice-row label {
-  margin-right: 20px;
-  font-weight: 400;
-}
-
 .editor-error {
   margin-left: 8px;
   color: #b42318;
@@ -100,7 +208,7 @@ fieldset.editor-field {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: var(--background);
+  background: var(--surface);
 }
 
 .editor-topbar {

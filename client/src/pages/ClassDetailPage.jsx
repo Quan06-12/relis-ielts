@@ -7,6 +7,7 @@ import ClassLibraryTab from '../features/classes/ClassLibraryTab.jsx'
 import GradebookTab from '../features/classes/GradebookTab.jsx'
 import MembersTab from '../features/classes/MembersTab.jsx'
 import AssignmentsTab from '../features/classes/AssignmentsTab.jsx'
+import ClassOverview from '../features/classes/ClassOverview.jsx'
 import { useConfirm, useToast } from '../components/FeedbackProvider.jsx'
 import { SkeletonCards } from '../components/Skeleton.jsx'
 import './ClassDetailPage.css'
@@ -21,6 +22,8 @@ export default function ClassDetailPage() {
   const [classInfo, setClassInfo] = useState(null)
   const [tab, setTab] = useState('assignments')
   const [isCreatingAssignment, setIsCreatingAssignment] = useState(false)
+  // Bumped when an assignment is created, so the summary numbers reload
+  const [overviewKey, setOverviewKey] = useState(0)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -98,6 +101,8 @@ export default function ClassDetailPage() {
         )}
       </header>
 
+      <ClassOverview classId={classId} isTeacher={isTeacher} studentCount={classInfo.studentCount} refreshKey={overviewKey} />
+
       <nav className="underline-tabs" role="tablist">
         {tabs.map((item) => (
           <button
@@ -119,7 +124,10 @@ export default function ClassDetailPage() {
           classId={classId}
           isTeacher={isTeacher}
           isCreating={isCreatingAssignment}
-          onCreatingChange={setIsCreatingAssignment}
+          onCreatingChange={(isOpen) => {
+            setIsCreatingAssignment(isOpen)
+            if (!isOpen) setOverviewKey((key) => key + 1)
+          }}
           onShowResults={() => setTab('gradebook')}
         />
       )}

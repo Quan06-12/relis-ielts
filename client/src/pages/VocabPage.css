@@ -19,11 +19,11 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--card-radius);
   background: var(--white);
   color: var(--text);
   text-decoration: none;
+  box-shadow: var(--card-shadow);
 }
 
 .vocab-card:hover {
@@ -281,5 +281,211 @@
 @media (prefers-reduced-motion: reduce) {
   .drawer {
     animation: none;
+  }
+}
+
+/* "Thêm vào từ vựng" from the passage */
+.add-word-dialog {
+  width: min(520px, 100%);
+}
+
+.add-word-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.add-word-dialog select,
+.add-word-dialog textarea {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 400;
+}
+
+/* ---- Flashcard review ---- */
+.flashcards-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(14 18 48 / 0.92);
+  backdrop-filter: blur(4px);
+}
+
+.flashcards {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: min(560px, 100%);
+}
+
+.flashcards-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #d0d6f0;
+}
+
+.flashcards-top p {
+  flex: 1;
+  margin: 0;
+  overflow: hidden;
+  color: var(--white);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flashcards-close {
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgb(255 255 255 / 0.3);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--white);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.flashcards-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.15);
+}
+
+.flashcards-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--yellow);
+  transition: width 0.25s;
+}
+
+/* The card turns over in 3D; front and back are stacked */
+.flashcard {
+  position: relative;
+  height: 320px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  perspective: 1200px;
+}
+
+.flashcard-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px;
+  border-radius: 20px;
+  background: var(--white);
+  color: var(--text);
+  box-shadow: 0 20px 50px rgb(0 0 0 / 0.3);
+  text-align: center;
+  backface-visibility: hidden;
+  transition: transform 0.45s;
+}
+
+.flashcard-face.back {
+  background: #fffbea;
+  transform: rotateY(180deg);
+}
+
+.flashcard.flipped .front {
+  transform: rotateY(-180deg);
+}
+
+.flashcard.flipped .back {
+  transform: rotateY(0deg);
+}
+
+.flashcard-face strong {
+  font-size: 34px;
+  line-height: 1.2;
+}
+
+.flashcard-face.back strong {
+  font-size: 26px;
+}
+
+.flashcard-face small {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.flashcard-face em {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-style: normal;
+}
+
+.flashcard-face q {
+  max-width: 440px;
+  color: #4b5170;
+  font-size: 15px;
+  font-style: italic;
+  line-height: 1.55;
+}
+
+.flashcards-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.flashcards-actions button {
+  padding: 13px 16px;
+  border: 0;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.flashcards-actions .again {
+  background: rgb(255 255 255 / 0.12);
+  color: var(--white);
+}
+
+.flashcards-actions .known {
+  background: var(--yellow);
+  color: #1a1f45;
+}
+
+.flashcards-done {
+  padding: 32px;
+  border-radius: 20px;
+  background: var(--white);
+  text-align: center;
+}
+
+.flashcards-done .flashcards-actions .again {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.flashcards-score {
+  margin: 0 0 4px;
+  color: var(--text-muted);
+  font-size: 18px;
+}
+
+.flashcards-score strong {
+  color: var(--text);
+  font-size: 44px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flashcard-face {
+    transition: none;
   }
 }

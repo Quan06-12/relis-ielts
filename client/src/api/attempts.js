@@ -45,17 +45,10 @@ export async function requestFeedback(attemptId) {
   return response.data.feedback
 }
 
-// GET /attempts/activity — submissions per day and study minutes for the home calendar (US42)
+// GET /attempts/activity — submissions per day and study minutes for the home streak strip (US42)
 // from, to: "yyyy-mm-dd"; days are counted in the browser's time zone
 export async function getActivity(from, to) {
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
   const response = await http.get('/attempts/activity', { params: { from, to, tz } })
   return response.data // { days: [{ date, reading, listening, minutes }], currentStreak }
-}
-
-// Minutes per month for the last few months, split by skill (home page "Thời gian học" chart)
-export async function getStudyTime(months) {
-  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
-  const response = await http.get('/attempts/study-time', { params: { months, tz } })
-  return response.data // { months: [{ month, readingMinutes, listeningMinutes }] }
 }

@@ -23,9 +23,7 @@ function section(title, passage, groups) {
   }
 }
 
-const PASSAGE_1 = `Green Roofs in Growing Cities
-
-As cities expand, more of their surface is covered by concrete, glass and asphalt. These materials absorb heat during the day and release it slowly at night, which is why city centres are often several degrees warmer than the countryside around them. One response that has spread quickly over the last twenty years is the green roof: a layer of soil and plants laid on top of a building.
+const PASSAGE_1 = `As cities expand, more of their surface is covered by concrete, glass and asphalt. These materials absorb heat during the day and release it slowly at night, which is why city centres are often several degrees warmer than the countryside around them. One response that has spread quickly over the last twenty years is the green roof: a layer of soil and plants laid on top of a building.
 
 The idea is not new. Houses with grass roofs have been built in Scandinavia for centuries, mainly because the thick layer of turf kept warmth inside during long winters. Modern green roofs are lighter and thinner. Most use a waterproof sheet, a drainage layer and only ten to fifteen centimetres of growing material, planted with hardy species such as sedum that need little water.
 
@@ -33,9 +31,7 @@ Supporters point to several benefits. In summer, a planted roof can be up to thi
 
 There are drawbacks, however. A green roof costs roughly twice as much as a conventional one to build, and older buildings may need extra support to carry the weight of wet soil. Maintenance is also required: weeds must be removed and dry patches replanted, at least in the first few years.`
 
-const PASSAGE_2 = `The Slow Return of the Night Train
-
-For much of the twentieth century, sleeper trains linked the major cities of Europe. Passengers boarded in the evening, slept in small cabins and woke up hundreds of kilometres away. By the early 2000s, however, many of these services had disappeared. Cheap flights were faster, and railway companies found the trains expensive to run, because each carriage carried far fewer people than a daytime train.
+const PASSAGE_2 = `For much of the twentieth century, sleeper trains linked the major cities of Europe. Passengers boarded in the evening, slept in small cabins and woke up hundreds of kilometres away. By the early 2000s, however, many of these services had disappeared. Cheap flights were faster, and railway companies found the trains expensive to run, because each carriage carried far fewer people than a daytime train.
 
 Recently the picture has begun to change. Several operators have introduced new routes, and some old ones have been brought back. The main reason is concern about climate change: a journey by train produces a small fraction of the carbon emissions of the same trip by air. Surveys suggest that younger travellers in particular are willing to spend more time travelling if it means a smaller environmental impact.
 
@@ -43,9 +39,7 @@ Comfort is another factor. Modern sleeper carriages offer private compartments w
 
 Problems remain. Tickets are often more expensive than flights, partly because trains must pay a fee for every country whose tracks they use. Finding enough modern carriages is also difficult, since only a few factories still build them. Even so, rail experts expect the network to keep growing over the next decade.`
 
-const PASSAGE_3 = `Why Sleep Helps Us Remember
-
-Scientists have long suspected that sleep plays a part in memory, but only in recent decades have they been able to observe what happens in the brain at night. The picture that has emerged is of a busy organ that sorts and stores the experiences of the day while the body rests.
+const PASSAGE_3 = `Scientists have long suspected that sleep plays a part in memory, but only in recent decades have they been able to observe what happens in the brain at night. The picture that has emerged is of a busy organ that sorts and stores the experiences of the day while the body rests.
 
 During the day, new information is held for a short time in a region called the hippocampus. Research on animals has shown that during deep sleep, the hippocampus replays recent events, sending signals to the outer layer of the brain, the cortex, where memories can be kept for many years. Without this transfer, much of what we learn seems to fade within days.
 

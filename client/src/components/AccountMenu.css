@@ -61,5 +61,5 @@
 }
 
 .account-dropdown button:hover {
-  background: var(--background);
+  background: var(--surface);
 }
