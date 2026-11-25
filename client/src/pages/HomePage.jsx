@@ -159,7 +159,7 @@ function gapText(current, goal) {
   if (!goal) return 'Chưa đặt mục tiêu'
   if (current === null) return 'Chưa có band'
   const gap = gapLabel(current, goal)
-  return gap === 'đạt mục tiêu' ? 'Đã đạt mục tiêu 🎉' : `${gap.charAt(0).toUpperCase()}${gap.slice(1)} band`
+  return gap === 'đạt mục tiêu' ? 'Đã đạt mục tiêu' : `${gap.charAt(0).toUpperCase()}${gap.slice(1)} band`
 }
 
 // Text of the exam-date chip: "Thi 12/12 · còn 17 ngày", or a prompt when no date is set

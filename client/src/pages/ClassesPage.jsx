@@ -6,6 +6,7 @@ import { CLASS_COLORS, colorOf, nextDueBox, splitByRole } from '../features/clas
 import { initialsOf } from '../components/initials.js'
 import { SkeletonCards } from '../components/Skeleton.jsx'
 import EmptyState from '../components/EmptyState.jsx'
+import SlideHighlight from '../components/SlideHighlight.jsx'
 import { useToast } from '../components/FeedbackProvider.jsx'
 import { useAuth } from '../auth/AuthContext.jsx'
 import GuestClassesNotice from '../features/classes/GuestClassesNotice.jsx'
@@ -72,6 +73,7 @@ function ClassesList() {
 
       <div className="classes-toolbar">
         <div className="segmented" role="tablist">
+          <SlideHighlight activeKey={`${tab}-${counts.all}`} />
           {TABS.map((item) => (
             <button
               key={item.key}

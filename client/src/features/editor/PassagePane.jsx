@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import SlideHighlight from '../../components/SlideHighlight.jsx'
 import FileUploadButton from './FileUploadButton.jsx'
 import { evidenceFromSelection, evidenceSnippet } from './evidence.js'
 import { paragraphRanges, paragraphSegments, sectionMarks } from './passageView.js'
@@ -57,6 +58,7 @@ export default function PassagePane({ test, sectionIndex, onSelectSection, numbe
           ))}
         </div>
         <div className="segmented" role="tablist">
+          <SlideHighlight activeKey={mode} />
           <button type="button" role="tab" aria-selected={mode === 'evidence'} className={mode === 'evidence' ? 'segmented-tab active' : 'segmented-tab'} onClick={() => setMode('evidence')}>
             Gắn bằng chứng
           </button>

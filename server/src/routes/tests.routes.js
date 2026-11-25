@@ -8,6 +8,7 @@ import {
   changeTestStatus,
   deleteTest,
   getTestForPlay,
+  listClassesWithTest,
 } from '../controllers/tests.controller.js'
 
 const router = Router()
@@ -21,5 +22,6 @@ router.put('/:testId', saveTest)
 router.patch('/:testId/status', changeTestStatus)
 router.delete('/:testId', deleteTest)
 router.get('/:testId/play', getTestForPlay)
+router.get('/:testId/classes', listClassesWithTest)
 
 export default router

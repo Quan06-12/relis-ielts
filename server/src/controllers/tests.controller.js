@@ -2,7 +2,9 @@ import mongoose from 'mongoose'
 import { Test } from '../models/Test.js'
 import { AppError, validationError } from '../errors/AppError.js'
 import { findOwnedTest, findTestUserCanTake } from '../services/testAccess.js'
-import { findLastBands, findDoneTestIds } from '../services/attemptStats.js'
+import { findLastBands, findDoneTestIds, findAttemptLinks } from '../services/attemptStats.js'
+import { ClassMember } from '../models/ClassMember.js'
+import { ClassLibraryItem } from '../models/ClassLibraryItem.js'
 import {
   newTestLayout,
   renumberQuestions,
@@ -38,9 +40,28 @@ export async function listMyTests(request, response) {
     Test.find(filter).sort(source === 'system' ? { kind: 1, title: 1 } : { updatedAt: -1 }).skip((page - 1) * limit).limit(limit),
     Test.countDocuments(filter),
   ])
-  const lastBands = await findLastBands(request.userId, tests.map((test) => test._id))
+  const testIds = tests.map((test) => test._id)
+  const [lastBands, links] = await Promise.all([findLastBands(request.userId, testIds), findAttemptLinks(request.userId, testIds)])
 
-  response.json({ items: tests.map((test) => toSummary(test, lastBands.get(String(test._id)) ?? null)), total, page, limit })
+  response.json({
+    items: tests.map((test) => toSummary(test, lastBands.get(String(test._id)) ?? null, links.get(String(test._id)))),
+    total,
+    page,
+    limit,
+  })
+}
+
+// GET /api/tests/:testId/classes — the classes I teach whose library already holds this test,
+// so the "Đưa lên lớp" dialog can mark them as done instead of offering them again
+export async function listClassesWithTest(request, response) {
+  const { testId } = request.params
+  if (!mongoose.isValidObjectId(testId)) {
+    response.json({ classIds: [] })
+    return
+  }
+  const taught = await ClassMember.find({ userId: request.userId, role: 'teacher' }).distinct('classId')
+  const classIds = await ClassLibraryItem.find({ testId, classId: { $in: taught } }).distinct('classId')
+  response.json({ classIds: classIds.map(String) })
 }
 
 // POST /api/tests — a new empty draft (US11)

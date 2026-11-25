@@ -103,7 +103,8 @@ export function toReviewView(test, sectionIndexes) {
 }
 
 // One card in the test library
-export function toSummary(test, lastBand = null) {
+// links: { lastAttemptId, openAttemptId } of the signed-in user for this test (library list only)
+export function toSummary(test, lastBand = null, links = {}) {
   return {
     id: String(test.id ?? test._id),
     title: test.title,
@@ -118,5 +119,7 @@ export function toSummary(test, lastBand = null) {
     updatedAt: test.updatedAt,
     isSystem: test.isSystem === true,
     lastBand,
+    lastAttemptId: links.lastAttemptId ?? null,
+    openAttemptId: links.openAttemptId ?? null,
   }
 }

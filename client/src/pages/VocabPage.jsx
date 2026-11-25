@@ -35,6 +35,7 @@ export default function VocabPage() {
       {error && <p className="library-message error">{error}</p>}
       {!sets && !error && <SkeletonCards />}
 
+      {sets && <h2 className="visually-hidden">Bộ từ của bạn</h2>}
       {sets && (
         <div className="vocab-grid">
           {sets.map((set) => (

@@ -8,6 +8,7 @@ import GradebookTab from '../features/classes/GradebookTab.jsx'
 import MembersTab from '../features/classes/MembersTab.jsx'
 import AssignmentsTab from '../features/classes/AssignmentsTab.jsx'
 import ClassOverview from '../features/classes/ClassOverview.jsx'
+import SlideHighlight from '../components/SlideHighlight.jsx'
 import { useConfirm, useToast } from '../components/FeedbackProvider.jsx'
 import { SkeletonCards } from '../components/Skeleton.jsx'
 import './ClassDetailPage.css'
@@ -83,9 +84,13 @@ export default function ClassDetailPage() {
     <main className="page">
       <Link to="/classes" className="class-back">← Lớp học</Link>
 
-      <header className="class-hero" style={{ background: colorOf(classInfo.color) }}>
+      {/* The header uses the app's own navy; the class colour stays as a small dot in the chip */}
+      <header className="class-hero">
         <div>
-          <span className="class-hero-chip">{isTeacher ? 'Bạn dạy lớp này' : 'Bạn học lớp này'}</span>
+          <span className="class-hero-chip">
+            <i className="class-color-dot" style={{ background: colorOf(classInfo.color) }} aria-hidden="true" />
+            {isTeacher ? 'Bạn dạy lớp này' : 'Bạn học lớp này'}
+          </span>
           <h1>{classInfo.name}</h1>
           <p className="class-hero-meta">
             {[classInfo.description, isTeacher ? studentCountLabel(classInfo.studentCount) : null].filter(Boolean).join(' · ')}
@@ -104,6 +109,7 @@ export default function ClassDetailPage() {
       <ClassOverview classId={classId} isTeacher={isTeacher} studentCount={classInfo.studentCount} refreshKey={overviewKey} />
 
       <nav className="underline-tabs" role="tablist">
+        <SlideHighlight variant="underline" activeKey={tab} />
         {tabs.map((item) => (
           <button
             key={item.id}
@@ -117,6 +123,9 @@ export default function ClassDetailPage() {
           </button>
         ))}
       </nav>
+
+      {/* Names the open tab for screen readers and keeps headings in order (h1 → h2 → card h3) */}
+      <h2 className="visually-hidden">{tabs.find((item) => item.id === tab)?.label}</h2>
 
       {tab === 'library' && <ClassLibraryTab classId={classId} isTeacher={isTeacher} />}
       {tab === 'assignments' && (
