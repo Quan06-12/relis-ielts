@@ -60,8 +60,8 @@ export default function TestCard({ test, onStart, onDelete, onShare, showSystemC
             </button>
             {isMenuOpen && (
               <div className="card-menu-list" role="menu">
-                {test.openAttemptId && <Link role="menuitem" to={`/attempts/${test.openAttemptId}`}>Làm tiếp bài đang dở</Link>}
-                {test.lastAttemptId && <Link role="menuitem" to={`/attempts/${test.lastAttemptId}/review`}>Xem lại bài làm gần nhất</Link>}
+                {test.openAttemptId && <Link role="menuitem" to={`/attempts/${test.openAttemptId}`}>Làm tiếp</Link>}
+                {test.lastAttemptId && <Link role="menuitem" to={`/attempts/${test.lastAttemptId}/review`}>Xem lại bài làm</Link>}
                 {(test.openAttemptId || test.lastAttemptId) && <hr className="card-menu-divider" />}
                 {!test.isSystem && <Link role="menuitem" to={`/tests/${test.id}/edit`}>Sửa đề</Link>}
                 {test.status === 'published' && (
