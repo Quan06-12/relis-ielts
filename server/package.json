@@ -13,6 +13,7 @@
     "seed:demo": "node --env-file=.env scripts/seedDemo.js",
     "seed:system": "node --env-file=.env scripts/seedSystem.js",
     "fix:passage-titles": "node --env-file=.env scripts/fixPassageTitles.js",
+    "fix:blank-attempts": "node --env-file=.env scripts/fixBlankAttempts.js",
     "lint": "oxlint src tests"
   },
   "dependencies": {

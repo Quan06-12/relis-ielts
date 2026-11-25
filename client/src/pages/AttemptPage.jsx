@@ -11,10 +11,13 @@ import AudioPlayer from '../features/attempt/AudioPlayer.jsx'
 import SplitPane from '../components/SplitPane.jsx'
 import { backupPending, loadPending, clearPending } from '../features/attempt/pendingBackup.js'
 import HighlightablePassage from '../features/attempt/HighlightablePassage.jsx'
+import PaneTabs from '../features/attempt/PaneTabs.jsx'
 import { loadHighlights, saveHighlights, clearHighlights, loadNotes, saveNotes, clearNotes } from '../features/attempt/highlights.js'
 import './AttemptPage.css'
 
 const AUTOSAVE_DELAY_MS = 1000
+// After a failed save (e.g. the network dropped), try again after this long
+const RETRY_DELAY_MS = 4000
 // In the last seconds, answers are saved immediately: the server rejects answers after the deadline
 const FINAL_SECONDS = 5
 
@@ -31,6 +34,11 @@ export default function AttemptPage() {
   const [currentNumber, setCurrentNumber] = useState(1) // the question being worked on, boxed in the bottom bar
   const [isConfirmingSubmit, setIsConfirmingSubmit] = useState(false)
   const [error, setError] = useState('')
+  // What the learner sees next to the clock: { state: 'saved' | 'saving' | 'error', at }
+  const [saveStatus, setSaveStatus] = useState(null)
+  const [isLeaving, setIsLeaving] = useState(false)
+  // Phones show the passage or the questions, one at a time
+  const [mobilePane, setMobilePane] = useState('passage')
   // US43: { [section position]: [{ start, end }] }, kept in the browser for this attempt
   const [highlights, setHighlights] = useState(() => loadHighlights(attemptId))
   // Notes on words of the passage: { [section position]: [{ start, end, text }] }, kept the same way
@@ -42,6 +50,9 @@ export default function AttemptPage() {
   const isSubmitting = useRef(false)
   const secondsLeftNow = useRef(null)
 
+  // The latest flushAnswers, for the retry timer that is set up inside it
+  const flushAnswersRef = useRef(null)
+
   const goToReview = useCallback(() => navigate(`/attempts/${attemptId}/review`, { replace: true }), [navigate, attemptId])
 
   // Send the pending answers now (used by autosave and before submitting)
@@ -51,16 +62,38 @@ export default function AttemptPage() {
     const changes = Object.entries(sending).map(([questionId, value]) => ({ questionId, value }))
     if (changes.length === 0) return
     pendingChanges.current = {}
+    setSaveStatus({ state: 'saving' })
     try {
       await saveAnswers(attemptId, changes)
     } catch (saveError) {
       // Not saved: put the answers back (newer changes win) so the next autosave retries them
       pendingChanges.current = { ...sending, ...pendingChanges.current }
+      setSaveStatus({ state: 'error' })
+      // Try again shortly unless the server has closed the attempt (time is up)
+      if (saveError.response?.status !== 409) {
+        clearTimeout(autosaveTimer.current)
+        autosaveTimer.current = setTimeout(() => flushAnswersRef.current?.().catch(() => {}), RETRY_DELAY_MS)
+      }
       throw saveError
     }
+    setSaveStatus({ state: 'saved', at: new Date() })
     // Answers changed while saving stay in the backup; otherwise it is no longer needed
     backupPending(attemptId, pendingChanges.current)
   }, [attemptId])
+
+  flushAnswersRef.current = flushAnswers
+
+  // "Lưu & thoát": send what is not saved yet, then go home, where "Làm tiếp" brings the learner back
+  async function handleSaveAndLeave() {
+    setIsLeaving(true)
+    try {
+      await flushAnswers()
+      navigate('/', { replace: true })
+    } catch (saveError) {
+      setIsLeaving(false)
+      setError(`${getErrorMessage(saveError)} Bài vẫn được giữ trên máy này, bạn có thể thử thoát lại.`)
+    }
+  }
 
   // Load the attempt (also used after a reload: answers and time continue where they were)
   useEffect(() => {
@@ -135,6 +168,7 @@ export default function AttemptPage() {
   const sectionWord = test.skill === 'reading' ? 'Passage' : 'Part'
 
   function jumpToQuestion(question) {
+    setMobilePane('questions')
     setCurrentSection(question.sectionPosition)
     setCurrentNumber(question.number)
     // Wait for the section to render before scrolling to the question and putting the cursor in it
@@ -167,7 +201,14 @@ export default function AttemptPage() {
   return (
     <div className="attempt-page">
       <header className="attempt-header">
+        <button type="button" className="leave-button" onClick={handleSaveAndLeave} disabled={isLeaving}>
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+          {isLeaving ? 'Đang lưu…' : 'Lưu & thoát'}
+        </button>
         <h1>{test.title}</h1>
+        <SaveStatus status={saveStatus} />
         <span className={secondsLeft <= 300 ? 'attempt-clock warning' : 'attempt-clock'} aria-live="polite">
           {formatClock(secondsLeft ?? 0)}
         </span>
@@ -182,7 +223,8 @@ export default function AttemptPage() {
       {test.skill === 'reading' ? (
         // US27: passage on the left, questions on the right, each scrolls on its own;
         // US38: the bar between them can be dragged
-        <main className="attempt-reading">
+        <main className="attempt-reading" data-pane={mobilePane}>
+          <PaneTabs pane={mobilePane} onChange={setMobilePane} questionsLabel={`Câu hỏi (${countUnanswered(questionsOf([section]), answers)} trống)`} />
           <SplitPane
             label="Đổi độ rộng bài đọc và câu hỏi"
             first={
@@ -252,5 +294,23 @@ export default function AttemptPage() {
         </div>
       )}
     </div>
+  )
+}
+
+// Small line next to the clock so the learner knows their answers are safe
+function SaveStatus({ status }) {
+  if (!status) return <span className="save-status">Đáp án được tự lưu</span>
+  if (status.state === 'saving') return <span className="save-status" role="status">Đang lưu…</span>
+  if (status.state === 'error') {
+    return <span className="save-status error" role="status">Chưa lưu được, đang thử lại</span>
+  }
+  const time = status.at.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+  return (
+    <span className="save-status" role="status">
+      <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M5 12.5l4.5 4.5L19 7.5" />
+      </svg>
+      Đã lưu · {time}
+    </span>
   )
 }

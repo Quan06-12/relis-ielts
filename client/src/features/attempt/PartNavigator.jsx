@@ -43,6 +43,8 @@ export default function PartNavigator({ sections, sectionWord, questions, answer
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
           <path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
+        {/* On phones the header has no room for "Nộp bài", so the label lives here */}
+        <span className="part-submit-label">Nộp bài</span>
       </button>
     </footer>
   )
