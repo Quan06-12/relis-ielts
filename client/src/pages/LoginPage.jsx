@@ -14,14 +14,14 @@ import './LoginPage.css'
 // After sign-in the Relis cube flies, tumbling, to the middle of the screen and then into the logo
 // of the navy bar while the app opens (LogoFlightLayer.jsx).
 export default function LoginPage() {
-  const { status, signIn, signInWithEmail, register } = useAuth()
+  const { status, signIn, signInWithUsername, register } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [state, setState] = useState('ready') // 'ready' | 'signing-in' | 'cancelled' | 'error'
   const [error, setError] = useState('')
   const [lastCredential, setLastCredential] = useState(null) // kept so "Thử lại" can send it again
-  const [formMode, setFormMode] = useState('login') // 'login' | 'register' for the email form
-  const [fields, setFields] = useState({ name: '', email: '', password: '' })
+  const [formMode, setFormMode] = useState('login') // 'login' | 'register' for the username form
+  const [fields, setFields] = useState({ username: '', password: '', name: '' })
   const brandCube = useRef(null)
   // The Google button has a fixed width in pixels; measure its box so it fits phones too
   const buttonBox = useRef(null)
@@ -51,12 +51,12 @@ export default function LoginPage() {
     return finishSignIn(() => signIn(credential))
   }
 
-  // Email form: sign in, or create the account first
-  function handleEmailSubmit(event) {
+  // Username form: sign in, or create the account first
+  function handleUsernameSubmit(event) {
     event.preventDefault()
     setLastCredential(null)
-    const { name, email, password } = fields
-    finishSignIn(() => (formMode === 'register' ? register({ name, email, password }) : signInWithEmail({ email, password })))
+    const { username, password, name } = fields
+    finishSignIn(() => (formMode === 'register' ? register({ username, password, name }) : signInWithUsername({ username, password })))
   }
 
   function updateField(name, value) {
@@ -110,7 +110,7 @@ export default function LoginPage() {
         <div className="login-card">
           <p className="login-eyebrow">Bắt đầu miễn phí</p>
           <h2>Chào mừng bạn</h2>
-          <p>Đăng nhập bằng Google, hoặc dùng email và mật khẩu.</p>
+          <p>Đăng nhập bằng Google, hoặc bằng tên đăng nhập và mật khẩu.</p>
 
           {state === 'signing-in' ? (
             <div className="login-connecting" role="status">
@@ -132,17 +132,24 @@ export default function LoginPage() {
           )}
 
           {state !== 'signing-in' && (
-            <form className="login-email-form" onSubmit={handleEmailSubmit}>
-              <p className="login-divider"><span>hoặc dùng email</span></p>
-              {formMode === 'register' && (
-                <label>
-                  Họ và tên
-                  <input type="text" autoComplete="name" maxLength={60} required value={fields.name} onChange={(event) => updateField('name', event.target.value)} />
-                </label>
-              )}
+            <form className="login-account-form" onSubmit={handleUsernameSubmit}>
+              <p className="login-divider"><span>hoặc dùng tên đăng nhập</span></p>
               <label>
-                Email
-                <input type="email" autoComplete="email" required value={fields.email} onChange={(event) => updateField('email', event.target.value)} />
+                Tên đăng nhập
+                <input
+                  type="text"
+                  autoComplete="username"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  minLength={formMode === 'register' ? 3 : undefined}
+                  maxLength={30}
+                  pattern={formMode === 'register' ? '[A-Za-z0-9._]{3,30}' : undefined}
+                  title="3–30 ký tự: chữ không dấu, số, dấu chấm hoặc gạch dưới"
+                  required
+                  value={fields.username}
+                  onChange={(event) => updateField('username', event.target.value)}
+                />
+                {formMode === 'register' && <span className="login-field-hint">3–30 ký tự: chữ không dấu, số, dấu chấm hoặc gạch dưới</span>}
               </label>
               <label>
                 Mật khẩu
@@ -157,6 +164,12 @@ export default function LoginPage() {
                 />
                 {formMode === 'register' && <span className="login-field-hint">Ít nhất 8 ký tự</span>}
               </label>
+              {formMode === 'register' && (
+                <label>
+                  Tên hiển thị (không bắt buộc)
+                  <input type="text" autoComplete="name" maxLength={60} placeholder="Ví dụ: Nguyễn Minh Anh" value={fields.name} onChange={(event) => updateField('name', event.target.value)} />
+                </label>
+              )}
               <button type="submit" className="login-submit">{formMode === 'register' ? 'Tạo tài khoản' : 'Đăng nhập'}</button>
               <p className="login-switch">
                 {formMode === 'register' ? 'Đã có tài khoản?' : 'Chưa có tài khoản?'}{' '}

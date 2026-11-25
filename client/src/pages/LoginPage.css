@@ -283,8 +283,8 @@
   }
 }
 
-/* Email and password form under the Google button */
-.login-email-form {
+/* Username and password form under the Google button */
+.login-account-form {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -308,7 +308,7 @@
   background: rgba(255, 255, 255, 0.22);
 }
 
-.login-email-form label {
+.login-account-form label {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -317,7 +317,7 @@
   font-weight: 600;
 }
 
-.login-email-form input {
+.login-account-form input {
   padding: 10px 12px;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 8px;
@@ -328,7 +328,7 @@
   font-weight: 400;
 }
 
-.login-email-form input:focus-visible {
+.login-account-form input:focus-visible {
   outline: 3px solid var(--yellow);
   outline-offset: 1px;
 }

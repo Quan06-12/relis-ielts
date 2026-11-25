@@ -51,8 +51,8 @@ export function AuthProvider({ children }) {
     keepSession(await signInWithGoogle(credential))
   }
 
-  // Email and password: sign in to an existing account, or create one
-  async function signInWithEmail(fields) {
+  // Username and password: sign in to an existing account, or create one
+  async function signInWithUsername(fields) {
     keepSession(await signInWithPassword(fields))
   }
 
@@ -64,7 +64,7 @@ export function AuthProvider({ children }) {
   const updateUser = useCallback((changedUser) => setUser(changedUser), [])
 
   return (
-    <AuthContext.Provider value={{ user, status, signIn, signInWithEmail, register, signOut, updateUser }}>
+    <AuthContext.Provider value={{ user, status, signIn, signInWithUsername, register, signOut, updateUser }}>
       {children}
     </AuthContext.Provider>
   )

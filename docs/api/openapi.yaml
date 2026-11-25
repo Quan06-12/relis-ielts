@@ -113,10 +113,10 @@ paths:
     post:
       operationId: register
       tags: [Auth]
-      summary: Create an account with email and password
+      summary: Create an account with a username and password
       description: |
-        The password is stored only as a salted scrypt hash. The email is stored in lower case.
-        Signing in with Google later using the same email links Google to this account.
+        The username is stored in lower case and must be unique. The password is stored only as a salted scrypt hash.
+        `name` is the display name; when it is left out, the username is shown.
       security: []
       requestBody:
         required: true
@@ -124,11 +124,11 @@ paths:
           application/json:
             schema:
               type: object
-              required: [name, email, password]
+              required: [username, password]
               properties:
-                name: { type: string, minLength: 1, maxLength: 60 }
-                email: { type: string, format: email }
+                username: { type: string, pattern: '^[A-Za-z0-9._]{3,30}$' }
                 password: { type: string, minLength: 8, maxLength: 72 }
+                name: { type: string, maxLength: 60 }
       responses:
         '201':
           description: Account created and signed in
@@ -137,7 +137,7 @@ paths:
               schema: { $ref: '#/components/schemas/AuthResult' }
         '400': { $ref: '#/components/responses/ValidationError' }
         '409':
-          description: An account with this email already exists (`EMAIL_TAKEN`)
+          description: The username is taken (`USERNAME_TAKEN`)
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
@@ -146,10 +146,10 @@ paths:
     post:
       operationId: signInWithPassword
       tags: [Auth]
-      summary: Sign in with email and password
+      summary: Sign in with username and password
       description: |
-        A wrong password and an unknown email get the same 401, so the API does not reveal who has an account.
-        After 5 wrong passwords for one email within 15 minutes, that email gets 429 until the window passes.
+        A wrong password and an unknown username get the same 401, so the API does not reveal who has an account.
+        After 5 wrong passwords for one username within 15 minutes, that username gets 429 until the window passes.
       security: []
       requestBody:
         required: true
@@ -157,9 +157,9 @@ paths:
           application/json:
             schema:
               type: object
-              required: [email, password]
+              required: [username, password]
               properties:
-                email: { type: string, format: email }
+                username: { type: string }
                 password: { type: string }
       responses:
         '200':
@@ -169,7 +169,7 @@ paths:
               schema: { $ref: '#/components/schemas/AuthResult' }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401':
-          description: Email or password is wrong (`INVALID_CREDENTIALS`)
+          description: Username or password is wrong (`INVALID_CREDENTIALS`)
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
@@ -1430,7 +1430,8 @@ components:
       properties:
         id: { $ref: '#/components/schemas/Id' }
         name: { type: string }
-        email: { type: string, format: email }
+        email: { type: string, format: email, description: 'Google accounts only' }
+        username: { type: string, description: 'Username accounts only' }
         avatarUrl: { type: string, format: uri }
         goals:
           type: object

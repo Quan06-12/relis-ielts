@@ -1,12 +1,13 @@
 import mongoose from 'mongoose'
 
-// One document per person (collection "users"). An account signs in with Google (googleId),
-// with an email and password (passwordHash), or both once a password account also uses Google.
+// One document per person (collection "users"). An account signs in either with Google
+// (googleId + email) or with a username and password it created itself (username + passwordHash).
 const userSchema = new mongoose.Schema(
   {
-    // sparse: many password-only accounts have no googleId, and that must not break uniqueness
+    // sparse: the unique check skips accounts that do not have the field
     googleId: { type: String, unique: true, sparse: true },
-    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    email: { type: String, unique: true, sparse: true, lowercase: true, trim: true },
+    username: { type: String, unique: true, sparse: true, lowercase: true, trim: true },
     // Never sent to the client and not loaded unless asked for (.select('+passwordHash'))
     passwordHash: { type: String, select: false },
     name: { type: String, required: true },

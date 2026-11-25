@@ -48,7 +48,8 @@ export default function AccountMenu() {
       {isOpen && (
         <div className="account-dropdown">
           <p className="account-name">{user.name}</p>
-          <p className="account-email">{user.email}</p>
+          {/* Google accounts show their email, username accounts their @username */}
+          <p className="account-email">{user.email ?? `@${user.username}`}</p>
           <button type="button" onClick={handleSignOut}>Đăng xuất</button>
         </div>
       )}

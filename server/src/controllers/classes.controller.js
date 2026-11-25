@@ -97,7 +97,7 @@ export async function getClass(request, response) {
 export async function listMembers(request, response) {
   const memberships = await ClassMember.find({ classId: request.params.classId })
     .sort({ role: -1, joinedAt: 1 }) // teachers first, then students in the order they joined
-    .populate('userId', 'name email avatarUrl')
+    .populate('userId', 'name email username avatarUrl')
 
   const items = memberships.map((membership) => ({
     user: toPublicUser(membership.userId),
@@ -193,7 +193,7 @@ export async function getGradebook(request, response) {
   const { classId } = request.params
 
   const [studentMemberships, libraryItems] = await Promise.all([
-    ClassMember.find({ classId, role: 'student' }).sort({ joinedAt: 1 }).populate('userId', 'name email avatarUrl'),
+    ClassMember.find({ classId, role: 'student' }).sort({ joinedAt: 1 }).populate('userId', 'name email username avatarUrl'),
     ClassLibraryItem.find({ classId }).sort({ addedAt: 1 }),
   ])
   const tests = await Test.find({ _id: { $in: libraryItems.map((item) => item.testId) } })
@@ -270,5 +270,5 @@ function toClassView(item, myRole, extra = {}) {
 }
 
 function toPublicUser(user) {
-  return { id: String(user._id), name: user.name, email: user.email, avatarUrl: user.avatarUrl ?? null }
+  return { id: String(user._id), name: user.name, email: user.email ?? null, username: user.username ?? null, avatarUrl: user.avatarUrl ?? null }
 }

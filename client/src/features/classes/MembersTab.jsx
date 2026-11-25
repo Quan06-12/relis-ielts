@@ -50,7 +50,7 @@ export default function MembersTab({ classId }) {
           )}
           <div className="member-info">
             <strong>{member.user.name}</strong>
-            <p>{member.user.email} · vào lớp {new Date(member.joinedAt).toLocaleDateString('vi-VN')}</p>
+            <p>{member.user.email ?? `@${member.user.username}`} · vào lớp {new Date(member.joinedAt).toLocaleDateString('vi-VN')}</p>
           </div>
           <span className="role-chip">{ROLE_LABEL[member.role]}</span>
           {member.role === 'student' && (
