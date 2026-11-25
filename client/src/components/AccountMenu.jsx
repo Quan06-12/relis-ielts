@@ -47,8 +47,8 @@ export default function AccountMenu() {
 
       {isOpen && (
         <div className="account-dropdown">
-          <p className="account-name">{user.name}</p>
-          <p className="account-email">{user.email}</p>
+          <p className={user.isGuest ? 'account-name guest' : 'account-name'}>{user.name}</p>
+          {!user.isGuest && <p className="account-email">{user.email}</p>}
           <button type="button" onClick={handleSignOut}>Đăng xuất</button>
         </div>
       )}

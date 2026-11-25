@@ -306,3 +306,28 @@
 .classes-header .page-heading {
   margin-bottom: 0;
 }
+
+/* Guests: classes need a Google account */
+.guest-classes {
+  max-width: 640px;
+  margin-top: 16px;
+  padding: 28px 32px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--white);
+}
+
+.guest-classes h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.guest-classes p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.guest-classes-button {
+  margin-top: 20px;
+}

@@ -84,6 +84,8 @@ paths:
       description: |
         The server verifies `credential` with Google, creates the user on the first sign-in,
         updates name and picture on later sign-ins, and returns the app's own JWT (valid 7 days).
+        When the request also carries a guest's token and this Google account does not exist yet,
+        the guest becomes this Google account and keeps their tests and attempts.
       security: []
       requestBody:
         required: true
@@ -105,6 +107,27 @@ paths:
         '400': { $ref: '#/components/responses/ValidationError' }
         '401':
           description: Google rejected the token (`INVALID_GOOGLE_TOKEN`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /auth/guest:
+    post:
+      operationId: signInAsGuest
+      tags: [Auth]
+      summary: Try Relis without an account
+      description: |
+        Creates a guest user and returns its token. A guest can use everything except creating
+        or joining a class (`403 GUEST_NOT_ALLOWED`). At most 10 guests per IP address per hour.
+      security: []
+      responses:
+        '201':
+          description: Guest created and signed in
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthResult' }
+        '429':
+          description: Too many guest accounts from this address (`TOO_MANY_GUESTS`)
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
@@ -711,6 +734,11 @@ paths:
                   class: { $ref: '#/components/schemas/ClassInfo' }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403':
+          description: Guests cannot use classes (`GUEST_NOT_ALLOWED`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
 
   /classes/join:
     post:
@@ -739,6 +767,11 @@ paths:
                   class: { $ref: '#/components/schemas/ClassInfo' }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403':
+          description: Guests cannot use classes (`GUEST_NOT_ALLOWED`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409':
           description: Already a member (`ALREADY_MEMBER`); `details.classId`
@@ -1364,7 +1397,8 @@ components:
       properties:
         id: { $ref: '#/components/schemas/Id' }
         name: { type: string }
-        email: { type: string, format: email }
+        email: { type: string, format: email, description: 'Missing for guests' }
+        isGuest: { type: boolean, description: 'A guest cannot create or join classes' }
         avatarUrl: { type: string, format: uri }
         goals:
           type: object

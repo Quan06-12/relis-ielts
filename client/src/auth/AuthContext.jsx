@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { googleLogout } from '@react-oauth/google'
-import { signInWithGoogle, getCurrentUser } from '../api/auth.js'
+import { signInWithGoogle, signInAsGuest, getCurrentUser } from '../api/auth.js'
 import { onUnauthorized } from '../api/http.js'
 import { getToken, saveToken, clearToken } from './tokenStorage.js'
 
@@ -40,19 +40,28 @@ export function AuthProvider({ children }) {
       })
   }, [status])
 
-  // US01: called by the login page with the credential returned by the Google button
-  async function signIn(credential) {
-    const { token, user: signedInUser } = await signInWithGoogle(credential)
+  function keepSession({ token, user: signedInUser }) {
     saveToken(token)
     setUser(signedInUser)
     setStatus('signed-in')
+  }
+
+  // US01: called with the credential returned by the Google button.
+  // A guest who is signed in sends their token too, so the server turns the guest into this Google account.
+  async function signIn(credential) {
+    keepSession(await signInWithGoogle(credential))
+  }
+
+  // "Dùng thử không cần tài khoản": a guest can do everything except create or join classes
+  async function signInGuest() {
+    keepSession(await signInAsGuest())
   }
 
   // After the user changes their profile (goals on the home page, US46)
   const updateUser = useCallback((changedUser) => setUser(changedUser), [])
 
   return (
-    <AuthContext.Provider value={{ user, status, signIn, signOut, updateUser }}>
+    <AuthContext.Provider value={{ user, status, signIn, signInGuest, signOut, updateUser }}>
       {children}
     </AuthContext.Provider>
   )

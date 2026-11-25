@@ -282,3 +282,47 @@
     backdrop-filter: none;
   }
 }
+
+/* "Dùng thử không cần tài khoản" under the Google button */
+.login-guest {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0 2px !important;
+  color: #b3bad8;
+  font-size: 13px;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.login-guest-button {
+  padding: 11px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--white);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.login-guest-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.login-guest-button:focus-visible {
+  outline: 3px solid var(--yellow);
+  outline-offset: 2px;
+}

@@ -4,6 +4,8 @@ const messages = {
   VALIDATION_ERROR: 'Thông tin chưa hợp lệ, vui lòng kiểm tra lại.',
   UNAUTHENTICATED: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.',
   INVALID_GOOGLE_TOKEN: 'Google không xác nhận được tài khoản, vui lòng thử lại.',
+  GUEST_NOT_ALLOWED: 'Tài khoản khách không tạo hoặc tham gia lớp được. Hãy đăng nhập bằng Google.',
+  TOO_MANY_GUESTS: 'Đã tạo quá nhiều tài khoản khách từ mạng này. Vui lòng thử lại sau.',
   NOT_FOUND: 'Không tìm thấy nội dung này.',
   ALREADY_MEMBER: 'Bạn đã ở trong lớp này rồi.',
   DUPLICATE_WORD: 'Từ này đã có trong bộ.',
