@@ -7,6 +7,8 @@ import { initialsOf } from '../components/initials.js'
 import { SkeletonCards } from '../components/Skeleton.jsx'
 import EmptyState from '../components/EmptyState.jsx'
 import { useToast } from '../components/FeedbackProvider.jsx'
+import { useAuth } from '../auth/AuthContext.jsx'
+import GuestClassesNotice from '../features/classes/GuestClassesNotice.jsx'
 import './ClassesPage.css'
 
 const TABS = [
@@ -15,10 +17,26 @@ const TABS = [
   { label: 'Lớp tôi học', key: 'studying' },
 ]
 
-// Classes page (US04, US06, US07): the classes I teach and the classes I study in.
+// Classes page (US04, US06, US07): the classes I teach and the classes I study in (not for guests).
 // One account can teach one class and study in another, so both lists load together
 // and the tabs only filter on the client.
 export default function ClassesPage() {
+  const { user } = useAuth()
+  // A guest cannot create or join classes: show how to get a real account instead
+  if (user?.isGuest) {
+    return (
+      <main className="page">
+        <div className="page-heading">
+          <h1>Lớp học</h1>
+        </div>
+        <GuestClassesNotice />
+      </main>
+    )
+  }
+  return <ClassesList />
+}
+
+function ClassesList() {
   const navigate = useNavigate()
   const [tab, setTab] = useState('all')
   const [search, setSearch] = useState('')

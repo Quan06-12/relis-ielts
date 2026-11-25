@@ -6,6 +6,12 @@ export async function signInWithGoogle(credential) {
   return response.data // { token, user }
 }
 
+// POST /auth/guest — try Relis without an account
+export async function signInAsGuest() {
+  const response = await http.post('/auth/guest')
+  return response.data // { token, user }
+}
+
 // GET /auth/me — who is signed in with the saved token.
 export async function getCurrentUser() {
   const response = await http.get('/auth/me')

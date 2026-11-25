@@ -14,7 +14,7 @@ import './LoginPage.css'
 // After sign-in the Relis cube flies, tumbling, to the middle of the screen and then into the logo
 // of the navy bar while the app opens (LogoFlightLayer.jsx).
 export default function LoginPage() {
-  const { status, signIn } = useAuth()
+  const { status, signIn, signInGuest } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [state, setState] = useState('ready') // 'ready' | 'signing-in' | 'cancelled' | 'error'
@@ -44,12 +44,21 @@ export default function LoginPage() {
     return <Navigate to={nextPage} replace />
   }
 
-  async function signInWith(credential) {
+  function signInWith(credential) {
     setLastCredential(credential)
+    return finishSignIn(() => signIn(credential))
+  }
+
+  function signInAsGuest() {
+    setLastCredential(null)
+    return finishSignIn(signInGuest)
+  }
+
+  async function finishSignIn(action) {
     setState('signing-in')
     isSigningInHere.current = true
     try {
-      await signIn(credential)
+      await action()
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       if (reduceMotion) {
         goToApp() // the user asked for less motion
@@ -92,11 +101,11 @@ export default function LoginPage() {
         <div className="login-card">
           <p className="login-eyebrow">Bắt đầu miễn phí</p>
           <h2>Chào mừng bạn</h2>
-          <p>Đăng nhập hoặc tạo tài khoản bằng Google.</p>
+          <p>Đăng nhập bằng Google, hoặc dùng thử với tư cách khách.</p>
 
           {state === 'signing-in' ? (
             <div className="login-connecting" role="status">
-              <span className="login-spinner" aria-hidden="true" /> Đang kết nối với Google…
+              <span className="login-spinner" aria-hidden="true" /> {lastCredential ? 'Đang kết nối với Google…' : 'Đang mở chế độ khách…'}
             </div>
           ) : (
             <div className="login-google-button" ref={buttonBox}>
@@ -110,6 +119,17 @@ export default function LoginPage() {
                   locale="vi"
                 />
               )}
+            </div>
+          )}
+
+          {state !== 'signing-in' && (
+            <div className="login-guest">
+              <p className="login-divider"><span>hoặc</span></p>
+              <button type="button" className="login-guest-button" onClick={signInAsGuest}>Dùng thử không cần tài khoản</button>
+              <p className="login-guest-note">
+                Khách dùng được mọi tính năng trừ tạo và tham gia lớp. Dữ liệu chỉ lưu trên trình duyệt này;
+                đăng nhập Google sau đó sẽ giữ lại bài đã làm.
+              </p>
             </div>
           )}
 

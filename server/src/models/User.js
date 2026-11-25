@@ -1,10 +1,15 @@
 import mongoose from 'mongoose'
 
-// One document per person who signed in with Google (collection "users").
+// One document per person (collection "users"): someone who signed in with Google,
+// or a guest who chose "Dùng thử không cần tài khoản" (no googleId, no email, isGuest = true).
 const userSchema = new mongoose.Schema(
   {
-    googleId: { type: String, required: true, unique: true },
-    email: { type: String, required: true, unique: true },
+    // sparse: guests have neither field, and that must not break uniqueness
+    googleId: { type: String, unique: true, sparse: true },
+    email: { type: String, unique: true, sparse: true },
+    // A guest can do everything except create or join classes; signing in with Google later
+    // turns the guest into that Google account and keeps their tests and attempts
+    isGuest: { type: Boolean, default: false },
     name: { type: String, required: true },
     avatarUrl: { type: String, default: null },
     // Target bands on the home page (US46)

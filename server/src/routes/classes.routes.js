@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { requireAuth } from '../middleware/requireAuth.js'
+import { requireAuth, refuseGuests } from '../middleware/requireAuth.js'
 import { loadMembership, requireTeacher } from '../middleware/classMembership.js'
 import {
   createClass,
@@ -22,8 +22,9 @@ const router = Router()
 router.use(requireAuth)
 
 router.get('/', listMyClasses)
-router.post('/', createClass)
-router.post('/join', joinClass)
+// Guests use everything else, but classes need a real account
+router.post('/', refuseGuests, createClass)
+router.post('/join', refuseGuests, joinClass)
 
 // Every route below is about one class: members only, some teachers only
 router.get('/:classId', loadMembership, getClass)
