@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import CubeLogo from '../components/CubeLogo.jsx'
 import AccountMenu from '../components/AccountMenu.jsx'
 import TabSlider, { useTabSlider } from '../components/TabSlider.jsx'
+import { useAuth } from '../auth/AuthContext.jsx'
 import './AppLayout.css'
 
 // Line icons from the wireframe (24×24, drawn with the text colour)
@@ -14,6 +15,9 @@ const tabs = [
   { label: 'Lịch sử', to: '/history', icon: 'M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2' },
 ]
 
+// Only for admins (ADMIN_EMAILS on the server)
+const adminTab = { label: 'Quản trị', to: '/admin', icon: 'M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6zM9 12l2 2 4-4' }
+
 // Purple navigation bar shared by every page except the login, attempt and review pages.
 // On narrow screens the tabs fold into a ☰ menu.
 export default function AppLayout() {
@@ -22,6 +26,8 @@ export default function AppLayout() {
   const createMenu = useRef(null)
   const { pathname } = useLocation()
   const [tabBar, tabBox] = useTabSlider(pathname)
+  const { user } = useAuth()
+  const shownTabs = user?.isAdmin ? [...tabs, adminTab] : tabs
 
   // Close the menus after moving to another page
   useEffect(() => {
@@ -67,7 +73,7 @@ export default function AppLayout() {
 
           <div ref={tabBar} className={isMenuOpen ? 'app-tabs open' : 'app-tabs'}>
             <TabSlider box={tabBox} className="nav-slider" />
-            {tabs.map((tab) => (
+            {shownTabs.map((tab) => (
               // `end` keeps "Trang chủ" from staying active on every page (all paths start with "/")
               <NavLink key={tab.to} to={tab.to} end={tab.to === '/'} className="app-tab">
                 <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -87,6 +93,7 @@ export default function AppLayout() {
                 <div className="create-dropdown" role="menu">
                   <Link role="menuitem" to="/tests/new?skill=reading">Đề Reading</Link>
                   <Link role="menuitem" to="/tests/new?skill=listening">Đề Listening</Link>
+                  {user?.isAdmin && <Link role="menuitem" to="/tests/new?system=1">Đề cho Kho đề Relis</Link>}
                 </div>
               )}
             </div>

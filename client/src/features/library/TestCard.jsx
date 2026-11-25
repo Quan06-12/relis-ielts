@@ -8,10 +8,12 @@ const SKILL_LABEL = { reading: 'Reading', listening: 'Listening' }
 // One test in the library (US20–US22): cover with time and question count, a coloured tag
 // (Full test / Bài lẻ), the title, the question types, "Làm bài" and a ⋯ menu: continue the attempt
 // in progress, review the latest result, edit, share, delete. A system test cannot be edited or deleted.
-export default function TestCard({ test, onStart, onDelete, onShare, showSystemChip = true }) {
+export default function TestCard({ test, onStart, onDelete, onShare, showSystemChip = true, canManageSystem = false }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const menu = useRef(null)
   const canStart = test.questionCount > 0
+  // Own tests can be edited and deleted; system tests only by an admin
+  const canEdit = !test.isSystem || canManageSystem
 
   // Close the ⋯ menu when clicking elsewhere or pressing Esc
   useEffect(() => {
@@ -63,12 +65,14 @@ export default function TestCard({ test, onStart, onDelete, onShare, showSystemC
                 {test.openAttemptId && <Link role="menuitem" to={`/attempts/${test.openAttemptId}`}>Làm tiếp</Link>}
                 {test.lastAttemptId && <Link role="menuitem" to={`/attempts/${test.lastAttemptId}/review`}>Xem lại bài làm</Link>}
                 {(test.openAttemptId || test.lastAttemptId) && <hr className="card-menu-divider" />}
-                {!test.isSystem && <Link role="menuitem" to={`/tests/${test.id}/edit`}>Sửa đề</Link>}
+                {canEdit && <Link role="menuitem" to={`/tests/${test.id}/edit`}>Sửa đề</Link>}
                 {test.status === 'published' && (
                   <button type="button" role="menuitem" onClick={() => { setIsMenuOpen(false); onShare(test) }}>Đưa lên lớp</button>
                 )}
-                {!test.isSystem && (
-                  <button type="button" role="menuitem" className="danger" onClick={() => { setIsMenuOpen(false); onDelete(test) }}>Xoá đề</button>
+                {canEdit && (
+                  <button type="button" role="menuitem" className="danger" onClick={() => { setIsMenuOpen(false); onDelete(test) }}>
+                    {test.isSystem ? 'Gỡ khỏi Kho đề' : 'Xoá đề'}
+                  </button>
                 )}
               </div>
             )}

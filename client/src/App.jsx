@@ -13,6 +13,7 @@ import HistoryPage from './pages/HistoryPage.jsx'
 import AttemptPage from './pages/AttemptPage.jsx'
 import ReviewPage from './pages/ReviewPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
+import AdminPage from './pages/AdminPage.jsx'
 import PageTitle from './components/PageTitle.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
 import EscapeToClose from './components/EscapeToClose.jsx'
@@ -42,6 +43,7 @@ export default function App() {
           <Route path="/vocab" element={<VocabPage />} />
           <Route path="/vocab/:setId" element={<VocabSetPage />} />
           <Route path="/history" element={<HistoryPage />} />
+          <Route path="/admin" element={<AdminPage />} />
         </Route>
 
         {/* Full-screen pages: no navigation bar while editing, taking or reviewing a test */}

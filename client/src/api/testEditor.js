@@ -2,9 +2,9 @@ import http from './http.js'
 
 // Endpoints used by the test editor and the library's edit/delete actions (owner A).
 
-// POST /tests — create an empty draft
-export async function createTest({ title, skill, kind }) {
-  const response = await http.post('/tests', { title, skill, kind })
+// POST /tests — create an empty draft; system: true (admins) puts it in "Kho đề Relis"
+export async function createTest({ title, skill, kind, system = false }) {
+  const response = await http.post('/tests', { title, skill, kind, ...(system ? { system: true } : {}) })
   return response.data.test
 }
 
