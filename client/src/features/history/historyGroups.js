@@ -31,6 +31,8 @@ export function groupByWeek(attempts, now = new Date()) {
 // The score on a history card: band for a full test, otherwise "correct/total"
 export function scoreLabel(result) {
   if (!result) return null
+  // Nothing was answered: say so instead of "0/40", it does not count towards any band
+  if (result.answered === 0) return 'Bài trống'
   if (result.band !== null && result.band !== undefined) return `Band ${result.band.toFixed(1)}`
   return `${result.correct}/${result.total} câu đúng`
 }

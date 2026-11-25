@@ -378,3 +378,19 @@
 .notes-box .review-explanation {
   margin: 6px 0 14px;
 }
+
+/* "Xoá lần làm này": quiet, on the dark header, before "Thoát" */
+.review-delete {
+  padding: 7px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #ffd7d7;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.review-delete:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--white);
+}

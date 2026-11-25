@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { getReview } from '../api/attempts.js'
+import { getReview, deleteAttempt } from '../api/attempts.js'
+import { useConfirm, useToast } from '../components/FeedbackProvider.jsx'
 import { getErrorMessage } from '../api/errorMessages.js'
 import { questionsOf } from '../features/attempt/answers.js'
 import { formatDuration } from '../features/review/reviewHelpers.js'
@@ -20,6 +21,8 @@ import './ReviewPage.css'
 export default function ReviewPage() {
   const { attemptId } = useParams()
   const navigate = useNavigate()
+  const confirm = useConfirm()
+  const toast = useToast()
   const [review, setReview] = useState(null)
   const [error, setError] = useState('')
   const [currentSection, setCurrentSection] = useState(0)
@@ -60,6 +63,26 @@ export default function ReviewPage() {
     setTimeout(() => scrollToQuestion(question.number), 0)
   }
 
+  // Only my own practice can be deleted; class work stays for the teacher's gradebook
+  const canDelete = viewerRole === 'owner' && !attempt.classId
+
+  async function handleDelete() {
+    const isSure = await confirm({
+      title: 'Xoá lần làm này?',
+      message: 'Lần làm bài này sẽ bị xoá khỏi Lịch sử và không còn tính vào band, biểu đồ hay thống kê. Không khôi phục được.',
+      confirmLabel: 'Xoá lần làm',
+      danger: true,
+    })
+    if (!isSure) return
+    try {
+      await deleteAttempt(attempt.id)
+      toast('Đã xoá lần làm bài')
+      navigate('/history', { replace: true })
+    } catch (deleteError) {
+      toast(getErrorMessage(deleteError), 'error')
+    }
+  }
+
   function pickSection(position) {
     setCurrentSection(position)
     setSelectedId(null)
@@ -84,6 +107,9 @@ export default function ReviewPage() {
       <header className="attempt-header">
         <h1>{test.title}</h1>
         {viewerRole === 'teacher' && <span className="review-chip">Giáo viên · chỉ xem</span>}
+        {canDelete && (
+          <button type="button" className="review-delete" onClick={handleDelete}>Xoá lần làm này</button>
+        )}
         {/* A teacher came from the gradebook, so "Exit" goes back there; a student goes to their history */}
         {viewerRole === 'teacher' ? (
           <button type="button" className="secondary-button" onClick={() => navigate(-1)}>Thoát</button>
@@ -174,7 +200,11 @@ function ScoreBox({ attempt, sectionCount, sectionWord, canAskAi }) {
           <li>{attempt.mode.type === 'full' ? 'Làm full đề' : `Luyện ${sectionCount} ${sectionWord.toLowerCase()}`}</li>
           <li>Thời gian làm: {formatDuration(attempt.startedAt, attempt.submittedAt)}</li>
           <li>Nộp lúc {new Date(attempt.submittedAt).toLocaleString('vi-VN')}</li>
-          {attempt.result.band === null && <li>Band chỉ tính khi làm full đề 40 câu.</li>}
+          {attempt.result.answered === 0 ? (
+            <li>Bài để trống nên không tính band và không ảnh hưởng thống kê của bạn.</li>
+          ) : (
+            attempt.result.band === null && <li>Band chỉ tính khi làm full đề 40 câu.</li>
+          )}
           <li>Bấm bong bóng cạnh đáp án để xem giải thích và bằng chứng.</li>
         </ul>
         {ai.feedback && <AiFeedbackPanel feedback={ai.feedback} />}

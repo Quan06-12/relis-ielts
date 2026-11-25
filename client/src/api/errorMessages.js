@@ -6,6 +6,7 @@ const messages = {
   INVALID_GOOGLE_TOKEN: 'Google không xác nhận được tài khoản, vui lòng thử lại.',
   GUEST_NOT_ALLOWED: 'Tài khoản khách không tạo hoặc tham gia lớp được. Hãy đăng nhập bằng Google.',
   TOO_MANY_GUESTS: 'Đã tạo quá nhiều tài khoản khách từ mạng này. Vui lòng thử lại sau.',
+  ATTEMPT_IN_CLASS: 'Bài làm cho lớp không xoá được, vì giáo viên cần nó trong bảng điểm.',
   NOT_FOUND: 'Không tìm thấy nội dung này.',
   ALREADY_MEMBER: 'Bạn đã ở trong lớp này rồi.',
   DUPLICATE_WORD: 'Từ này đã có trong bộ.',

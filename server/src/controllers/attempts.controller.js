@@ -134,6 +134,19 @@ export async function submitAttempt(request, response) {
   response.json({ attemptId: attempt.id, status: attempt.status, result: attempt.result })
 }
 
+// DELETE /api/attempts/:attemptId — remove one of my own practice attempts (finished or not),
+// e.g. a test left blank. Homework and class attempts stay, because the teacher's gradebook uses them.
+export async function deleteAttempt(request, response) {
+  const { attemptId } = request.params
+  if (!mongoose.isValidObjectId(attemptId)) throw notFound('Attempt')
+  const attempt = await findOwnAttempt(attemptId, request.userId)
+  if (attempt.classId !== null) {
+    throw new AppError(409, 'ATTEMPT_IN_CLASS', 'Attempts made for a class cannot be deleted')
+  }
+  await attempt.deleteOne()
+  response.status(204).end()
+}
+
 // GET /api/attempts/:attemptId/review — the submitted attempt with answers, explanations and evidence (US36, US37)
 // The person who took it can always see it; a teacher can see it when it was made from their class.
 export async function reviewAttempt(request, response) {
