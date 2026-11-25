@@ -32,6 +32,8 @@ tags:
     description: Classes, class library and gradebook (owner A)
   - name: Vocabulary
     description: Personal vocabulary sets and their words (US47, US48)
+  - name: Admin
+    description: System tests and statistics; only for the emails listed in ADMIN_EMAILS
 
 paths:
   /health:
@@ -156,7 +158,8 @@ paths:
       summary: My test library, or the system tests (US20, US22, US23)
       description: |
         By default lists the caller's own tests. `source=system` lists the published system tests
-        that come with Relis instead; every signed-in user can take those, nobody can edit them.
+        that come with Relis instead; every signed-in user can take those, only admins can edit them.
+        For an admin, `source=system` also lists draft system tests (filter with `status`).
       parameters:
         - { name: source, in: query, description: 'mine (default) or system', schema: { type: string, enum: [mine, system] } }
         - { name: skill, in: query, schema: { $ref: '#/components/schemas/Skill' } }
@@ -187,6 +190,7 @@ paths:
       description: |
         Creates the right number of empty sections for the kind:
         Reading full = 3 passages, Listening full = 4 parts, single = 1.
+        With `system: true` an admin creates a draft system test (owned by the built-in Relis account).
       requestBody:
         required: true
         content:
@@ -198,6 +202,7 @@ paths:
                 title: { type: string, minLength: 1, maxLength: 120 }
                 skill: { $ref: '#/components/schemas/Skill' }
                 kind: { $ref: '#/components/schemas/TestKind' }
+                system: { type: boolean, default: false, description: 'Admins only: create it in Kho đề Relis' }
       responses:
         '201':
           description: Created
@@ -209,6 +214,11 @@ paths:
                   test: { $ref: '#/components/schemas/Test' }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403':
+          description: '`system: true` from someone who is not an admin (`ADMIN_ONLY`)'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
 
   /tests/{testId}:
     parameters:
@@ -217,7 +227,7 @@ paths:
       operationId: getTest
       tags: [Tests]
       summary: Full test with answers, for the editor (US20)
-      description: Owner only. Other users get 404, so they cannot tell whether the test exists.
+      description: Owner only (admins also open system tests). Other users get 404, so they cannot tell whether the test exists.
       responses:
         '200':
           description: The test
@@ -1069,6 +1079,56 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
 
+  /admin/stats:
+    get:
+      operationId: getAdminStats
+      tags: [Admin]
+      summary: Statistics for the admin page
+      description: Totals, the last 30 days (Vietnam time) and the 5 most taken system tests. Admins only.
+      responses:
+        '200':
+          description: The numbers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: object
+                    properties: { total: { type: integer }, google: { type: integer }, guests: { type: integer } }
+                  tests:
+                    type: object
+                    properties: { byUsers: { type: integer }, system: { type: integer }, systemDrafts: { type: integer } }
+                  attempts:
+                    type: object
+                    properties: { submitted: { type: integer }, inProgress: { type: integer } }
+                  classes:
+                    type: object
+                    properties: { total: { type: integer }, assignments: { type: integer } }
+                  daily:
+                    type: array
+                    items:
+                      type: object
+                      properties: { date: { type: string, format: date }, newUsers: { type: integer }, attempts: { type: integer } }
+                  topSystemTests:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { $ref: '#/components/schemas/Id' }
+                        title: { type: string }
+                        skill: { $ref: '#/components/schemas/Skill' }
+                        kind: { $ref: '#/components/schemas/TestKind' }
+                        attempts: { type: integer }
+                        users: { type: integer }
+                        averageBand: { type: [number, 'null'] }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403':
+          description: Not an admin (`ADMIN_ONLY`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
   /users/me:
     patch:
       operationId: updateMyProfile
@@ -1435,6 +1495,7 @@ components:
         name: { type: string }
         email: { type: string, format: email, description: 'Missing for guests' }
         isGuest: { type: boolean, description: 'A guest cannot create or join classes' }
+        isAdmin: { type: boolean, description: 'Email listed in ADMIN_EMAILS (never a guest)' }
         avatarUrl: { type: string, format: uri }
         goals:
           type: object

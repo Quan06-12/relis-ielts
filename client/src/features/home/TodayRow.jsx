@@ -14,7 +14,7 @@ export default function TodayRow({ unfinished }) {
   const [testToStart, setTestToStart] = useState(null)
 
   useEffect(() => {
-    listMyTests({ source: 'system', done: 'false', limit: 20 })
+    listMyTests({ source: 'system', status: 'published', done: 'false', limit: 20 })
       .then((page) => setSuggestions(pickSuggestions(page.items)))
       // Suggestions are a bonus: without them the row just shows the continue card
       .catch(() => setSuggestions([]))

@@ -45,6 +45,11 @@
   --tint: #fdeee0;
 }
 
+.choice-tile.system {
+  --tone: #2f7a3b;
+  --tint: #e8f5ee;
+}
+
 .choice-tile:hover {
   border-color: var(--tone);
 }

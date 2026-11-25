@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { isAdminUser } from '../utils/admin.js'
 
 // One document per person (collection "users"): someone who signed in with Google,
 // or a guest who chose "Dùng thử không cần tài khoản" (no googleId, no email, isGuest = true).
@@ -22,5 +23,10 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 )
+
+// Sent with the user (toJSON includes virtuals), so the client can show the admin pages
+userSchema.virtual('isAdmin').get(function isAdmin() {
+  return isAdminUser(this)
+})
 
 export const User = mongoose.model('User', userSchema)

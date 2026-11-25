@@ -1,7 +1,8 @@
 import mongoose from 'mongoose'
 import { Test } from '../models/Test.js'
 import { AppError, validationError } from '../errors/AppError.js'
-import { findOwnedTest, findTestUserCanTake } from '../services/testAccess.js'
+import { findEditableTest, findTestUserCanTake, isAdmin } from '../services/testAccess.js'
+import { findOrCreateSystemOwner } from '../services/systemOwner.js'
 import { findLastBands, findDoneTestIds, findAttemptLinks } from '../services/attemptStats.js'
 import { ClassMember } from '../models/ClassMember.js'
 import { ClassLibraryItem } from '../models/ClassLibraryItem.js'
@@ -17,19 +18,20 @@ const SKILLS = ['reading', 'listening']
 const KINDS = ['full', 'single']
 
 // GET /api/tests — my library, newest first (US20, US22, US23)
-// source=system lists the published system tests instead of my own.
+// source=system lists the published system tests instead of my own (an admin also sees their drafts).
 // Filters combine: skill, kind (full / single), status, q (title), done (true = taken before, false = not yet)
 export async function listMyTests(request, response) {
   const { skill, kind, status, q, done, source } = request.query
   const page = Math.max(Number(request.query.page) || 1, 1)
   const limit = Math.min(Math.max(Number(request.query.limit) || 20, 1), 50)
 
+  const adminView = source === 'system' && (await isAdmin(request.userId))
   const filter = source === 'system'
-    ? { isSystem: true, status: 'published', hidden: false }
+    ? { isSystem: true, hidden: false, ...(adminView ? {} : { status: 'published' }) }
     : { ownerId: request.userId, hidden: false }
   if (SKILLS.includes(skill)) filter.skill = skill
   if (KINDS.includes(kind)) filter.kind = kind
-  if (source !== 'system' && ['draft', 'published'].includes(status)) filter.status = status
+  if ((source !== 'system' || adminView) && ['draft', 'published'].includes(status)) filter.status = status
   if (q) filter.title = { $regex: escapeRegex(q), $options: 'i' }
   if (done === 'true' || done === 'false') {
     const doneIds = await findDoneTestIds(request.userId)
@@ -65,8 +67,9 @@ export async function listClassesWithTest(request, response) {
 }
 
 // POST /api/tests — a new empty draft (US11)
+// system: true (admins only) creates it in "Kho đề Relis", owned by the built-in Relis account
 export async function createTest(request, response) {
-  const { title, skill, kind } = request.body ?? {}
+  const { title, skill, kind, system } = request.body ?? {}
 
   const problems = []
   if (typeof title !== 'string' || title.trim() === '') problems.push({ field: 'title', message: 'title is required' })
@@ -74,21 +77,29 @@ export async function createTest(request, response) {
   if (!KINDS.includes(kind)) problems.push({ field: 'kind', message: 'kind must be full or single' })
   if (problems.length > 0) throw validationError(problems)
 
+  let ownerId = request.userId
+  if (system === true) {
+    if (!(await isAdmin(request.userId))) {
+      throw new AppError(403, 'ADMIN_ONLY', 'Only an admin can add a system test')
+    }
+    ownerId = (await findOrCreateSystemOwner())._id
+  }
+
   const { sections, durationMin } = newTestLayout(skill, kind)
-  const test = await Test.create({ ownerId: request.userId, title, skill, kind, sections, durationMin })
+  const test = await Test.create({ ownerId, title, skill, kind, sections, durationMin, isSystem: system === true })
 
   response.status(201).json({ test })
 }
 
-// GET /api/tests/:testId — full test with answers, owner only (US20)
+// GET /api/tests/:testId — full test with answers, owner only (US20); admins also open system tests
 export async function getTest(request, response) {
-  const test = await findOwnedTest(request.params.testId, request.userId)
+  const test = await findEditableTest(request.params.testId, request.userId)
   response.json({ test })
 }
 
 // PUT /api/tests/:testId — the editor sends the whole test on every save (US12–US18)
 export async function saveTest(request, response) {
-  const test = await findOwnedTest(request.params.testId, request.userId)
+  const test = await findEditableTest(request.params.testId, request.userId)
   const { title, coverUrl, durationMin, sections } = request.body ?? {}
 
   if (!Array.isArray(sections)) {
@@ -115,7 +126,7 @@ export async function saveTest(request, response) {
 
 // PATCH /api/tests/:testId/status — publish, or move back to draft (US19)
 export async function changeTestStatus(request, response) {
-  const test = await findOwnedTest(request.params.testId, request.userId)
+  const test = await findEditableTest(request.params.testId, request.userId)
   const { status } = request.body ?? {}
 
   if (!['draft', 'published'].includes(status)) {
@@ -138,7 +149,7 @@ export async function changeTestStatus(request, response) {
 
 // DELETE /api/tests/:testId — removed for real only if nobody has taken it (US20)
 export async function deleteTest(request, response) {
-  const test = await findOwnedTest(request.params.testId, request.userId)
+  const test = await findEditableTest(request.params.testId, request.userId)
 
   if (await hasAttempts(test)) {
     test.hidden = true
