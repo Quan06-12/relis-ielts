@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../auth/AuthContext.jsx'
 import { listMyTests } from '../api/tests.js'
 import { deleteTest } from '../api/testEditor.js'
 import { getErrorMessage } from '../api/errorMessages.js'
@@ -41,6 +42,9 @@ export default function LibraryPage() {
   const [testToStart, setTestToStart] = useState(null)
   const [testToDelete, setTestToDelete] = useState(null)
   const [testToShare, setTestToShare] = useState(null)
+  const { user } = useAuth()
+  // Admins add, edit and remove the tests of "Kho đề Relis" from its tab
+  const manageSystem = user?.isAdmin === true && source === 'system'
 
   useEffect(() => {
     setIsLoading(true)
@@ -134,7 +138,9 @@ export default function LibraryPage() {
             </section>
           )
         })}
-        <Link to="/tests/new" className="menu-create">+ Tạo đề mới</Link>
+        <Link to={manageSystem ? '/tests/new?system=1' : '/tests/new'} className="menu-create">
+          {manageSystem ? '+ Thêm đề vào Kho đề Relis' : '+ Tạo đề mới'}
+        </Link>
       </aside>
 
       <div className="library-main">
@@ -191,7 +197,7 @@ export default function LibraryPage() {
         {!isLoading && (
           <div className="library-grid">
             {shown.map((test) => (
-              <TestCard key={test.id} test={test} showSystemChip={source !== 'system'} onStart={setTestToStart} onDelete={setTestToDelete} onShare={setTestToShare} />
+              <TestCard key={test.id} test={test} showSystemChip={source !== 'system'} canManageSystem={manageSystem} onStart={setTestToStart} onDelete={setTestToDelete} onShare={setTestToShare} />
             ))}
           </div>
         )}
@@ -203,14 +209,15 @@ export default function LibraryPage() {
       {testToDelete && (
         <div className="dialog-backdrop" onClick={() => setTestToDelete(null)}>
           <div className="dialog" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
-            <h2>Xoá đề?</h2>
+            <h2>{testToDelete.isSystem ? 'Gỡ đề khỏi Kho đề Relis?' : 'Xoá đề?'}</h2>
             <p>
-              Đề <strong>{testToDelete.title}</strong> sẽ bị xoá khỏi kho đề. Các lần làm bài trước đó vẫn còn trong
-              Lịch sử.
+              {testToDelete.isSystem
+                ? <>Đề <strong>{testToDelete.title}</strong> sẽ không còn hiện với mọi người dùng. Các lần làm bài trước đó vẫn còn trong Lịch sử của họ.</>
+                : <>Đề <strong>{testToDelete.title}</strong> sẽ bị xoá khỏi kho đề. Các lần làm bài trước đó vẫn còn trong Lịch sử.</>}
             </p>
             <div className="dialog-actions">
               <button type="button" className="secondary-button" onClick={() => setTestToDelete(null)}>Huỷ</button>
-              <button type="button" className="primary-button danger" onClick={handleConfirmDelete}>Xoá đề</button>
+              <button type="button" className="primary-button danger" onClick={handleConfirmDelete}>{testToDelete.isSystem ? 'Gỡ đề' : 'Xoá đề'}</button>
             </div>
           </div>
         </div>

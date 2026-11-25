@@ -16,7 +16,7 @@ export async function getTestForPlay(testId) {
 export async function listShareableTests() {
   const [mine, system] = await Promise.all([
     listMyTests({ status: 'published', limit: 50 }),
-    listMyTests({ source: 'system', limit: 50 }),
+    listMyTests({ source: 'system', status: 'published', limit: 50 }),
   ])
   return [...mine.items, ...system.items]
 }

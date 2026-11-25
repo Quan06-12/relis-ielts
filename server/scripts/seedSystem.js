@@ -10,14 +10,14 @@
 import { pathToFileURL } from 'node:url'
 import mongoose from 'mongoose'
 import { connectDatabase } from '../src/config/db.js'
-import { User } from '../src/models/User.js'
 import { Test } from '../src/models/Test.js'
 import { renumberQuestions } from '../src/utils/testContent.js'
+import { SYSTEM_GOOGLE_ID, findOrCreateSystemOwner } from '../src/services/systemOwner.js'
 import { demoReadingTest, demoShortTest } from './demoData.js'
 import { practiceTests } from './practiceTests.js'
 import { listeningTests } from './listeningTests.js'
 
-export const SYSTEM_GOOGLE_ID = 'system-relis'
+export { SYSTEM_GOOGLE_ID }
 
 // Every system test, written by the team (no copyrighted exam material)
 export function systemTestContents() {
@@ -26,11 +26,7 @@ export function systemTestContents() {
 
 // Adds the missing system tests and returns { added, kept } (titles), so tests can call it too.
 export async function seedSystemTests() {
-  const owner = await User.findOneAndUpdate(
-    { googleId: SYSTEM_GOOGLE_ID },
-    { $setOnInsert: { googleId: SYSTEM_GOOGLE_ID, email: 'system@relis.site', name: 'Relis' } },
-    { upsert: true, returnDocument: 'after' }
-  )
+  const owner = await findOrCreateSystemOwner()
 
   const added = []
   const kept = []

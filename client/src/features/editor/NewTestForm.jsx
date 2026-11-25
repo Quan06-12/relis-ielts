@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { createTest } from '../../api/testEditor.js'
 import { getErrorMessage } from '../../api/errorMessages.js'
+import { useAuth } from '../../auth/AuthContext.jsx'
 
 // Icons drawn as one SVG path each (24×24, stroke)
 const ICONS = {
@@ -9,6 +10,7 @@ const ICONS = {
   listening: 'M3 18v-6a9 9 0 0 1 18 0v6M3 18a2 2 0 0 0 2 2h1v-6H5a2 2 0 0 0-2 2zm18 0a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2z',
   full: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
   single: 'M6 3h9l4 4v14H6zM15 3v4h4M9 12h7M9 16h5',
+  shield: 'M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6zM9 12l2 2 4-4',
 }
 
 // Step 1 of creating a test: name, skill and kind (US11). Then the editor opens.
@@ -19,6 +21,9 @@ export default function NewTestForm() {
   const [searchParams] = useSearchParams()
   const [skill, setSkill] = useState(searchParams.get('skill') === 'listening' ? 'listening' : 'reading')
   const [kind, setKind] = useState('full')
+  const { user } = useAuth()
+  // Admins: "Kho đề Relis" (system test, everyone can take it once published) or their own library
+  const [place, setPlace] = useState(searchParams.get('system') === '1' ? 'system' : 'mine')
   const [error, setError] = useState('')
   const [isCreating, setIsCreating] = useState(false)
 
@@ -30,7 +35,7 @@ export default function NewTestForm() {
     setError('')
     setIsCreating(true)
     try {
-      const test = await createTest({ title, skill, kind })
+      const test = await createTest({ title, skill, kind, system: user?.isAdmin === true && place === 'system' })
       navigate(`/tests/${test.id}/edit`, { replace: true })
     } catch (createError) {
       setError(getErrorMessage(createError))
@@ -41,7 +46,7 @@ export default function NewTestForm() {
   return (
     <main className="page">
       <form className="new-test-form" onSubmit={handleSubmit}>
-        <h1>Tạo đề mới</h1>
+        <h1>{user?.isAdmin && place === 'system' ? 'Tạo đề cho Kho đề Relis' : 'Tạo đề mới'}</h1>
 
         <label className="editor-field">
           Tên đề
@@ -67,6 +72,18 @@ export default function NewTestForm() {
             { value: 'single', title: 'Bài lẻ', text: `1 ${sectionWord}, luyện nhanh một phần`, icon: ICONS.single },
           ]}
         />
+
+        {user?.isAdmin && (
+          <ChoiceTiles
+            legend="Lưu vào"
+            value={place}
+            onChange={setPlace}
+            options={[
+              { value: 'mine', title: 'Đề của tôi', text: 'Chỉ bạn và lớp bạn chia sẻ thấy', icon: ICONS.single },
+              { value: 'system', title: 'Kho đề Relis', text: 'Mọi người làm được khi xuất bản', icon: ICONS.shield, tone: 'system' },
+            ]}
+          />
+        )}
 
         {error && <p className="editor-error" role="alert">{error}</p>}
 

@@ -47,6 +47,7 @@ Client hiển thị thông báo tiếng Việt dựa trên `code`, không hiển
 | 400 | `INVALID_JSON` | Body không phải JSON hợp lệ |
 | 401 | `UNAUTHENTICATED` | Thiếu token, token sai hoặc hết hạn |
 | 401 | `INVALID_GOOGLE_TOKEN` | Google từ chối `credential` |
+| 403 | `ADMIN_ONLY` | Người không phải admin gọi `/admin/...` hoặc tạo đề hệ thống |
 | 403 | `GUEST_NOT_ALLOWED` | Tài khoản khách tạo lớp hoặc tham gia lớp |
 | 404 | `NOT_FOUND` | Không tồn tại hoặc không có quyền xem |
 | 409 | `ATTEMPT_IN_PROGRESS` | Đã có bài làm dở của đề này; `details.attemptId` |
