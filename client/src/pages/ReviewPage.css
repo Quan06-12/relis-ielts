@@ -394,3 +394,50 @@
   background: rgba(255, 255, 255, 0.12);
   color: var(--white);
 }
+
+/* AI feedback button and heading: drawn sparkle icon, a small spinner while waiting */
+.ai-feedback-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ai-feedback h2 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ai-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgb(255 255 255 / 0.4);
+  border-top-color: var(--white);
+  border-radius: 50%;
+  animation: ai-spin 0.8s linear infinite;
+}
+
+@keyframes ai-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* The AI panel appears by fading up instead of popping in */
+.ai-feedback {
+  animation: ai-in 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes ai-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-feedback,
+  .ai-spinner {
+    animation: none;
+  }
+}

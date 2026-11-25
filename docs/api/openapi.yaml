@@ -301,6 +301,25 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
 
+  /tests/{testId}/classes:
+    get:
+      operationId: listClassesWithTest
+      tags: [Tests]
+      summary: Classes I teach whose library already holds this test
+      description: Used by the "Đưa lên lớp" dialog to mark those classes and not offer them again.
+      parameters:
+        - { name: testId, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Class ids
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  classIds: { type: array, items: { type: string } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
   /tests/{testId}/play:
     parameters:
       - $ref: '#/components/parameters/TestId'
@@ -1446,6 +1465,8 @@ components:
         questionCount: { type: integer }
         updatedAt: { type: string, format: date-time }
         isSystem: { type: boolean, description: 'A system test that comes with Relis (read-only)' }
+        lastAttemptId: { type: [string, 'null'], description: "The caller's latest submitted attempt of this test (to review it)" }
+        openAttemptId: { type: [string, 'null'], description: "The caller's attempt of this test still in progress (to continue it)" }
         lastBand:
           type: [number, 'null']
           description: Band of the caller's latest full attempt, for the band stamp

@@ -20,3 +20,9 @@ export async function listShareableTests() {
   ])
   return [...mine.items, ...system.items]
 }
+
+// GET /tests/:id/classes — ids of the classes I teach that already hold this test
+export async function listClassesWithTest(testId) {
+  const response = await http.get(`/tests/${testId}/classes`)
+  return response.data.classIds
+}

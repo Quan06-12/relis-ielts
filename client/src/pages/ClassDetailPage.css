@@ -8,6 +8,7 @@
 }
 
 .class-hero {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -17,6 +18,16 @@
   padding: 24px 28px;
   border-radius: 14px;
   color: var(--white);
+}
+
+.class-color-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 6px;
+  border: 1.5px solid rgb(255 255 255 / 0.85);
+  border-radius: 50%;
+  vertical-align: 0;
 }
 
 .class-hero-chip {
@@ -118,6 +129,15 @@
 .underline-tab.active {
   border-bottom-color: var(--primary);
   color: var(--primary);
+}
+
+/* With the sliding underline (SlideHighlight) the tab's own border stays hidden */
+.underline-tabs.slides > .underline-tab.active {
+  border-bottom-color: transparent;
+}
+
+.underline-tab {
+  transition: color 0.25s;
 }
 
 /* Assignment cards */
@@ -317,6 +337,18 @@
   display: flex;
   gap: 8px;
   align-items: center;
+}
+
+/* A class that already has the test: greyed out, with a green "Đã có" */
+.pick-list label.is-done {
+  color: var(--text-muted);
+}
+
+.pick-done {
+  margin-left: auto;
+  color: #15803d;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 /* Gradebook */

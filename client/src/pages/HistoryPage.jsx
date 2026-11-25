@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import SlideHighlight from '../components/SlideHighlight.jsx'
 import { Link } from 'react-router-dom'
 import { listMyAttempts, getActivity } from '../api/attempts.js'
 import { getErrorMessage } from '../api/errorMessages.js'
@@ -124,6 +125,7 @@ export default function HistoryPage() {
 function Segmented({ tabs, value, onChange }) {
   return (
     <div className="segmented" role="tablist">
+      <SlideHighlight activeKey={value} />
       {tabs.map((tab) => (
         <button
           key={tab.value}
@@ -219,7 +221,15 @@ function HistoryCard({ attempt, onRetake }) {
   const test = attempt.test
   const skill = test?.skill ?? 'reading'
   const result = attempt.result
-  const ribbon = result?.band !== null && result?.band !== undefined ? result.band.toFixed(1) : result ? `${result.correct}/${result.total}` : null
+  // Band when there is one; "Trống" for a blank attempt (it does not count); otherwise the correct count
+  const ribbon =
+    result?.band !== null && result?.band !== undefined
+      ? result.band.toFixed(1)
+      : result?.answered === 0
+        ? 'Trống'
+        : result
+          ? `${result.correct}/${result.total}`
+          : null
 
   return (
     <li className={`history-card ${skill}`}>

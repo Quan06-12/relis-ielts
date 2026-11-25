@@ -9,6 +9,7 @@ import ShareToClassesDialog from '../features/classes/ShareToClassesDialog.jsx'
 import { MENU, QUESTION_TYPE_LABELS, filterByQuestionType, questionTypesIn } from '../features/library/libraryFilters.js'
 import { SkeletonCards } from '../components/Skeleton.jsx'
 import TabSlider, { useTabSlider } from '../components/TabSlider.jsx'
+import SlideHighlight from '../components/SlideHighlight.jsx'
 import './LibraryPage.css'
 
 const ICONS = {
@@ -75,6 +76,7 @@ export default function LibraryPage() {
     <main className="page library-page">
       <aside className="library-menu" aria-label="Lọc đề">
         <div className="source-switch" role="tablist" aria-label="Nguồn đề">
+          <SlideHighlight activeKey={source} />
           {SOURCES.map((item) => (
             <button
               key={item.value}
@@ -100,11 +102,15 @@ export default function LibraryPage() {
                   <path d={ICONS[item.skill]} />
                 </svg>
                 {item.label}
-                <span className="menu-caret" aria-hidden="true">{isOpen ? '▴' : '▾'}</span>
+                <svg className="menu-caret" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
               </button>
 
-              {isOpen && (
+              {/* Always rendered so opening and closing can slide; hidden from keyboard when closed */}
+              <div className="menu-collapse" inert={!isOpen}>
                 <div className="menu-items">
+                  <SlideHighlight variant="soft" activeKey={`${skill}-${kind}`} />
                   <button type="button" className={kind === '' ? 'menu-item active' : 'menu-item'} onClick={() => choose(item.skill, '')}>
                     <span className="menu-dot" aria-hidden="true" /> Tất cả đề
                   </button>
@@ -124,7 +130,7 @@ export default function LibraryPage() {
                     <span className="menu-dot" aria-hidden="true" /> Full đề
                   </button>
                 </div>
-              )}
+              </div>
             </section>
           )
         })}

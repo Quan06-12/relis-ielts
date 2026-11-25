@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { listMyClasses, addToClassLibrary } from '../../api/classes.js'
+import { listClassesWithTest } from '../../api/tests.js'
 import { getErrorMessage } from '../../api/errorMessages.js'
 import { useToast } from '../../components/FeedbackProvider.jsx'
 
@@ -8,14 +9,19 @@ import { useToast } from '../../components/FeedbackProvider.jsx'
 export default function ShareToClassesDialog({ test, onClose }) {
   const [classes, setClasses] = useState(null)
   const [chosen, setChosen] = useState([])
+  // Classes whose library already has this test: shown as "Đã có", cannot be ticked
+  const [alreadyIn, setAlreadyIn] = useState([])
   const [error, setError] = useState('')
   const toast = useToast()
 
   useEffect(() => {
-    listMyClasses('teacher')
-      .then(setClasses)
+    Promise.all([listMyClasses('teacher'), listClassesWithTest(test.id)])
+      .then(([items, ids]) => {
+        setClasses(items)
+        setAlreadyIn(ids)
+      })
       .catch((loadError) => setError(getErrorMessage(loadError)))
-  }, [])
+  }, [test.id])
 
   function toggle(classId) {
     setChosen((current) => (current.includes(classId) ? current.filter((id) => id !== classId) : [...current, classId]))
@@ -43,9 +49,15 @@ export default function ShareToClassesDialog({ test, onClose }) {
         {classes && classes.length > 0 && (
           <div className="pick-list">
             {classes.map((item) => (
-              <label key={item.id}>
-                <input type="checkbox" checked={chosen.includes(item.id)} onChange={() => toggle(item.id)} />
+              <label key={item.id} className={alreadyIn.includes(item.id) ? 'is-done' : undefined}>
+                <input
+                  type="checkbox"
+                  checked={alreadyIn.includes(item.id) || chosen.includes(item.id)}
+                  disabled={alreadyIn.includes(item.id)}
+                  onChange={() => toggle(item.id)}
+                />
                 {item.name}
+                {alreadyIn.includes(item.id) && <span className="pick-done">Đã có</span>}
               </label>
             ))}
           </div>

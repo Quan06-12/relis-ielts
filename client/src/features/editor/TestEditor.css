@@ -704,7 +704,8 @@ fieldset.editor-field {
   flex: 1;
   margin: 0;
   padding: 8px 12px;
-  border-left: 4px solid #f5c400;
+  /* A full tinted box (a thick bar on one side read as decoration, not as "quoted evidence") */
+  border: 1px solid #f0d97a;
   border-radius: 6px;
   background: #fffbea;
   font-weight: 400;
@@ -713,7 +714,7 @@ fieldset.editor-field {
 }
 
 .evidence-quote.broken {
-  border-left-color: #b42318;
+  border-color: #f3b4ad;
   background: #fdecea;
   color: #b42318;
 }
