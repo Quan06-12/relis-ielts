@@ -168,12 +168,6 @@ export default function LibraryPage() {
           </form>
         </div>
 
-        <Link to="/history" className="library-history-link">
-          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2" />
-          </svg>
-          Xem lịch sử làm bài
-        </Link>
 
         {error && <p className="library-message error">{error}</p>}
         {isLoading && <SkeletonCards />}
@@ -191,7 +185,7 @@ export default function LibraryPage() {
         {!isLoading && (
           <div className="library-grid">
             {shown.map((test) => (
-              <TestCard key={test.id} test={test} onStart={setTestToStart} onDelete={setTestToDelete} onShare={setTestToShare} />
+              <TestCard key={test.id} test={test} showSystemChip={source !== 'system'} onStart={setTestToStart} onDelete={setTestToDelete} onShare={setTestToShare} />
             ))}
           </div>
         )}

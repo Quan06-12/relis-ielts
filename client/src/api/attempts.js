@@ -52,3 +52,8 @@ export async function getActivity(from, to) {
   const response = await http.get('/attempts/activity', { params: { from, to, tz } })
   return response.data // { days: [{ date, reading, listening, minutes }], currentStreak }
 }
+
+// DELETE /attempts/:id — remove one of my own practice attempts (not class work)
+export async function deleteAttempt(attemptId) {
+  await http.delete(`/attempts/${attemptId}`)
+}

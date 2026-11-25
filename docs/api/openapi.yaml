@@ -548,6 +548,23 @@ paths:
               schema: { $ref: '#/components/schemas/AttemptWithTest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      operationId: deleteAttempt
+      tags: [Attempts]
+      summary: Delete one of my own practice attempts
+      description: |
+        Removes the attempt from history and statistics, for example a test left blank.
+        Attempts made for a class or an assignment cannot be deleted (`409 ATTEMPT_IN_CLASS`),
+        because the teacher's gradebook uses them.
+      responses:
+        '204': { description: Deleted }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: The attempt belongs to a class (`ATTEMPT_IN_CLASS`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
 
   /attempts/{attemptId}/answers:
     parameters:
@@ -1601,7 +1618,10 @@ components:
         total: { type: integer }
         band:
           type: [number, 'null']
-          description: Only for full tests with 40 questions
+          description: Only for full tests with 40 questions where at least one question was answered
+        answered:
+          type: integer
+          description: Questions with an answer; 0 means a blank attempt, which never counts towards bands
 
     Attempt:
       type: object

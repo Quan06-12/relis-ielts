@@ -5,6 +5,7 @@ import {
   getAttempt,
   saveAnswers,
   submitAttempt,
+  deleteAttempt,
   reviewAttempt,
   listMyAttempts,
   getActivity,
@@ -24,5 +25,6 @@ router.get('/:attemptId', getAttempt)
 router.patch('/:attemptId/answers', saveAnswers)
 router.post('/:attemptId/submit', submitAttempt)
 router.get('/:attemptId/review', reviewAttempt)
+router.delete('/:attemptId', deleteAttempt)
 
 export default router

@@ -1,3 +1,4 @@
+import mongoose from 'mongoose'
 import { test, before, after, beforeEach } from 'node:test'
 import assert from 'node:assert/strict'
 import request from 'supertest'
@@ -165,7 +166,7 @@ test('a submit request delayed five seconds closes saved answers and remains rep
   const second = await request(app).post(`/api/attempts/${attemptId}/submit`).set('Authorization', authHeader)
   assert.equal(first.status, 200)
   assert.equal(first.body.status, 'submitted')
-  assert.deepEqual(first.body.result, { correct: 1, total: 3, band: null })
+  assert.deepEqual(first.body.result, { correct: 1, total: 3, band: null, answered: 1 })
   assert.equal(second.status, 200)
   assert.deepEqual(second.body, first.body)
 
@@ -222,3 +223,31 @@ test('US42: study time lists the last months with minutes per skill', async () =
   assert.deepEqual(Object.keys(response.body.months[0]).sort(), ['listeningMinutes', 'month', 'readingMinutes'])
 })
 
+
+test('I can delete my own practice attempt; it disappears from my history', async () => {
+  const { authHeader, test: savedTest } = await setUp()
+  const started = await request(app).post('/api/attempts').set('Authorization', authHeader).send({ testId: savedTest.id, mode: fullMode })
+  const attemptId = started.body.attempt.id
+  await request(app).post(`/api/attempts/${attemptId}/submit`).set('Authorization', authHeader)
+
+  const deleted = await request(app).delete(`/api/attempts/${attemptId}`).set('Authorization', authHeader)
+  assert.equal(deleted.status, 204)
+
+  const history = await request(app).get('/api/attempts').set('Authorization', authHeader)
+  assert.equal(history.body.items.length, 0)
+})
+
+test('someone else cannot delete my attempt, and a class attempt cannot be deleted', async () => {
+  const { authHeader, test: savedTest } = await setUp()
+  const started = await request(app).post('/api/attempts').set('Authorization', authHeader).send({ testId: savedTest.id, mode: fullMode })
+  const attemptId = started.body.attempt.id
+
+  const { authHeader: otherHeader } = await createSignedInUser('mallory')
+  const byOther = await request(app).delete(`/api/attempts/${attemptId}`).set('Authorization', otherHeader)
+  assert.equal(byOther.status, 404)
+
+  await Attempt.updateOne({ _id: attemptId }, { $set: { classId: new mongoose.Types.ObjectId() } })
+  const classAttempt = await request(app).delete(`/api/attempts/${attemptId}`).set('Authorization', authHeader)
+  assert.equal(classAttempt.status, 409)
+  assert.equal(classAttempt.body.error.code, 'ATTEMPT_IN_CLASS')
+})

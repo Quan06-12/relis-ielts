@@ -64,3 +64,8 @@ test('durationLabel', () => {
   assert.equal(durationLabel(229), '3 giờ 49 phút')
   assert.equal(durationLabel(120), '2 giờ')
 })
+
+test('a blank attempt is labelled as blank, not 0 correct', () => {
+  assert.equal(scoreLabel({ correct: 0, total: 40, band: null, answered: 0 }), 'Bài trống')
+  assert.equal(scoreLabel({ correct: 0, total: 40, band: 2.5, answered: 12 }), 'Band 2.5')
+})

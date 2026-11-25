@@ -46,7 +46,7 @@ test('US35: submitting scores the attempt; case and spaces are ignored', async (
   const response = await submit(user, attemptId)
 
   assert.equal(response.status, 200)
-  assert.deepEqual(response.body.result, { correct: 2, total: 3, band: null })
+  assert.deepEqual(response.body.result, { correct: 2, total: 3, band: null, answered: 3 })
 })
 
 test('US36: the review has every answer marked, with the correct answers and the passage', async () => {
