@@ -10,13 +10,15 @@ import { scrollToQuestion } from '../features/attempt/scrollToQuestion.js'
 import AudioPlayer from '../features/attempt/AudioPlayer.jsx'
 import SplitPane from '../components/SplitPane.jsx'
 import { backupPending, loadPending, clearPending } from '../features/attempt/pendingBackup.js'
+import HighlightablePassage from '../features/attempt/HighlightablePassage.jsx'
+import { loadHighlights, saveHighlights, clearHighlights } from '../features/attempt/highlights.js'
 import './AttemptPage.css'
 
 const AUTOSAVE_DELAY_MS = 1000
 // In the last seconds, answers are saved immediately: the server rejects answers after the deadline
 const FINAL_SECONDS = 5
 
-// Taking a test (US27–US32): passage or audio, questions, countdown, autosave and submit.
+// Taking a test (US27–US32, US43): passage or audio, questions, countdown, autosave, highlights and submit.
 export default function AttemptPage() {
   const { attemptId } = useParams()
   const navigate = useNavigate()
@@ -29,6 +31,8 @@ export default function AttemptPage() {
   const [currentNumber, setCurrentNumber] = useState(1) // the question being worked on, boxed in the bottom bar
   const [isConfirmingSubmit, setIsConfirmingSubmit] = useState(false)
   const [error, setError] = useState('')
+  // US43: { [section position]: [{ start, end }] }, kept in the browser for this attempt
+  const [highlights, setHighlights] = useState(() => loadHighlights(attemptId))
 
   // Answers changed since the last autosave
   const pendingChanges = useRef({})
@@ -62,6 +66,7 @@ export default function AttemptPage() {
       .then(({ attempt, test: loadedTest }) => {
         if (attempt.status === 'submitted') {
           clearPending(attemptId)
+          clearHighlights(attemptId)
           goToReview()
           return
         }
@@ -105,6 +110,7 @@ export default function AttemptPage() {
       await flushAnswers().catch(() => {})
       await submitAttempt(attemptId)
       clearPending(attemptId)
+      clearHighlights(attemptId)
       goToReview()
     } catch (submitError) {
       isSubmitting.current = false
@@ -140,6 +146,12 @@ export default function AttemptPage() {
     if (first) jumpToQuestion(first)
   }
 
+  function handleHighlightsChange(ranges) {
+    const next = { ...highlights, [currentSection]: ranges }
+    setHighlights(next)
+    saveHighlights(attemptId, next)
+  }
+
   const groupProps = { answers, onAnswer: handleAnswer, onFocusQuestion: (question) => setCurrentNumber(question.number) }
 
   return (
@@ -164,12 +176,14 @@ export default function AttemptPage() {
           <SplitPane
             label="Đổi độ rộng bài đọc và câu hỏi"
             first={
-              <article className="attempt-passage">
-                <h2>{section.title}</h2>
-                {section.passage.split('\n').map((paragraph, index) => (
-                  <p key={index}>{paragraph}</p>
-                ))}
-              </article>
+              // US43: select words in the passage to highlight them
+              <HighlightablePassage
+                key={currentSection}
+                title={section.title}
+                passage={section.passage}
+                ranges={highlights[currentSection] ?? []}
+                onChange={handleHighlightsChange}
+              />
             }
             second={
               <div className="attempt-questions">
