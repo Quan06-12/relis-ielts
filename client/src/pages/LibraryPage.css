@@ -40,6 +40,33 @@
   gap: 12px;
 }
 
+/* "Kho đề Relis" / "Đề của tôi": a two-part switch above the menu */
+.source-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: #eceef5;
+}
+
+.source-tab {
+  padding: 10px 8px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.source-tab.active {
+  background: var(--white);
+  color: var(--primary);
+  box-shadow: 0 1px 3px rgb(20 27 77 / 0.15);
+}
+
 .menu-group {
   --tone: var(--primary);
   --tint: var(--primary-soft);

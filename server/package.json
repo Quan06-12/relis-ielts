@@ -11,6 +11,7 @@
     "start": "node src/server.js",
     "test": "node --test",
     "seed:demo": "node --env-file=.env scripts/seedDemo.js",
+    "seed:system": "node --env-file=.env scripts/seedSystem.js",
     "lint": "oxlint src tests"
   },
   "dependencies": {

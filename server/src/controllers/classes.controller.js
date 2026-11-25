@@ -3,6 +3,7 @@ import { Class, CLASS_COLORS } from '../models/Class.js'
 import { ClassMember } from '../models/ClassMember.js'
 import { ClassLibraryItem } from '../models/ClassLibraryItem.js'
 import { Test } from '../models/Test.js'
+import { shareableTestFilter } from '../services/testAccess.js'
 import { Attempt } from '../models/Attempt.js'
 import { AppError, notFound, validationError } from '../errors/AppError.js'
 import { generateClassCode, normalizeClassCode } from '../utils/classCode.js'
@@ -155,12 +156,12 @@ export async function addToClassLibrary(request, response) {
     throw validationError([{ field: 'testIds', message: 'testIds must be a non-empty list of test ids' }])
   }
 
-  // Only the teacher's own published tests can go into a class
-  const tests = await Test.find({ _id: { $in: testIds }, ownerId: request.userId, status: 'published', hidden: false })
+  // Only the teacher's own published tests and system tests can go into a class
+  const tests = await Test.find({ _id: { $in: testIds }, ...shareableTestFilter(request.userId) })
   const foundIds = new Set(tests.map((test) => String(test._id)))
   const rejected = testIds.filter((id) => !foundIds.has(String(id)))
   if (rejected.length > 0) {
-    throw validationError(rejected.map((id) => ({ field: 'testIds', message: `test ${id} is not one of your published tests` })))
+    throw validationError(rejected.map((id) => ({ field: 'testIds', message: `test ${id} is not one of your published tests or a system test` })))
   }
 
   // upsert = insert only when (classId, testId) is not there yet
