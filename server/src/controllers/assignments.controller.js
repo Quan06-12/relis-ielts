@@ -3,6 +3,7 @@ import { Assignment } from '../models/Assignment.js'
 import { ClassMember } from '../models/ClassMember.js'
 import { ClassLibraryItem } from '../models/ClassLibraryItem.js'
 import { Test } from '../models/Test.js'
+import { shareableTestFilter } from '../services/testAccess.js'
 import { Attempt } from '../models/Attempt.js'
 import { notFound, validationError } from '../errors/AppError.js'
 import { assignmentStatus } from '../utils/assignmentStatus.js'
@@ -20,8 +21,8 @@ export async function createAssignment(request, response) {
   if (typeof allowLate !== 'boolean') problems.push({ field: 'allowLate', message: 'allowLate must be true or false' })
   if (problems.length > 0) throw validationError(problems)
 
-  const test = await Test.findOne({ _id: testId, ownerId: request.userId, status: 'published', hidden: false })
-  if (!test) throw validationError([{ field: 'testId', message: 'only your own published tests can be assigned' }])
+  const test = await Test.findOne({ _id: testId, ...shareableTestFilter(request.userId) })
+  if (!test) throw validationError([{ field: 'testId', message: 'only your own published tests or system tests can be assigned' }])
 
   await ClassLibraryItem.updateOne(
     { classId, testId: test._id },

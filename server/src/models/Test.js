@@ -49,6 +49,9 @@ const testSchema = new mongoose.Schema(
     // A deleted test that someone already took is hidden instead of removed,
     // so history and gradebooks still work
     hidden: { type: Boolean, default: false },
+    // System tests come with Relis: every signed-in user can take them, nobody edits them in the app
+    // (they are loaded by `npm run seed:system`)
+    isSystem: { type: Boolean, default: false, index: true },
   },
   { timestamps: true }
 )

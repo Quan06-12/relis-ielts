@@ -41,6 +41,11 @@
   font-weight: 600;
 }
 
+/* A guest has no email line, so the name needs the gap before the button */
+.account-name.guest {
+  margin-bottom: 12px;
+}
+
 .account-email {
   margin: 4px 0 12px;
   color: var(--text-muted);

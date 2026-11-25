@@ -16,9 +16,17 @@ const ICONS = {
   listening: 'M3 18v-6a9 9 0 0 1 18 0v6M3 18a2 2 0 0 0 2 2h1v-6H5a2 2 0 0 0-2 2zm18 0a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2z',
 }
 
-// My test library (US20–US23): a menu on the left (Reading / Listening, single sections or full tests,
-// question type), "not done / done" tabs and a search box on top, and the tests as cards.
+const SOURCES = [
+  { value: 'system', label: 'Kho đề Relis' },
+  { value: 'mine', label: 'Đề của tôi' },
+]
+
+// The test library (US20–US23): a switch between the system tests that come with Relis and my own tests,
+// a menu on the left (Reading / Listening, single sections or full tests, question type),
+// "not done / done" tabs and a search box on top, and the tests as cards.
 export default function LibraryPage() {
+  // System tests first, so a new user has something to practise right away
+  const [source, setSource] = useState('system') // 'system' | 'mine'
   const [skill, setSkill] = useState('reading') // 'reading' | 'listening'
   const [kind, setKind] = useState('') // '' (all) | 'single' | 'full'
   const [questionType, setQuestionType] = useState('')
@@ -37,11 +45,11 @@ export default function LibraryPage() {
     setIsLoading(true)
     setError('')
     // US23: every filter is sent together, so they combine
-    listMyTests({ skill, kind: kind || undefined, done, q: search || undefined, limit: 50 })
+    listMyTests({ source, skill, kind: kind || undefined, done, q: search || undefined, limit: 50 })
       .then((page) => setTests(page.items))
       .catch((loadError) => setError(getErrorMessage(loadError)))
       .finally(() => setIsLoading(false))
-  }, [skill, kind, done, search])
+  }, [source, skill, kind, done, search])
 
   function choose(nextSkill, nextKind) {
     setSkill(nextSkill)
@@ -66,6 +74,23 @@ export default function LibraryPage() {
   return (
     <main className="page library-page">
       <aside className="library-menu" aria-label="Lọc đề">
+        <div className="source-switch" role="tablist" aria-label="Nguồn đề">
+          {SOURCES.map((item) => (
+            <button
+              key={item.value}
+              type="button"
+              role="tab"
+              aria-selected={source === item.value}
+              className={source === item.value ? 'source-tab active' : 'source-tab'}
+              onClick={() => {
+                setSource(item.value)
+                setQuestionType('')
+              }}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
         {MENU.map((item) => {
           const isOpen = skill === item.skill
           return (
@@ -155,7 +180,11 @@ export default function LibraryPage() {
 
         {!isLoading && !error && shown.length === 0 && (
           <p className="library-message">
-            {done === 'true' ? 'Chưa có đề nào bạn đã làm trong mục này.' : <>Không có đề nào ở đây. <Link to="/tests/new">Tạo đề mới</Link></>}
+            {done === 'true'
+              ? 'Chưa có đề nào bạn đã làm trong mục này.'
+              : source === 'system'
+                ? 'Kho đề Relis chưa có đề nào trong mục này.'
+                : <>Không có đề nào ở đây. <Link to="/tests/new">Tạo đề mới</Link></>}
           </p>
         )}
 

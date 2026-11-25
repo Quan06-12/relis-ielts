@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { listAssignments, createAssignment, deleteAssignment } from '../../api/classes.js'
-import { listMyTests } from '../../api/tests.js'
+import { listShareableTests } from '../../api/tests.js'
 import { getErrorMessage } from '../../api/errorMessages.js'
 import ModeDialog from '../attempt/ModeDialog.jsx'
 import { STATUS_LABEL, groupByStatus, timeLeftLabel, defaultDeadlineInput, assignmentChips, shortDeadline, averageLabel } from './assignmentDisplay.js'
@@ -164,7 +164,7 @@ function StudentAction({ assignment, onStart }) {
   }
 }
 
-// US44: pick one of my published tests, a deadline, and whether late work is accepted
+// US44: pick one of my published tests or a system test, a deadline, and whether late work is accepted
 function CreateAssignmentDialog({ classId, onClose, onCreated }) {
   const [tests, setTests] = useState(null)
   const [testId, setTestId] = useState('')
@@ -173,8 +173,8 @@ function CreateAssignmentDialog({ classId, onClose, onCreated }) {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    listMyTests({ status: 'published', limit: 50 })
-      .then((page) => setTests(page.items))
+    listShareableTests()
+      .then(setTests)
       .catch((loadError) => setError(getErrorMessage(loadError)))
   }, [])
 
@@ -198,9 +198,18 @@ function CreateAssignmentDialog({ classId, onClose, onCreated }) {
           Đề
           <select value={testId} onChange={(event) => setTestId(event.target.value)} required>
             <option value="">{tests ? 'Chọn một đề đã xuất bản' : 'Đang tải…'}</option>
-            {tests?.map((test) => (
-              <option key={test.id} value={test.id}>{test.title}</option>
-            ))}
+            {[
+              { label: 'Đề của tôi', items: tests?.filter((test) => !test.isSystem) ?? [] },
+              { label: 'Kho đề Relis', items: tests?.filter((test) => test.isSystem) ?? [] },
+            ]
+              .filter((group) => group.items.length > 0)
+              .map((group) => (
+                <optgroup key={group.label} label={group.label}>
+                  {group.items.map((test) => (
+                    <option key={test.id} value={test.id}>{test.title}</option>
+                  ))}
+                </optgroup>
+              ))}
           </select>
         </label>
         <label>

@@ -25,6 +25,8 @@ export function createApp({
   generateFeedback = createGeminiFeedback(),
 } = {}) {
   const app = express()
+  // Render sits in front of the app as a proxy; trust it so request.ip is the visitor's address
+  app.set('trust proxy', 1)
 
   // Only our own frontend may call the API from a browser
   app.use(cors({ origin: clientUrl }))

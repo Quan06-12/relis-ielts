@@ -47,6 +47,7 @@ Client hiển thị thông báo tiếng Việt dựa trên `code`, không hiển
 | 400 | `INVALID_JSON` | Body không phải JSON hợp lệ |
 | 401 | `UNAUTHENTICATED` | Thiếu token, token sai hoặc hết hạn |
 | 401 | `INVALID_GOOGLE_TOKEN` | Google từ chối `credential` |
+| 403 | `GUEST_NOT_ALLOWED` | Tài khoản khách tạo lớp hoặc tham gia lớp |
 | 404 | `NOT_FOUND` | Không tồn tại hoặc không có quyền xem |
 | 409 | `ATTEMPT_IN_PROGRESS` | Đã có bài làm dở của đề này; `details.attemptId` |
 | 409 | `ATTEMPT_CLOSED` | Lưu đáp án khi bài đã nộp hoặc đã hết giờ |
@@ -58,6 +59,7 @@ Client hiển thị thông báo tiếng Việt dựa trên `code`, không hiển
 | 422 | `TEST_INCOMPLETE` | Xuất bản đề còn câu chưa có đáp án; `details` liệt kê số câu |
 | 422 | `DEADLINE_PASSED` | Bắt đầu làm bài giao sau hạn khi giáo viên không cho nộp trễ (US44) |
 | 422 | `NO_QUESTIONS` | Bắt đầu làm một đề (hoặc các phần đã chọn) chưa có câu hỏi nào |
+| 429 | `TOO_MANY_GUESTS` | Tạo quá 10 tài khoản khách trong một giờ từ cùng một địa chỉ IP |
 | 500 | `INTERNAL_ERROR` | Lỗi không lường trước; xem log trên Render |
 | 502 | `AI_FEEDBACK_FAILED` | Gemini lỗi hoặc hết hạn mức (US49) |
 | 503 | `DATABASE_UNAVAILABLE` | Mất kết nối MongoDB |

@@ -7,6 +7,12 @@ export function createToken(userId) {
   return jwt.sign({ userId: String(userId) }, process.env.JWT_SECRET, { expiresIn: TOKEN_LIFETIME })
 }
 
+// The user id from an "Authorization: Bearer <token>" header, or null
+export function readUserIdFromHeader(header) {
+  const value = header ?? ''
+  return value.startsWith('Bearer ') ? readUserIdFromToken(value.slice('Bearer '.length)) : null
+}
+
 // Returns the user id, or null if the token is wrong or expired.
 export function readUserIdFromToken(token) {
   try {
