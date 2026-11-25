@@ -145,6 +145,10 @@ button {
   font-weight: 600;
 }
 
+.segmented-tab {
+  transition: color 0.25s;
+}
+
 .segmented-tab.active {
   background: var(--white);
   color: var(--primary);
@@ -181,4 +185,137 @@ button {
 .chip.open {
   background: #e4f3e4;
   color: #1e6b2a;
+}
+
+/* ---- Motion: one easing for the whole app, everything settles quickly and never bounces far ---- */
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Buttons answer the pointer: a short colour change, and a small press */
+.primary-button,
+.secondary-button,
+.create-test-button,
+.continue-button,
+.test-card button,
+.dialog-actions button {
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s,
+    box-shadow 0.2s,
+    transform 0.12s var(--ease-out);
+}
+
+.primary-button:hover:not(:disabled) {
+  background: var(--primary-dark);
+}
+
+.secondary-button:hover:not(:disabled) {
+  border-color: #c3c8e2;
+  background: var(--surface);
+}
+
+.primary-button:active:not(:disabled),
+.secondary-button:active:not(:disabled),
+.create-test-button:active,
+.continue-button:active {
+  transform: scale(0.97);
+}
+
+/* Cards rise a little under the pointer, their shadow deepens */
+.test-card,
+.class-card,
+.vocab-card,
+.history-card {
+  transition:
+    transform 0.25s var(--ease-out),
+    box-shadow 0.25s var(--ease-out);
+}
+
+.test-card:hover,
+.class-card:hover,
+.vocab-card:hover,
+.history-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 6px rgb(17 24 54 / 0.08), 0 12px 28px rgb(17 24 54 / 0.12);
+}
+
+/* Dialogs: the backdrop fades in, the box rises a little */
+.dialog-backdrop {
+  animation: backdrop-in 0.2s ease-out;
+}
+
+.dialog-backdrop > * {
+  animation: dialog-in 0.28s var(--ease-out);
+}
+
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+}
+
+/* Dropdowns and popups open by fading down from their button */
+.create-dropdown,
+.account-dropdown,
+.card-menu-list {
+  animation: menu-in 0.18s var(--ease-out);
+  transform-origin: top right;
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+  }
+}
+
+/* A new page fades in instead of appearing at once */
+main.page {
+  animation: page-in 0.3s var(--ease-out);
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog-backdrop,
+  .dialog-backdrop > *,
+  .create-dropdown,
+  .account-dropdown,
+  .card-menu-list,
+  main.page {
+    animation: none;
+  }
+
+  .primary-button,
+  .secondary-button,
+  .test-card,
+  .class-card,
+  .vocab-card,
+  .history-card {
+    transition: none;
+  }
+}
+
+/* Text for screen readers only (headings that keep the outline in order, labels) */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }

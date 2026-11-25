@@ -285,3 +285,79 @@
 .library-grid {
   margin-top: 18px;
 }
+
+/* ---- Motion ---- */
+/* A skill group opens and closes by sliding its height (grid rows 0fr → 1fr) */
+.menu-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.menu-group.open .menu-collapse {
+  grid-template-rows: 1fr;
+}
+
+.menu-collapse > .menu-items {
+  min-height: 0;
+  overflow: hidden;
+  /* Padding would stay visible when the group is closed, so the space is a border inside the box */
+  padding: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 10px solid transparent;
+}
+
+.menu-group:not(.open) .menu-collapse > .menu-items {
+  border-width: 0;
+}
+
+.menu-caret {
+  margin-left: auto;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.menu-group.open .menu-caret {
+  transform: rotate(180deg);
+}
+
+.menu-group-head,
+.menu-item,
+.source-tab {
+  transition: color 0.25s, background-color 0.25s;
+}
+
+/* The chosen item's tint slides (SlideHighlight "soft"); the radio dot grows in its ring */
+.menu-group .slide-highlight.soft {
+  border-radius: 0;
+}
+
+.menu-dot {
+  position: relative;
+  transition: border-color 0.25s;
+}
+
+.menu-dot::after {
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--tone);
+  content: '';
+  transform: scale(0);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.menu-item.active .menu-dot {
+  background: var(--white);
+}
+
+.menu-item.active .menu-dot::after {
+  transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-collapse,
+  .menu-caret,
+  .menu-dot::after {
+    transition: none;
+  }
+}
