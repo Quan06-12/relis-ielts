@@ -3,6 +3,14 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { createTest } from '../../api/testEditor.js'
 import { getErrorMessage } from '../../api/errorMessages.js'
 
+// Icons drawn as one SVG path each (24×24, stroke)
+const ICONS = {
+  reading: 'M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2zM4 21V5M8 7h6M8 11h6',
+  listening: 'M3 18v-6a9 9 0 0 1 18 0v6M3 18a2 2 0 0 0 2 2h1v-6H5a2 2 0 0 0-2 2zm18 0a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2z',
+  full: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
+  single: 'M6 3h9l4 4v14H6zM15 3v4h4M9 12h7M9 16h5',
+}
+
 // Step 1 of creating a test: name, skill and kind (US11). Then the editor opens.
 export default function NewTestForm() {
   const navigate = useNavigate()
@@ -40,17 +48,25 @@ export default function NewTestForm() {
           <input type="text" required maxLength={120} placeholder="Ví dụ: Cambridge 18 – Test 1" value={title} onChange={(event) => setTitle(event.target.value)} />
         </label>
 
-        <fieldset className="editor-field choice-row">
-          <legend>Kỹ năng</legend>
-          <label><input type="radio" checked={skill === 'reading'} onChange={() => setSkill('reading')} /> Reading</label>
-          <label><input type="radio" checked={skill === 'listening'} onChange={() => setSkill('listening')} /> Listening</label>
-        </fieldset>
+        <ChoiceTiles
+          legend="Kỹ năng"
+          value={skill}
+          onChange={setSkill}
+          options={[
+            { value: 'reading', title: 'Reading', text: 'Đoạn văn bên trái, câu hỏi bên phải', icon: ICONS.reading, tone: 'reading' },
+            { value: 'listening', title: 'Listening', text: 'File audio kèm câu hỏi theo từng part', icon: ICONS.listening, tone: 'listening' },
+          ]}
+        />
 
-        <fieldset className="editor-field choice-row">
-          <legend>Loại đề</legend>
-          <label><input type="radio" checked={kind === 'full'} onChange={() => setKind('full')} /> Full test ({fullSize} {sectionWord})</label>
-          <label><input type="radio" checked={kind === 'single'} onChange={() => setKind('single')} /> Đề lẻ (1 {sectionWord})</label>
-        </fieldset>
+        <ChoiceTiles
+          legend="Loại đề"
+          value={kind}
+          onChange={setKind}
+          options={[
+            { value: 'full', title: 'Full test', text: `${fullSize} ${sectionWord}, tính band khi làm đủ`, icon: ICONS.full },
+            { value: 'single', title: 'Bài lẻ', text: `1 ${sectionWord}, luyện nhanh một phần`, icon: ICONS.single },
+          ]}
+        />
 
         {error && <p className="editor-error" role="alert">{error}</p>}
 
@@ -59,5 +75,32 @@ export default function NewTestForm() {
         </button>
       </form>
     </main>
+  )
+}
+
+// A group of large selectable cards. Each card is a real radio button (hidden), so the keyboard
+// and screen readers work as with ordinary radios.
+function ChoiceTiles({ legend, value, onChange, options }) {
+  return (
+    <fieldset className="choice-tiles">
+      <legend>{legend}</legend>
+      <div className="choice-tiles-grid">
+        {options.map((option) => (
+          <label key={option.value} className={`choice-tile ${option.tone ?? ''} ${value === option.value ? 'selected' : ''}`}>
+            <input type="radio" name={legend} checked={value === option.value} onChange={() => onChange(option.value)} />
+            <span className="choice-tile-icon" aria-hidden="true">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d={option.icon} />
+              </svg>
+            </span>
+            <span className="choice-tile-text">
+              <strong>{option.title}</strong>
+              <span>{option.text}</span>
+            </span>
+            <span className="choice-tile-check" aria-hidden="true">✓</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
   )
 }

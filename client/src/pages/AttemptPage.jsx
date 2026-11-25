@@ -11,14 +11,14 @@ import AudioPlayer from '../features/attempt/AudioPlayer.jsx'
 import SplitPane from '../components/SplitPane.jsx'
 import { backupPending, loadPending, clearPending } from '../features/attempt/pendingBackup.js'
 import HighlightablePassage from '../features/attempt/HighlightablePassage.jsx'
-import { loadHighlights, saveHighlights, clearHighlights } from '../features/attempt/highlights.js'
+import { loadHighlights, saveHighlights, clearHighlights, loadNotes, saveNotes, clearNotes } from '../features/attempt/highlights.js'
 import './AttemptPage.css'
 
 const AUTOSAVE_DELAY_MS = 1000
 // In the last seconds, answers are saved immediately: the server rejects answers after the deadline
 const FINAL_SECONDS = 5
 
-// Taking a test (US27–US32, US43): passage or audio, questions, countdown, autosave, highlights and submit.
+// Taking a test (US27–US32, US43): passage or audio, questions, countdown, autosave, highlights, notes and submit.
 export default function AttemptPage() {
   const { attemptId } = useParams()
   const navigate = useNavigate()
@@ -33,6 +33,8 @@ export default function AttemptPage() {
   const [error, setError] = useState('')
   // US43: { [section position]: [{ start, end }] }, kept in the browser for this attempt
   const [highlights, setHighlights] = useState(() => loadHighlights(attemptId))
+  // Notes on words of the passage: { [section position]: [{ start, end, text }] }, kept the same way
+  const [notes, setNotes] = useState(() => loadNotes(attemptId))
 
   // Answers changed since the last autosave
   const pendingChanges = useRef({})
@@ -67,6 +69,7 @@ export default function AttemptPage() {
         if (attempt.status === 'submitted') {
           clearPending(attemptId)
           clearHighlights(attemptId)
+          clearNotes(attemptId)
           goToReview()
           return
         }
@@ -111,6 +114,7 @@ export default function AttemptPage() {
       await submitAttempt(attemptId)
       clearPending(attemptId)
       clearHighlights(attemptId)
+      clearNotes(attemptId)
       goToReview()
     } catch (submitError) {
       isSubmitting.current = false
@@ -152,6 +156,12 @@ export default function AttemptPage() {
     saveHighlights(attemptId, next)
   }
 
+  function handleNotesChange(sectionNotes) {
+    const next = { ...notes, [currentSection]: sectionNotes }
+    setNotes(next)
+    saveNotes(attemptId, next)
+  }
+
   const groupProps = { answers, onAnswer: handleAnswer, onFocusQuestion: (question) => setCurrentNumber(question.number) }
 
   return (
@@ -182,7 +192,9 @@ export default function AttemptPage() {
                 title={section.title}
                 passage={section.passage}
                 ranges={highlights[currentSection] ?? []}
+                notes={notes[currentSection] ?? []}
                 onChange={handleHighlightsChange}
+                onNotesChange={handleNotesChange}
               />
             }
             second={
