@@ -259,16 +259,6 @@
   font-weight: 700;
 }
 
-.library-history-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin: 16px 0;
-  color: var(--primary);
-  font-size: 16px;
-  font-weight: 600;
-}
-
 .library-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
@@ -289,4 +279,9 @@
     position: static;
     max-height: none;
   }
+}
+
+/* Space between the tabs bar and the first row of cards */
+.library-grid {
+  margin-top: 18px;
 }

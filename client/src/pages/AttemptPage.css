@@ -490,3 +490,48 @@
     display: inline;
   }
 }
+
+/* Phones: one pane at a time, switched with "Bài đọc / Câu hỏi" tabs (PaneTabs.jsx) */
+.pane-tabs {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .attempt-reading {
+    flex-direction: column;
+  }
+
+  .pane-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--paper-line);
+    background: var(--paper);
+  }
+
+  .pane-tab {
+    padding: 9px 8px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .pane-tab.active {
+    background: var(--white);
+    color: var(--primary);
+    box-shadow: 0 1px 3px rgb(17 24 54 / 0.12);
+  }
+
+  .attempt-reading[data-pane='passage'] .split-pane > .split-pane-part:last-child,
+  .attempt-reading[data-pane='questions'] .split-pane > .split-pane-part:first-child {
+    display: none;
+  }
+
+  .attempt-reading .split-pane-part {
+    flex: 1;
+  }
+}
