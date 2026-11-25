@@ -71,9 +71,9 @@
   --tone: var(--primary);
   --tint: var(--primary-soft);
   overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--card-radius);
   background: var(--white);
+  box-shadow: var(--card-shadow);
 }
 
 .menu-group.listening {

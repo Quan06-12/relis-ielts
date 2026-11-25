@@ -7,7 +7,8 @@ import { getErrorMessage } from '../api/errorMessages.js'
 import { daysUntil, latestBands, gapLabel, BAND_CHOICES, todayLabel, goalProgress, overallBand } from '../features/home/homeStats.js'
 import { scoreLabel } from '../features/history/historyGroups.js'
 import BandChart from '../features/home/BandChart.jsx'
-import ActivityPanels from '../features/home/ActivityPanels.jsx'
+import TodayRow from '../features/home/TodayRow.jsx'
+import StreakStrip from '../features/home/StreakStrip.jsx'
 import Leaderboard from '../features/home/Leaderboard.jsx'
 import EmptyState from '../components/EmptyState.jsx'
 import { SkeletonRows } from '../components/Skeleton.jsx'
@@ -21,8 +22,9 @@ const GOAL_CARDS = [
   { key: 'overall', label: 'Overall', letter: 'O' },
 ]
 
-// Home page (US46, US42): target bands and exam date, latest band against the goal,
-// a chart of bands over time, unfinished attempts to continue and the last few results.
+// Home page (US46, US42), in the order a learner needs it: what to do now (continue or a suggested
+// system test), goals with the exam date and the practice streak, bands over time and recent results,
+// then the class leaderboard.
 export default function HomePage() {
   const { user } = useAuth()
   const [recent, setRecent] = useState([])
@@ -53,13 +55,21 @@ export default function HomePage() {
       </div>
       {error && <p className="library-message error">{error}</p>}
 
+      {!isLoading && <TodayRow unfinished={unfinished} />}
+
       <div className="home-top">
         <section className="home-panel">
           <div className="home-panel-header">
             <h2>Mục tiêu của bạn</h2>
-            <button type="button" className="secondary-button" onClick={() => setIsEditing(true)}>
-              {goals.overall || goals.reading || goals.listening ? 'Sửa mục tiêu' : 'Đặt mục tiêu'}
-            </button>
+            <div className="home-panel-actions">
+              {/* The exam date used to have its own box; now it is a chip next to the goals */}
+              <button type="button" className="exam-chip" onClick={() => setIsEditing(true)} title="Đổi ngày thi">
+                <span aria-hidden="true">📅</span> {examChipText(user.examDate, daysLeft)}
+              </button>
+              <button type="button" className="secondary-button" onClick={() => setIsEditing(true)}>
+                {goals.overall || goals.reading || goals.listening ? 'Sửa mục tiêu' : 'Đặt mục tiêu'}
+              </button>
+            </div>
           </div>
 
           <div className="home-cards">
@@ -92,32 +102,12 @@ export default function HomePage() {
           <p className="home-hint">“Hiện tại” lấy từ lần làm full đề gần nhất của mỗi kỹ năng; Overall là trung bình Reading và Listening.</p>
         </section>
 
-        <section className="home-panel">
-          <div className="home-panel-header">
-            <h2>Lịch thi</h2>
-          </div>
-          <div className="home-exam">
-            <button type="button" className="home-exam-box" onClick={() => setIsEditing(true)} title="Đổi ngày thi">
-              <small>Ngày dự thi</small>
-              <strong>{user.examDate ? new Date(user.examDate).toLocaleDateString('vi-VN') : 'Chưa đặt'}</strong>
-              <span aria-hidden="true" className="home-exam-edit">✎</span>
-            </button>
-            <div className="home-exam-box soft">
-              <small>Số ngày còn lại</small>
-              <strong>{daysLeft !== null && daysLeft >= 0 ? `${daysLeft} ngày` : '—'}</strong>
-            </div>
-          </div>
-          <p className="home-hint">{examLabel(daysLeft)}</p>
-        </section>
+        <StreakStrip />
       </div>
-
-      <ActivityPanels />
-
-      <Leaderboard />
 
       <div className="home-row">
         <section>
-          <h2>Band theo thời gian</h2>
+          <h2>Band qua các lần làm full đề</h2>
           {isLoading ? <SkeletonRows count={1} /> : <BandChart attempts={recent} goals={goals} />}
         </section>
 
@@ -146,22 +136,9 @@ export default function HomePage() {
             </ul>
           )}
         </section>
-
       </div>
 
-      {unfinished.length > 0 && (
-        <section>
-          <h2>Đang làm dở</h2>
-          <ul className="home-list">
-            {unfinished.map((attempt) => (
-              <li key={attempt.id}>
-                <span>{attempt.test?.title}</span>
-                <Link to={`/attempts/${attempt.id}`} className="primary-button">Làm tiếp</Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      <Leaderboard />
 
       {isEditing && <GoalsDialog user={user} onClose={() => setIsEditing(false)} />}
     </main>
@@ -175,11 +152,13 @@ function gapText(current, goal) {
   return gap === 'đạt mục tiêu' ? 'Đã đạt mục tiêu 🎉' : `${gap.charAt(0).toUpperCase()}${gap.slice(1)} band`
 }
 
-function examLabel(daysLeft) {
-  if (daysLeft === null) return 'Chưa đặt ngày thi'
-  if (daysLeft > 0) return `Còn ${daysLeft} ngày đến ngày thi`
-  if (daysLeft === 0) return 'Hôm nay là ngày thi, chúc may mắn!'
-  return 'Ngày thi đã qua'
+// Text of the exam-date chip: "Thi 12/12 · còn 17 ngày", or a prompt when no date is set
+function examChipText(examDate, daysLeft) {
+  if (!examDate) return 'Đặt ngày thi'
+  const date = new Date(examDate).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })
+  if (daysLeft > 0) return `Thi ${date} · còn ${daysLeft} ngày`
+  if (daysLeft === 0) return 'Hôm nay thi, chúc may mắn!'
+  return `Đã thi ${date}`
 }
 
 // US46: target band for each skill and overall, and the exam date

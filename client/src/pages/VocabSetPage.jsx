@@ -4,6 +4,7 @@ import { getSet, updateSet, deleteSet, addWord, updateWord, deleteWord } from '.
 import { getErrorMessage } from '../api/errorMessages.js'
 import { WORD_TYPES, typeInfo, filterWords, wordForm } from '../features/vocab/vocabDisplay.js'
 import { SkeletonRows } from '../components/Skeleton.jsx'
+import Flashcards from '../features/vocab/Flashcards.jsx'
 import { useConfirm, useToast } from '../components/FeedbackProvider.jsx'
 import './VocabPage.css'
 
@@ -18,6 +19,7 @@ export default function VocabSetPage() {
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [panel, setPanel] = useState(null) // { mode: 'view' | 'edit' | 'add', word }
+  const [isReviewing, setIsReviewing] = useState(false)
 
   useEffect(() => {
     getSet(setId)
@@ -107,6 +109,9 @@ export default function VocabSetPage() {
           <input type="search" className="vocab-search" placeholder="Tìm từ, nghĩa hoặc ghi chú" value={search} onChange={(event) => setSearch(event.target.value)} aria-label="Tìm từ" />
           <button type="button" className="secondary-button" onClick={handleRenameSet}>Đổi tên</button>
           <button type="button" className="secondary-button danger-text" onClick={handleDeleteSet}>Xoá bộ</button>
+          {set.words.length > 0 && (
+            <button type="button" className="secondary-button review-button" onClick={() => setIsReviewing(true)}>Ôn bằng flashcard</button>
+          )}
           <button type="button" className="primary-button" onClick={() => setPanel({ mode: 'add', word: null })}>+ Thêm từ</button>
         </div>
       </div>
@@ -160,6 +165,7 @@ export default function VocabSetPage() {
           </aside>
         </div>
       )}
+      {isReviewing && <Flashcards words={set.words} setName={set.name} onClose={() => setIsReviewing(false)} />}
     </main>
   )
 }

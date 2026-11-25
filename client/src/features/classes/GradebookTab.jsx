@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getGradebook } from '../../api/classes.js'
 import { getErrorMessage } from '../../api/errorMessages.js'
-import { formatScore } from './classDisplay.js'
+import { formatScore, scoreLevel } from './classDisplay.js'
 import { SkeletonRows } from '../../components/Skeleton.jsx'
 
 // "Gradebook" tab, teacher only (US40): one row per student, one column per class test.
@@ -23,6 +23,7 @@ export default function GradebookTab({ classId }) {
   if (gradebook.tests.length === 0) return <p className="library-message">Lớp chưa có đề nào trong kho đề lớp.</p>
 
   return (
+    <>
     <div className="gradebook-scroll">
       <table className="gradebook">
         <thead>
@@ -41,17 +42,24 @@ export default function GradebookTab({ classId }) {
               {row.cells.map((cell, index) => (
                 <td key={gradebook.tests[index].id}>
                   {cell ? (
-                    <Link to={`/attempts/${cell.attemptId}/review`}>{formatScore(cell)}</Link>
+                    <Link className={`score-chip ${scoreLevel(cell) ?? ''}`} to={`/attempts/${cell.attemptId}/review`}>{formatScore(cell)}</Link>
                   ) : (
                     <span className="empty-cell">—</span>
                   )}
                 </td>
               ))}
-              <td>{row.averageBand !== null ? row.averageBand.toFixed(1) : '—'}</td>
+              <td className="average-cell">{row.averageBand !== null ? row.averageBand.toFixed(1) : '—'}</td>
             </tr>
           ))}
         </tbody>
       </table>
     </div>
+    {/* What the colours mean */}
+    <p className="gradebook-legend">
+      <span className="score-chip high">Tốt</span> band 7+ hoặc từ 75% câu đúng
+      <span className="score-chip mid">Khá</span> band 5.5–6.5 hoặc 50–74%
+      <span className="score-chip low">Cần cố gắng</span> thấp hơn
+    </p>
+    </>
   )
 }

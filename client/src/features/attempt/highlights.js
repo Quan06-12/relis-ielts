@@ -41,21 +41,30 @@ export function rangeAt(ranges, position) {
   return ranges.find((current) => current.start <= position && position < current.end) ?? null
 }
 
-// Splits one paragraph into plain and highlighted pieces.
-// `offset` is where the paragraph starts in the whole passage; each piece keeps its own start.
-export function paintParagraph(text, offset, ranges) {
-  const pieces = []
-  let position = offset
+// Splits one paragraph into pieces using two layers: highlights (merged ranges) and notes
+// ({ start, end, text }, may overlap). Each piece knows whether it is highlighted and which note
+// (index in `notes`) it belongs to, or -1. `offset` is where the paragraph starts in the passage.
+export function paintLayers(text, offset, highlights, notes) {
   const end = offset + text.length
-  for (const range of ranges) {
-    if (range.end <= position || range.start >= end) continue
-    const from = Math.max(range.start, position)
-    const to = Math.min(range.end, end)
-    if (from > position) pieces.push({ text: text.slice(position - offset, from - offset), start: position, marked: false })
-    pieces.push({ text: text.slice(from - offset, to - offset), start: from, marked: true })
-    position = to
+  const cuts = new Set([offset, end])
+  for (const range of [...highlights, ...notes]) {
+    if (range.start > offset && range.start < end) cuts.add(range.start)
+    if (range.end > offset && range.end < end) cuts.add(range.end)
   }
-  if (position < end) pieces.push({ text: text.slice(position - offset), start: position, marked: false })
+  const points = [...cuts].sort((a, b) => a - b)
+  const pieces = []
+  for (let index = 0; index < points.length - 1; index += 1) {
+    const from = points[index]
+    const to = points[index + 1]
+    if (to <= from) continue
+    const inside = (range) => range.start <= from && range.end >= to
+    pieces.push({
+      text: text.slice(from - offset, to - offset),
+      start: from,
+      marked: highlights.some(inside),
+      note: notes.findIndex(inside),
+    })
+  }
   return pieces
 }
 
@@ -94,6 +103,34 @@ export function saveHighlights(attemptId, highlights, storage = window.localStor
 export function clearHighlights(attemptId, storage = window.localStorage) {
   try {
     storage.removeItem(keyFor(attemptId))
+  } catch {
+    // nothing to clear
+  }
+}
+
+// ---- notes, saved the same way under their own key ----
+const notesKeyFor = (attemptId) => `relis:notes:${attemptId}`
+
+export function loadNotes(attemptId, storage = window.localStorage) {
+  try {
+    const saved = JSON.parse(storage.getItem(notesKeyFor(attemptId)) ?? '{}')
+    return saved && typeof saved === 'object' ? saved : {}
+  } catch {
+    return {}
+  }
+}
+
+export function saveNotes(attemptId, notes, storage = window.localStorage) {
+  try {
+    storage.setItem(notesKeyFor(attemptId), JSON.stringify(notes))
+  } catch {
+    // not saved this time
+  }
+}
+
+export function clearNotes(attemptId, storage = window.localStorage) {
+  try {
+    storage.removeItem(notesKeyFor(attemptId))
   } catch {
     // nothing to clear
   }

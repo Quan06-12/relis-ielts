@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { colorOf, formatScore, studentCountLabel, nextDueBox, splitByRole } from './classDisplay.js'
+import { scoreLevel, colorOf, formatScore, studentCountLabel, nextDueBox, splitByRole } from './classDisplay.js'
 
 test('an unknown colour falls back to purple', () => {
   assert.equal(colorOf('blue'), '#1d4ed8')
@@ -36,4 +36,14 @@ test('splitByRole', () => {
   const { teaching, studying } = splitByRole([{ myRole: 'teacher' }, { myRole: 'student' }, { myRole: 'teacher' }])
   assert.equal(teaching.length, 2)
   assert.equal(studying.length, 1)
+})
+
+test('scoreLevel colours a cell by band, or by share of correct answers', () => {
+  assert.equal(scoreLevel({ band: 7.5 }), 'high')
+  assert.equal(scoreLevel({ band: 6 }), 'mid')
+  assert.equal(scoreLevel({ band: 5 }), 'low')
+  assert.equal(scoreLevel({ band: null, correct: 10, total: 13 }), 'high')
+  assert.equal(scoreLevel({ band: null, correct: 7, total: 13 }), 'mid')
+  assert.equal(scoreLevel({ band: null, correct: 3, total: 13 }), 'low')
+  assert.equal(scoreLevel(null), null)
 })

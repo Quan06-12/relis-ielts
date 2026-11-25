@@ -8,6 +8,7 @@ import ReviewGroup from '../features/review/ReviewGroup.jsx'
 import ReviewNavigator from '../features/review/ReviewNavigator.jsx'
 import { scrollToQuestion } from '../features/attempt/scrollToQuestion.js'
 import MarkedText from '../features/review/MarkedText.jsx'
+import WordPicker from '../features/vocab/WordPicker.jsx'
 import { useAiFeedback, AiFeedbackButton, AiFeedbackPanel } from '../features/review/AiFeedback.jsx'
 import SplitPane from '../components/SplitPane.jsx'
 import './AttemptPage.css'
@@ -15,6 +16,7 @@ import './ReviewPage.css'
 
 // Review page (US35–US37): score summary, then every question coloured right / wrong.
 // Clicking a question shows its explanation and highlights the evidence in the passage or transcript.
+// Selecting words in the passage or transcript offers "Thêm vào từ vựng".
 export default function ReviewPage() {
   const { attemptId } = useParams()
   const navigate = useNavigate()
@@ -47,6 +49,7 @@ export default function ReviewPage() {
   // Only the evidence of the selected question is highlighted (two questions may share a passage)
   const evidence = selected && selected.sectionPosition === currentSection ? selected.evidence : null
   const sectionWord = test.skill === 'reading' ? 'Passage' : 'Part'
+  const vocabSetName = `Từ vựng: ${test.title}`.slice(0, 80)
 
   // Open a question's explanation (from the bubble or the bottom bar); a second click closes it
   function selectQuestion(picked, { toggle = false } = {}) {
@@ -100,7 +103,10 @@ export default function ReviewPage() {
             first={
               <article className="attempt-passage">
                 <h2>{section.title}</h2>
-                <MarkedText text={section.passage} evidence={evidence} />
+                <p className="highlight-hint">Bôi đen một từ để thêm vào từ vựng</p>
+                <WordPicker text={section.passage} newSetName={vocabSetName}>
+                  <MarkedText text={section.passage} evidence={evidence} />
+                </WordPicker>
               </article>
             }
             second={questionList}
@@ -117,7 +123,9 @@ export default function ReviewPage() {
               first={
                 <section className="review-transcript">
                   <h3>Transcript</h3>
-                  <MarkedText text={section.transcript} evidence={evidence} />
+                  <WordPicker text={section.transcript} newSetName={vocabSetName}>
+                    <MarkedText text={section.transcript} evidence={evidence} />
+                  </WordPicker>
                 </section>
               }
               second={questionList}

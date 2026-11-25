@@ -21,6 +21,20 @@ export function formatScore(cell) {
   return '—'
 }
 
+// Colour level of a gradebook cell: by band for a full test, otherwise by the share of correct answers.
+// high = band 7+ or 75%+, mid = band 5.5+ or 50%+, low = below that; null when there is no score.
+export function scoreLevel(cell) {
+  if (!cell) return null
+  if (cell.band !== null && cell.band !== undefined) {
+    if (cell.band >= 7) return 'high'
+    return cell.band >= 5.5 ? 'mid' : 'low'
+  }
+  if (!cell.total) return null
+  const share = cell.correct / cell.total
+  if (share >= 0.75) return 'high'
+  return share >= 0.5 ? 'mid' : 'low'
+}
+
 // "1 học viên", "12 học viên"
 export function studentCountLabel(count) {
   return `${count ?? 0} học viên`

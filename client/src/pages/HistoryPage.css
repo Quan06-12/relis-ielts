@@ -12,8 +12,9 @@
   flex-direction: column;
   gap: 2px;
   padding: 14px 16px;
-  border-radius: 12px;
+  border-radius: var(--card-radius);
   background: var(--white);
+  box-shadow: var(--card-shadow);
 }
 
 .history-stat.reading {
@@ -86,9 +87,9 @@
   flex-wrap: wrap;
   margin-bottom: 20px;
   padding: 12px 14px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--card-radius);
   background: var(--white);
+  box-shadow: var(--card-shadow);
 }
 
 .history-filters select {
@@ -127,9 +128,9 @@
   --tone: var(--primary);
   --tint: #e3e7f8;
   overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--card-radius);
   background: var(--white);
+  box-shadow: var(--card-shadow);
 }
 
 .history-card.listening {

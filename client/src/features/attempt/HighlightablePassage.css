@@ -1,9 +1,9 @@
-/* US43: the student's own highlights while taking a Reading test */
+/* US43: the student's own highlights while taking a Reading test (dark brown with white text, like YouPass) */
 .student-highlight {
   padding: 1px 0;
   border-radius: 2px;
-  background: #fde68a;
-  color: inherit;
+  background: #750102;
+  color: #fff;
   cursor: pointer;
 }
 
@@ -14,46 +14,146 @@
   text-align: center;
 }
 
-/* Small menu above the selection */
-.highlight-menu {
+/* Notes: the words get a dashed underline; the note shows on hover and on click */
+.student-note {
+  padding: 1px 0;
+  border-bottom: 2px dashed #b45309;
+  background: #fff3c4;
+  color: inherit;
+  cursor: pointer;
+}
+
+.student-note.student-highlight {
+  border-bottom-color: #fbbf24;
+  background: #750102;
+  color: #fff;
+}
+
+/* The menu over a selection while taking a test: white, icons above their labels, a small arrow,
+   like the toolbar of the computer-based IELTS */
+.exam-menu {
   position: fixed;
   z-index: 50;
   display: flex;
-  gap: 4px;
-  padding: 4px;
-  border-radius: 10px;
-  background: var(--primary-dark);
-  box-shadow: 0 6px 20px rgb(20 27 77 / 0.25);
-  transform: translate(-50%, calc(-100% - 8px));
+  padding: 6px;
+  border: 1px solid #c9ccd8;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgb(17 24 54 / 0.18);
+  transform: translate(-50%, calc(-100% - 12px));
 }
 
-.highlight-menu.below {
-  transform: translate(-50%, 8px);
+.exam-menu.below {
+  transform: translate(-50%, 12px);
 }
 
-.highlight-menu button {
-  display: inline-flex;
+/* Arrow pointing at the selection */
+.exam-menu::after {
+  position: absolute;
+  bottom: -7px;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  border-right: 1px solid #c9ccd8;
+  border-bottom: 1px solid #c9ccd8;
+  background: #fff;
+  content: '';
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.exam-menu.below::after {
+  top: -7px;
+  bottom: auto;
+  transform: translateX(-50%) rotate(225deg);
+}
+
+.exam-menu button {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
+  gap: 4px;
+  min-width: 76px;
+  padding: 6px 10px;
   border: 0;
-  border-radius: 7px;
+  border-radius: 6px;
   background: transparent;
-  color: #fff;
+  color: #1f2433;
   font: inherit;
   font-size: 14px;
-  font-weight: 600;
+}
+
+.exam-menu button:hover,
+.exam-menu button:focus-visible {
+  background: #f0f1f6;
+}
+
+/* Writing or reading a note */
+.note-box {
+  position: fixed;
+  z-index: 50;
+  width: 280px;
+  padding: 12px;
+  border: 1px solid #c9ccd8;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgb(17 24 54 / 0.18);
+  transform: translate(-50%, calc(-100% - 12px));
+}
+
+.note-box.below {
+  transform: translate(-50%, 12px);
+}
+
+.note-box-quote {
+  overflow: hidden;
+  margin: 0 0 8px;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  font-style: italic;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.highlight-menu button:hover,
-.highlight-menu button:focus-visible {
-  background: rgb(255 255 255 / 0.15);
+.note-box textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 14px;
+  resize: vertical;
 }
 
-.highlight-menu .swatch {
-  width: 12px;
-  height: 12px;
-  border-radius: 3px;
-  background: #fde68a;
+.note-box-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.note-box-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.note-box-actions button {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.note-box-actions button.primary {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+}
+
+.note-box-actions button:disabled {
+  opacity: 0.5;
 }

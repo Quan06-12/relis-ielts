@@ -32,9 +32,7 @@ function singlePassageTest({ title, cover, passage, tfng, completion }) {
   }
 }
 
-const BEES = `The Secret Life of Urban Bees
-
-Most people imagine honeybees living in quiet fields far from traffic. In fact, cities can be surprisingly good homes for them. Parks, gardens and balconies contain a wide variety of flowers, and because towns are warmer than the countryside, plants there often bloom earlier and for longer.
+const BEES = `Most people imagine honeybees living in quiet fields far from traffic. In fact, cities can be surprisingly good homes for them. Parks, gardens and balconies contain a wide variety of flowers, and because towns are warmer than the countryside, plants there often bloom earlier and for longer.
 
 Many cities now have rooftop hives looked after by volunteers, restaurants and even hotels. In London alone, the number of registered hives rose sharply in the 2010s. Some beekeepers sell the honey, which often tastes different from street to street because the bees collect nectar from whatever trees grow nearby.
 
@@ -42,9 +40,7 @@ Not everyone welcomes this trend. Ecologists warn that too many honeybees can ta
 
 Pollution was once thought to be a serious danger to city bees. However, studies of urban honey have found very low levels of harmful metals, and colonies in towns are often healthier than those on farms, where they may be exposed to pesticides.`
 
-const LIGHTHOUSE = `A Guide to the Harbour Lighthouse
-
-The white lighthouse at the end of the harbour wall was built in 1857 after a winter storm wrecked three fishing boats on the rocks below. For more than a century, a keeper and his family lived in the small cottage beside it, climbing the one hundred and twelve steps every evening to light the lamp.
+const LIGHTHOUSE = `The white lighthouse at the end of the harbour wall was built in 1857 after a winter storm wrecked three fishing boats on the rocks below. For more than a century, a keeper and his family lived in the small cottage beside it, climbing the one hundred and twelve steps every evening to light the lamp.
 
 The original light burned oil and could be seen about eighteen kilometres out at sea. In 1923 it was replaced by an electric lamp, and a large glass lens was added to make the beam stronger. The lens, made in France, is still in place today.
 
@@ -52,9 +48,7 @@ Since 1981 the lighthouse has worked automatically, and no keeper lives there an
 
 Visitors can climb to the gallery at the top between April and October. Tours run every hour, but children under eight are not allowed on the stairs for safety reasons. On clear days, the view stretches across the bay to the islands in the north.`
 
-const OCEAN = `Can Oceans Store Our Carbon?
-
-The oceans already absorb about a quarter of the carbon dioxide that humans release into the air each year. Some of it dissolves directly into sea water, while tiny floating plants called phytoplankton take in carbon as they grow. When these plants die, a small part of them sinks to the deep ocean, where the carbon can remain for centuries.
+const OCEAN = `The oceans already absorb about a quarter of the carbon dioxide that humans release into the air each year. Some of it dissolves directly into sea water, while tiny floating plants called phytoplankton take in carbon as they grow. When these plants die, a small part of them sinks to the deep ocean, where the carbon can remain for centuries.
 
 Scientists are now studying whether this natural process could be increased on purpose. One idea is to add iron to areas of ocean where it is scarce, so that more phytoplankton can grow. Early experiments did produce large blooms of plants, but it was not clear how much carbon actually reached the deep sea.
 
@@ -62,9 +56,7 @@ Another approach is to protect and restore coastal habitats such as mangroves an
 
 Critics warn that absorbing more carbon makes sea water more acidic, which harms shellfish and coral reefs. They argue that cutting emissions must remain the main solution.`
 
-const NIGHT = `Night Skies and Light Pollution
-
-A century ago, almost everyone could see the Milky Way on a clear night. Today, around a third of the world's population, and most people in Europe and North America, live under skies so bright that it is no longer visible.
+const NIGHT = `A century ago, almost everyone could see the Milky Way on a clear night. Today, around a third of the world's population, and most people in Europe and North America, live under skies so bright that it is no longer visible.
 
 The main cause is artificial light that shines upwards or sideways instead of down onto streets and buildings. Street lamps, advertising screens and floodlit sports grounds all add to a glow that can be seen from aircraft hundreds of kilometres away.
 
@@ -72,9 +64,7 @@ Light pollution affects more than astronomers. Many birds migrate at night and u
 
 Solutions are relatively cheap. Lamps can be shielded so that light only falls where it is needed, and many towns now switch off or dim lights after midnight. Some areas have been named dark sky parks, where strict rules on outdoor lighting help attract visitors who come to watch the stars.`
 
-const MONEY = `The History of Paper Money
-
-For thousands of years, people paid for goods with coins made from gold, silver or copper. Coins were valuable in themselves, but they were heavy, and carrying large amounts over long distances was both difficult and dangerous.
+const MONEY = `For thousands of years, people paid for goods with coins made from gold, silver or copper. Coins were valuable in themselves, but they were heavy, and carrying large amounts over long distances was both difficult and dangerous.
 
 The first paper money appeared in China more than a thousand years ago. Merchants began leaving their heavy coins with trusted traders and receiving written receipts in return. These receipts could be passed from person to person, and by the eleventh century the government had taken control of printing them.
 
@@ -82,9 +72,7 @@ When the traveller Marco Polo visited China in the thirteenth century, he was as
 
 Today paper money is slowly giving way to card and phone payments. In some countries, fewer than one purchase in ten is now paid in cash, and some shops no longer accept notes at all.`
 
-const DESERT = `Desert Plants That Drink Fog
-
-The Namib Desert on the coast of south-west Africa receives almost no rain. In some years, not a single shower falls. Yet many plants and animals survive there, thanks to the thick fog that rolls in from the cold Atlantic Ocean on many mornings.
+const DESERT = `The Namib Desert on the coast of south-west Africa receives almost no rain. In some years, not a single shower falls. Yet many plants and animals survive there, thanks to the thick fog that rolls in from the cold Atlantic Ocean on many mornings.
 
 Some plants have leaves covered in tiny grooves that guide drops of fog towards their roots. One famous beetle stands on the tops of sand dunes with its back raised into the wind, so that water collects on its shell and runs down towards its mouth.
 
@@ -92,9 +80,7 @@ Engineers have copied these ideas. In Chile and Morocco, large vertical nets cal
 
 Fog collectors are cheap and need no electricity, but they only work in places where fog is frequent and the wind blows it towards the nets.`
 
-const RECYCLING = `A Group Project on Recycling
-
-Every year the world produces more than three hundred million tonnes of plastic, yet less than a tenth of it is recycled. The rest is buried, burned or ends up in the natural environment, where it can take hundreds of years to break down.
+const RECYCLING = `Every year the world produces more than three hundred million tonnes of plastic, yet less than a tenth of it is recycled. The rest is buried, burned or ends up in the natural environment, where it can take hundreds of years to break down.
 
 One problem is that there are many different types of plastic, and they cannot all be recycled together. Drinks bottles are usually made from a type that is easy to recycle, while yoghurt pots and food wrappers often contain mixtures that are much harder to process.
 
@@ -102,9 +88,7 @@ Contamination is another difficulty. Containers that still contain food or drink
 
 Many experts believe that recycling alone cannot solve the problem. They argue that the best solution is to use less plastic in the first place, for example by choosing refillable bottles and buying food without packaging.`
 
-const ART = `A Day at the Modern Art Gallery
-
-Modern art galleries often surprise first-time visitors. Instead of quiet rooms filled with old paintings in golden frames, they may find huge sculptures, video screens, or even an empty room in which the light itself is the artwork.
+const ART = `Modern art galleries often surprise first-time visitors. Instead of quiet rooms filled with old paintings in golden frames, they may find huge sculptures, video screens, or even an empty room in which the light itself is the artwork.
 
 Many galleries now try to make modern art easier to understand. Labels are written in plain language, and free guided tours explain what the artists were trying to achieve. Some museums offer apps that play short recordings when visitors stand in front of a particular work.
 
