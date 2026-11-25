@@ -51,6 +51,7 @@ Client hiển thị thông báo tiếng Việt dựa trên `code`, không hiển
 | 404 | `NOT_FOUND` | Không tồn tại hoặc không có quyền xem |
 | 409 | `ATTEMPT_IN_PROGRESS` | Đã có bài làm dở của đề này; `details.attemptId` |
 | 409 | `ATTEMPT_CLOSED` | Lưu đáp án khi bài đã nộp hoặc đã hết giờ |
+| 409 | `ATTEMPT_IN_CLASS` | Xoá một lần làm bài thuộc lớp hoặc bài tập (chỉ xoá được bài tự luyện) |
 | 409 | `ATTEMPT_NOT_SUBMITTED` | Mở trang Xem lại khi bài còn đang làm |
 | 409 | `ALREADY_MEMBER` | Nhập mã lớp đã tham gia (Sprint 2) |
 | 409 | `TEACHER_CANNOT_LEAVE` | Giáo viên bấm rời lớp của chính mình (US10) |

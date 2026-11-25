@@ -15,7 +15,8 @@ const resultSchema = new mongoose.Schema(
   {
     correct: Number,
     total: Number,
-    band: Number, // null when only some sections were practised
+    band: Number, // null when only some sections were practised, or when nothing was answered
+    answered: Number, // questions with an answer; 0 = a blank attempt, which never counts for bands
   },
   { _id: false }
 )

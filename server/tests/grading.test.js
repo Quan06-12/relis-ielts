@@ -48,14 +48,14 @@ test('a full 40-question test gets a band', () => {
   const fullTest = makeTest('reading', [13, 13, 14])
   const { result } = gradeAttempt(fullTest, answerAll(fullTest, 'TRUE', 30), { type: 'full', sectionIndexes: [0, 1, 2] })
 
-  assert.deepEqual(result, { correct: 30, total: 40, band: 7 })
+  assert.deepEqual(result, { correct: 30, total: 40, band: 7, answered: 30 })
 })
 
 test('practising some sections gives no band and only counts those sections', () => {
   const fullTest = makeTest('reading', [13, 13, 14])
   const { result, answers } = gradeAttempt(fullTest, answerAll(fullTest, 'TRUE'), { type: 'parts', sectionIndexes: [1] })
 
-  assert.deepEqual(result, { correct: 13, total: 13, band: null })
+  assert.deepEqual(result, { correct: 13, total: 13, band: null, answered: 13 })
   assert.equal(answers.length, 13)
 })
 
@@ -66,4 +66,19 @@ test('unanswered questions are listed as wrong', () => {
   assert.deepEqual(answers.map((answer) => answer.correct), [true, false, false])
   assert.deepEqual(answers[2].value, [])
   assert.equal(result.correct, 1)
+})
+
+test('a blank full test gets no band, so it never counts as band 0', () => {
+  const fullTest = makeTest('reading', [13, 13, 14])
+  const { result } = gradeAttempt(fullTest, [], { type: 'full', sectionIndexes: [0, 1, 2] })
+  assert.deepEqual(result, { correct: 0, total: 40, band: null, answered: 0 })
+})
+
+test('answered counts questions with a non-empty answer, right or wrong', () => {
+  const fullTest = makeTest('reading', [13, 13, 14])
+  const answers = [...answerAll(fullTest, 'FALSE', 5), { questionId: fullTest.sections[2].groups[0].questions[0]._id, value: ['  '] }]
+  const { result } = gradeAttempt(fullTest, answers, { type: 'full', sectionIndexes: [0, 1, 2] })
+  assert.equal(result.answered, 5)
+  assert.equal(result.correct, 0)
+  assert.notEqual(result.band, null, 'answered but all wrong still has a band')
 })

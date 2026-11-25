@@ -42,7 +42,15 @@ export function gradeAttempt(test, answers, mode) {
 
   const correct = gradedAnswers.filter((answer) => answer.correct).length
   const total = listQuestions(test.sections, mode.sectionIndexes).length
-  const band = mode.type === 'full' && total === 40 ? bandFromCorrect(test.skill, correct) : null
+  const answered = gradedAnswers.filter((answer) => hasAnswer(answer.value)).length
+  // A blank attempt (time ran out or it was handed in untouched) gets no band, so it never pulls
+  // the learner's current band, averages or chart down to 0
+  const band = mode.type === 'full' && total === 40 && answered > 0 ? bandFromCorrect(test.skill, correct) : null
 
-  return { answers: gradedAnswers, result: { correct, total, band } }
+  return { answers: gradedAnswers, result: { correct, total, band, answered } }
+}
+
+// True when at least one non-empty value was given
+export function hasAnswer(value) {
+  return Array.isArray(value) && value.some((item) => String(item ?? '').trim() !== '')
 }
