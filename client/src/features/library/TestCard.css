@@ -56,6 +56,11 @@
   font-weight: 600;
 }
 
+.system-chip {
+  background: var(--primary);
+  color: var(--white);
+}
+
 /* Coloured tag in the bottom-left corner: Full test / Bài lẻ */
 .kind-tag {
   position: absolute;

@@ -130,8 +130,12 @@ paths:
     get:
       operationId: listMyTests
       tags: [Tests]
-      summary: My test library (US20, US22, US23)
+      summary: My test library, or the system tests (US20, US22, US23)
+      description: |
+        By default lists the caller's own tests. `source=system` lists the published system tests
+        that come with Relis instead; every signed-in user can take those, nobody can edit them.
       parameters:
+        - { name: source, in: query, description: 'mine (default) or system', schema: { type: string, enum: [mine, system] } }
         - { name: skill, in: query, schema: { $ref: '#/components/schemas/Skill' } }
         - { name: kind, in: query, schema: { $ref: '#/components/schemas/TestKind' } }
         - { name: status, in: query, schema: { $ref: '#/components/schemas/TestStatus' } }
@@ -1390,6 +1394,7 @@ components:
         durationMin: { type: integer }
         questionCount: { type: integer }
         updatedAt: { type: string, format: date-time }
+        isSystem: { type: boolean, description: 'A system test that comes with Relis (read-only)' }
         lastBand:
           type: [number, 'null']
           description: Band of the caller's latest full attempt, for the band stamp

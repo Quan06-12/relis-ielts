@@ -7,6 +7,7 @@ const SKILL_LABEL = { reading: 'Reading', listening: 'Listening' }
 
 // One test in the library (US20–US22): cover with time and question count, a coloured tag
 // (Full test / Bài lẻ), the title, the question types, "Làm bài" and a ⋯ menu (edit, share, delete).
+// A system test cannot be edited or deleted, so its menu only has "Đưa lên lớp".
 export default function TestCard({ test, onStart, onDelete, onShare }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const menu = useRef(null)
@@ -31,6 +32,7 @@ export default function TestCard({ test, onStart, onDelete, onShare }) {
         {!test.coverUrl && <span className="test-card-skill-mark">{SKILL_LABEL[test.skill]}</span>}
         <span className="cover-chip">⏱ {test.durationMin} phút · {test.questionCount} câu</span>
         {test.status === 'draft' && <span className="draft-chip">Nháp</span>}
+        {test.isSystem && <span className="draft-chip system-chip">Đề Relis</span>}
         {/* Band stamp: only for tests the user finished as a full test */}
         {test.lastBand !== null && (
           <span className="band-stamp" title="Band lần làm full gần nhất">{test.lastBand.toFixed(1)}</span>
@@ -57,11 +59,13 @@ export default function TestCard({ test, onStart, onDelete, onShare }) {
             </button>
             {isMenuOpen && (
               <div className="card-menu-list" role="menu">
-                <Link role="menuitem" to={`/tests/${test.id}/edit`}>Sửa đề</Link>
+                {!test.isSystem && <Link role="menuitem" to={`/tests/${test.id}/edit`}>Sửa đề</Link>}
                 {test.status === 'published' && (
                   <button type="button" role="menuitem" onClick={() => { setIsMenuOpen(false); onShare(test) }}>Đưa lên lớp</button>
                 )}
-                <button type="button" role="menuitem" className="danger" onClick={() => { setIsMenuOpen(false); onDelete(test) }}>Xoá đề</button>
+                {!test.isSystem && (
+                  <button type="button" role="menuitem" className="danger" onClick={() => { setIsMenuOpen(false); onDelete(test) }}>Xoá đề</button>
+                )}
               </div>
             )}
           </div>

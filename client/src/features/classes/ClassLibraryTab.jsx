@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { listClassLibrary, addToClassLibrary, removeFromClassLibrary } from '../../api/classes.js'
-import { listMyTests } from '../../api/tests.js'
+import { listShareableTests } from '../../api/tests.js'
 import { getErrorMessage } from '../../api/errorMessages.js'
 import ModeDialog from '../attempt/ModeDialog.jsx'
 import { useConfirm, useToast } from '../../components/FeedbackProvider.jsx'
@@ -97,15 +97,15 @@ export default function ClassLibraryTab({ classId, isTeacher }) {
   )
 }
 
-// Pick some of my published tests that are not in the class yet
+// Pick some of my published tests, or system tests, that are not in the class yet
 function AddTestsDialog({ classId, alreadyInClass, onClose, onAdded }) {
   const [publishedTests, setPublishedTests] = useState(null)
   const [chosen, setChosen] = useState([])
   const [error, setError] = useState('')
 
   useEffect(() => {
-    listMyTests({ status: 'published', limit: 50 })
-      .then((page) => setPublishedTests(page.items))
+    listShareableTests()
+      .then(setPublishedTests)
       .catch((loadError) => setError(getErrorMessage(loadError)))
   }, [])
 
@@ -135,7 +135,7 @@ function AddTestsDialog({ classId, alreadyInClass, onClose, onAdded }) {
             {myTests.map((test) => (
               <label key={test.id}>
                 <input type="checkbox" checked={chosen.includes(test.id)} onChange={() => toggle(test.id)} />
-                {test.title} · {SKILL_LABEL[test.skill]}
+                {test.title} · {SKILL_LABEL[test.skill]}{test.isSystem ? ' · Đề Relis' : ''}
               </label>
             ))}
           </div>

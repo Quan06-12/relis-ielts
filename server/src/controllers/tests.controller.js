@@ -15,16 +15,19 @@ const SKILLS = ['reading', 'listening']
 const KINDS = ['full', 'single']
 
 // GET /api/tests — my library, newest first (US20, US22, US23)
+// source=system lists the published system tests instead of my own.
 // Filters combine: skill, kind (full / single), status, q (title), done (true = taken before, false = not yet)
 export async function listMyTests(request, response) {
-  const { skill, kind, status, q, done } = request.query
+  const { skill, kind, status, q, done, source } = request.query
   const page = Math.max(Number(request.query.page) || 1, 1)
   const limit = Math.min(Math.max(Number(request.query.limit) || 20, 1), 50)
 
-  const filter = { ownerId: request.userId, hidden: false }
+  const filter = source === 'system'
+    ? { isSystem: true, status: 'published', hidden: false }
+    : { ownerId: request.userId, hidden: false }
   if (SKILLS.includes(skill)) filter.skill = skill
   if (KINDS.includes(kind)) filter.kind = kind
-  if (['draft', 'published'].includes(status)) filter.status = status
+  if (source !== 'system' && ['draft', 'published'].includes(status)) filter.status = status
   if (q) filter.title = { $regex: escapeRegex(q), $options: 'i' }
   if (done === 'true' || done === 'false') {
     const doneIds = await findDoneTestIds(request.userId)
@@ -32,7 +35,7 @@ export async function listMyTests(request, response) {
   }
 
   const [tests, total] = await Promise.all([
-    Test.find(filter).sort({ updatedAt: -1 }).skip((page - 1) * limit).limit(limit),
+    Test.find(filter).sort(source === 'system' ? { kind: 1, title: 1 } : { updatedAt: -1 }).skip((page - 1) * limit).limit(limit),
     Test.countDocuments(filter),
   ])
   const lastBands = await findLastBands(request.userId, tests.map((test) => test._id))
