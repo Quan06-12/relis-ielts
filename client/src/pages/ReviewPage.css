@@ -80,15 +80,43 @@
   background: #fde68a;
 }
 
-.review-transcript {
-  overflow-y: auto;
-  padding: 12px 24px;
-  background: var(--white);
+/* Listening review: the left column, set like the Reading passage (paper, wide margins) */
+/* Side and bottom padding and the paper come from .attempt-page .review-transcript (AttemptPage.css).
+   No top padding here: the sticky player band carries it, so no text shows above the player. */
+.attempt-page .review-transcript {
+  padding-top: 0;
+  line-height: 1.75;
 }
 
-.review-transcript h3 {
-  margin: 0 0 8px;
-  font-size: 15px;
+.review-transcript h2 {
+  margin: 20px 0 4px;
+  font-size: 20px;
+  text-align: center;
+}
+
+/* The player stays at the top of the column while the transcript scrolls; its paper band covers
+   the text passing underneath */
+.transcript-player {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 32px 0 12px;
+  background: var(--paper);
+}
+
+.transcript-player .attempt-audio {
+  display: block;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .attempt-page .review-transcript {
+    padding-top: 0;
+  }
+
+  .transcript-player {
+    padding-top: 16px;
+  }
 }
 
 /* ---- Results inside the gaps: "garhg → reservoir" ---- */

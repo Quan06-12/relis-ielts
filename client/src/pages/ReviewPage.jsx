@@ -142,16 +142,22 @@ export default function ReviewPage() {
           />
         </main>
       ) : (
-        <main className="attempt-listening">
-          {section.audioUrl && <audio key={section.audioUrl} className="attempt-audio" src={section.audioUrl} controls preload="metadata" />}
-          {section.transcript ? (
-            // US38: drag the bar to change the heights of the transcript and the questions
+        section.transcript ? (
+          // Listening with a transcript: audio and transcript on the left, questions on the right,
+          // like the Reading review (US38: drag the bar to change the widths)
+          <main className="attempt-reading" data-pane={mobilePane}>
+            <PaneTabs pane={mobilePane} onChange={setMobilePane} passageLabel="Transcript" />
             <SplitPane
-              direction="rows"
-              label="Đổi chiều cao transcript và câu hỏi"
+              label="Đổi độ rộng transcript và câu hỏi"
               first={
                 <section className="review-transcript">
-                  <h3>Transcript</h3>
+                  {section.audioUrl && (
+                    <div className="transcript-player">
+                      <audio key={section.audioUrl} className="attempt-audio" src={section.audioUrl} controls preload="metadata" />
+                    </div>
+                  )}
+                  <h2>Transcript</h2>
+                  <p className="highlight-hint">Bôi đen một từ để thêm vào từ vựng</p>
                   <WordPicker text={section.transcript} newSetName={vocabSetName}>
                     <MarkedText text={section.transcript} evidence={evidence} />
                   </WordPicker>
@@ -159,10 +165,13 @@ export default function ReviewPage() {
               }
               second={questionList}
             />
-          ) : (
-            questionList
-          )}
-        </main>
+          </main>
+        ) : (
+          <main className="attempt-listening">
+            {section.audioUrl && <audio key={section.audioUrl} className="attempt-audio" src={section.audioUrl} controls preload="metadata" />}
+            {questionList}
+          </main>
+        )
       )}
 
       <ReviewNavigator
