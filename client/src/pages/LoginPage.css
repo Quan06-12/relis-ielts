@@ -326,10 +326,3 @@
   outline: 3px solid var(--yellow);
   outline-offset: 2px;
 }
-
-.login-guest-note {
-  margin: 0 !important;
-  color: #b3bad8 !important;
-  font-size: 12.5px;
-  line-height: 1.5;
-}

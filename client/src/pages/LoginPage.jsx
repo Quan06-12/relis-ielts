@@ -126,10 +126,6 @@ export default function LoginPage() {
             <div className="login-guest">
               <p className="login-divider"><span>hoặc</span></p>
               <button type="button" className="login-guest-button" onClick={signInAsGuest}>Dùng thử không cần tài khoản</button>
-              <p className="login-guest-note">
-                Khách dùng được mọi tính năng trừ tạo và tham gia lớp. Dữ liệu chỉ lưu trên trình duyệt này;
-                đăng nhập Google sau đó sẽ giữ lại bài đã làm.
-              </p>
             </div>
           )}
 

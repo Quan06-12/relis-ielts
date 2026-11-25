@@ -47,14 +47,9 @@ export default function AccountMenu() {
 
       {isOpen && (
         <div className="account-dropdown">
-          <p className="account-name">{user.name}</p>
-          {user.isGuest ? (
-            // A guest who signs out cannot come back to this account, so say so
-            <p className="account-email">Tài khoản khách: đăng xuất sẽ mất dữ liệu đã làm. Đăng nhập Google ở trang Lớp học để giữ lại.</p>
-          ) : (
-            <p className="account-email">{user.email}</p>
-          )}
-          <button type="button" onClick={handleSignOut}>{user.isGuest ? 'Thoát chế độ khách' : 'Đăng xuất'}</button>
+          <p className={user.isGuest ? 'account-name guest' : 'account-name'}>{user.name}</p>
+          {!user.isGuest && <p className="account-email">{user.email}</p>}
+          <button type="button" onClick={handleSignOut}>Đăng xuất</button>
         </div>
       )}
     </div>
