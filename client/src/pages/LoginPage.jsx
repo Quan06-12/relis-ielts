@@ -14,12 +14,14 @@ import './LoginPage.css'
 // After sign-in the Relis cube flies, tumbling, to the middle of the screen and then into the logo
 // of the navy bar while the app opens (LogoFlightLayer.jsx).
 export default function LoginPage() {
-  const { status, signIn } = useAuth()
+  const { status, signIn, signInWithEmail, register } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [state, setState] = useState('ready') // 'ready' | 'signing-in' | 'cancelled' | 'error'
   const [error, setError] = useState('')
   const [lastCredential, setLastCredential] = useState(null) // kept so "Thử lại" can send it again
+  const [formMode, setFormMode] = useState('login') // 'login' | 'register' for the email form
+  const [fields, setFields] = useState({ name: '', email: '', password: '' })
   const brandCube = useRef(null)
   // The Google button has a fixed width in pixels; measure its box so it fits phones too
   const buttonBox = useRef(null)
@@ -44,12 +46,28 @@ export default function LoginPage() {
     return <Navigate to={nextPage} replace />
   }
 
-  async function signInWith(credential) {
+  function signInWith(credential) {
     setLastCredential(credential)
+    return finishSignIn(() => signIn(credential))
+  }
+
+  // Email form: sign in, or create the account first
+  function handleEmailSubmit(event) {
+    event.preventDefault()
+    setLastCredential(null)
+    const { name, email, password } = fields
+    finishSignIn(() => (formMode === 'register' ? register({ name, email, password }) : signInWithEmail({ email, password })))
+  }
+
+  function updateField(name, value) {
+    setFields((current) => ({ ...current, [name]: value }))
+  }
+
+  async function finishSignIn(action) {
     setState('signing-in')
     isSigningInHere.current = true
     try {
-      await signIn(credential)
+      await action()
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       if (reduceMotion) {
         goToApp() // the user asked for less motion
@@ -92,11 +110,11 @@ export default function LoginPage() {
         <div className="login-card">
           <p className="login-eyebrow">Bắt đầu miễn phí</p>
           <h2>Chào mừng bạn</h2>
-          <p>Đăng nhập hoặc tạo tài khoản bằng Google.</p>
+          <p>Đăng nhập bằng Google, hoặc dùng email và mật khẩu.</p>
 
           {state === 'signing-in' ? (
             <div className="login-connecting" role="status">
-              <span className="login-spinner" aria-hidden="true" /> Đang kết nối với Google…
+              <span className="login-spinner" aria-hidden="true" /> {lastCredential ? 'Đang kết nối với Google…' : 'Đang đăng nhập…'}
             </div>
           ) : (
             <div className="login-google-button" ref={buttonBox}>
@@ -111,6 +129,48 @@ export default function LoginPage() {
                 />
               )}
             </div>
+          )}
+
+          {state !== 'signing-in' && (
+            <form className="login-email-form" onSubmit={handleEmailSubmit}>
+              <p className="login-divider"><span>hoặc dùng email</span></p>
+              {formMode === 'register' && (
+                <label>
+                  Họ và tên
+                  <input type="text" autoComplete="name" maxLength={60} required value={fields.name} onChange={(event) => updateField('name', event.target.value)} />
+                </label>
+              )}
+              <label>
+                Email
+                <input type="email" autoComplete="email" required value={fields.email} onChange={(event) => updateField('email', event.target.value)} />
+              </label>
+              <label>
+                Mật khẩu
+                <input
+                  type="password"
+                  autoComplete={formMode === 'register' ? 'new-password' : 'current-password'}
+                  minLength={formMode === 'register' ? 8 : undefined}
+                  maxLength={72}
+                  required
+                  value={fields.password}
+                  onChange={(event) => updateField('password', event.target.value)}
+                />
+                {formMode === 'register' && <span className="login-field-hint">Ít nhất 8 ký tự</span>}
+              </label>
+              <button type="submit" className="login-submit">{formMode === 'register' ? 'Tạo tài khoản' : 'Đăng nhập'}</button>
+              <p className="login-switch">
+                {formMode === 'register' ? 'Đã có tài khoản?' : 'Chưa có tài khoản?'}{' '}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormMode(formMode === 'register' ? 'login' : 'register')
+                    setState('ready')
+                  }}
+                >
+                  {formMode === 'register' ? 'Đăng nhập' : 'Tạo tài khoản'}
+                </button>
+              </p>
+            </form>
           )}
 
           {state === 'cancelled' && (

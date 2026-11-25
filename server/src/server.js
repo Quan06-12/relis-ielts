@@ -1,11 +1,14 @@
 import { loadConfig } from './config/env.js'
 import { connectDatabase } from './config/db.js'
 import { createApp } from './app.js'
+import { User } from './models/User.js'
 
 // Entry point: read settings, connect to MongoDB, then start listening.
 const config = loadConfig()
 
 await connectDatabase(config.mongodbUri)
+// The googleId index became sparse when password accounts were added; rebuild indexes that changed
+await User.syncIndexes()
 
 const app = createApp(config)
 

@@ -282,3 +282,92 @@
     backdrop-filter: none;
   }
 }
+
+/* Email and password form under the Google button */
+.login-email-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0 2px;
+  color: #b3bad8;
+  font-size: 13px;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.login-email-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #d0d6f0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.login-email-form input {
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--text);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.login-email-form input:focus-visible {
+  outline: 3px solid var(--yellow);
+  outline-offset: 1px;
+}
+
+.login-field-hint {
+  color: #b3bad8;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.login-submit {
+  margin-top: 4px;
+  padding: 11px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--yellow);
+  color: #1a1f45;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.login-submit:hover {
+  filter: brightness(1.06);
+}
+
+.login-switch {
+  margin: 0;
+  color: #d0d6f0;
+  font-size: 13px;
+  text-align: center;
+}
+
+.login-switch button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--yellow);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+}

@@ -109,6 +109,76 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
 
+  /auth/register:
+    post:
+      operationId: register
+      tags: [Auth]
+      summary: Create an account with email and password
+      description: |
+        The password is stored only as a salted scrypt hash. The email is stored in lower case.
+        Signing in with Google later using the same email links Google to this account.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password]
+              properties:
+                name: { type: string, minLength: 1, maxLength: 60 }
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8, maxLength: 72 }
+      responses:
+        '201':
+          description: Account created and signed in
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthResult' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '409':
+          description: An account with this email already exists (`EMAIL_TAKEN`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /auth/login:
+    post:
+      operationId: signInWithPassword
+      tags: [Auth]
+      summary: Sign in with email and password
+      description: |
+        A wrong password and an unknown email get the same 401, so the API does not reveal who has an account.
+        After 5 wrong passwords for one email within 15 minutes, that email gets 429 until the window passes.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+      responses:
+        '200':
+          description: Signed in
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthResult' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401':
+          description: Email or password is wrong (`INVALID_CREDENTIALS`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '429':
+          description: Too many wrong passwords (`TOO_MANY_ATTEMPTS`); see the Retry-After header
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
   /auth/me:
     get:
       operationId: getCurrentUser

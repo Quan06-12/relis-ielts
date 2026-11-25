@@ -47,17 +47,20 @@ Client hiển thị thông báo tiếng Việt dựa trên `code`, không hiển
 | 400 | `INVALID_JSON` | Body không phải JSON hợp lệ |
 | 401 | `UNAUTHENTICATED` | Thiếu token, token sai hoặc hết hạn |
 | 401 | `INVALID_GOOGLE_TOKEN` | Google từ chối `credential` |
+| 401 | `INVALID_CREDENTIALS` | Đăng nhập bằng email: sai email hoặc mật khẩu (không phân biệt hai trường hợp) |
 | 404 | `NOT_FOUND` | Không tồn tại hoặc không có quyền xem |
 | 409 | `ATTEMPT_IN_PROGRESS` | Đã có bài làm dở của đề này; `details.attemptId` |
 | 409 | `ATTEMPT_CLOSED` | Lưu đáp án khi bài đã nộp hoặc đã hết giờ |
 | 409 | `ATTEMPT_NOT_SUBMITTED` | Mở trang Xem lại khi bài còn đang làm |
 | 409 | `ALREADY_MEMBER` | Nhập mã lớp đã tham gia (Sprint 2) |
 | 409 | `TEACHER_CANNOT_LEAVE` | Giáo viên bấm rời lớp của chính mình (US10) |
+| 409 | `EMAIL_TAKEN` | Đăng ký bằng email đã có tài khoản (kể cả tài khoản Google) |
 | 409 | `DUPLICATE_WORD` | Thêm hoặc sửa từ trùng với một từ đã có trong bộ (US48); `details` chỉ trường `term` |
 | 413 | `FILE_TOO_LARGE` | File upload vượt giới hạn |
 | 422 | `TEST_INCOMPLETE` | Xuất bản đề còn câu chưa có đáp án; `details` liệt kê số câu |
 | 422 | `DEADLINE_PASSED` | Bắt đầu làm bài giao sau hạn khi giáo viên không cho nộp trễ (US44) |
 | 422 | `NO_QUESTIONS` | Bắt đầu làm một đề (hoặc các phần đã chọn) chưa có câu hỏi nào |
+| 429 | `TOO_MANY_ATTEMPTS` | Sai mật khẩu 5 lần trong 15 phút với cùng một email; header `Retry-After` (giây) |
 | 500 | `INTERNAL_ERROR` | Lỗi không lường trước; xem log trên Render |
 | 502 | `AI_FEEDBACK_FAILED` | Gemini lỗi hoặc hết hạn mức (US49) |
 | 503 | `DATABASE_UNAVAILABLE` | Mất kết nối MongoDB |

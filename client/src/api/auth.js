@@ -6,6 +6,18 @@ export async function signInWithGoogle(credential) {
   return response.data // { token, user }
 }
 
+// POST /auth/register — create an account with name, email and password
+export async function registerWithPassword({ name, email, password }) {
+  const response = await http.post('/auth/register', { name, email, password })
+  return response.data // { token, user }
+}
+
+// POST /auth/login — sign in with email and password
+export async function signInWithPassword({ email, password }) {
+  const response = await http.post('/auth/login', { email, password })
+  return response.data // { token, user }
+}
+
 // GET /auth/me — who is signed in with the saved token.
 export async function getCurrentUser() {
   const response = await http.get('/auth/me')
