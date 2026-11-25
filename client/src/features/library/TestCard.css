@@ -144,7 +144,9 @@
   z-index: 20;
   display: flex;
   flex-direction: column;
-  width: 160px;
+  /* Grows with its longest item instead of letting text spill out */
+  width: max-content;
+  min-width: 160px;
   padding: 6px;
   border: 1px solid var(--border);
   border-radius: 10px;
